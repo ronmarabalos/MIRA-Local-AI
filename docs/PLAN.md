@@ -22,7 +22,7 @@ Success at judging: the demo script in spec section 10.3 runs on the Infinix GT 
 
 ## Current Sprint Focus
 
-Active phase: **Phase 0: Setup, together**
+Active phase: **Phase 1: Prove the risky parts**
 
 About 8 to 13 hours remained when this plan was written. Phases are sized for 10 hours, counted from the moment Phase 0 starts (**T+0**), which leaves up to 3 hours of slack. Update "Active phase" above each time a phase's exit check passes.
 
@@ -48,7 +48,7 @@ Two lanes with separate folders, so the two developers almost never edit the sam
 | | Lane A: native and model | Lane B: app logic and screens |
 | :--- | :--- | :--- |
 | **Owner** | Steve (has the Infinix) | Ronmar |
-| **Owns** | `mobile/android/**` · `mobile/src/services/native/**` · `mobile/src/services/model/**` · `mobile/package.json` · `mobile/package-lock.json` | `mobile/src/core/**` · `mobile/src/services/db/**` · `mobile/src/services/intake/**` · `mobile/src/services/actions/**` · `mobile/src/services/fakes/**` · `mobile/src/theme/**` · `mobile/src/components/**` · `mobile/src/screens/**` · `mobile/__tests__/**` |
+| **Owns** | `mobile/android/**` · `mobile/src/services/native/**` · `mobile/src/services/model/**` · `mobile/package.json` · `mobile/package-lock.json` · `mobile/index.js` · `mobile/jest.config.js` | `mobile/src/core/**` · `mobile/src/services/db/**` · `mobile/src/services/intake/**` · `mobile/src/services/actions/**` · `mobile/src/services/fakes/**` · `mobile/src/theme/**` · `mobile/src/components/**` · `mobile/src/screens/**` · `mobile/__tests__/**` |
 | **Checks on** | The Infinix | Unit tests and fixture messages; the phone only at integration |
 
 **Shared files, and the rule for each**
@@ -103,12 +103,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Do:** `git rm --cached` both files, add `.agents/sync/handoff.*` to `.gitignore`, remove the `git add .agents/sync/handoff.json` line from the hook.
   - **Done when:** a commit no longer changes anything under `.agents/sync/`.
 
-- [ ] **Task P0.2: Install every library once**
-  - **Priority:** P0 · **Status:** In Progress · **Lane:** A
+- [x] **Task P0.2: Install every library once**
+  - **Priority:** P0 · **Status:** Done · **Lane:** A
   - **Files:** `mobile/package.json`, `mobile/package-lock.json`, `mobile/android/**` as the libraries require
   - **Do:** install `llama.rn`, `@op-engineering/op-sqlite`, `@react-navigation/native`, `@react-navigation/bottom-tabs`, `@react-navigation/native-stack`, `react-native-screens`, `react-native-linear-gradient`, `chrono-node`. Add the Onest font files under `mobile/android/app/src/main/assets/fonts/`. Do not install `react-native-paper` (the MIRA design replaces it) or `@notifee/react-native` (reminders are posted from Kotlin).
   - **Done when:** the app still builds and launches on the Infinix. If a library fails to build, apply its fallback from spec section 11 now, not later.
-  - **State:** installed and passing type-check and unit tests: `llama.rn` 0.13.0-rc.7 (pinned; its `latest` tag is a release candidate), `op-sqlite` 18, React Navigation 7, `react-native-screens` 4, `react-native-linear-gradient` 2.8, `chrono-node` 2. Onest in five weights, used as `Onest-Light`, `Onest-Regular`, `Onest-Medium`, `Onest-SemiBold`, `Onest-Bold`. `MainActivity` overrides `onCreate` for `react-native-screens`. **Not yet built on the Infinix**: run `npm run android` from `mobile/` to finish this task.
+  - **State:** installed and passing type-check and unit tests: `llama.rn` 0.13.0-rc.7 (pinned; its `latest` tag is a release candidate), `op-sqlite` 18, React Navigation 7, `react-native-screens` 4, `react-native-linear-gradient` 2.8, `chrono-node` 2. Onest in five weights, used as `Onest-Light`, `Onest-Regular`, `Onest-Medium`, `Onest-SemiBold`, `Onest-Bold`. `MainActivity` overrides `onCreate` for `react-native-screens`. Built and installed on the Infinix on 2026-10-10; all native libraries compile. Rebuild faster with `npm run android -- --device <id> --active-arch-only`.
 
 - [x] **Task P0.3: Skeleton, shared types, and contracts**
   - **Priority:** P0 · **Status:** Done · **Lane:** both, written together
@@ -133,24 +133,33 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 **Lane A**
 
-- [ ] **Task A1.1: A model answers on the phone**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task A1.1: A model answers on the phone**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/model/llama.ts`, a developer-only screen under `mobile/src/services/model/dev/`
   - **Do:** download one instruct model of about 1 to 2B parameters in GGUF, 4-bit (candidates to try: Qwen2.5 1.5B Instruct, Gemma 3 1B). Copy it to the phone with `adb push`. Load it with `llama.rn` and run one prompt.
   - **Done when:** the phone prints an answer and the time taken. Record the model name and seconds per message in this task. Try a 3 to 4B model only if the small one is well under 6 seconds.
   - **If it fails:** stop and rethink together (spec section 12).
+  - **Result (2026-10-10, Infinix, debug build):** Qwen2.5 1.5B Instruct, GGUF Q4_K_M (1.1 GB), CPU, 4 threads. Loads in about 4 s. One extraction takes **7.7 to 9.0 s**: about 2 s to read a 140-token prompt, then 80 to 120 output tokens at 13.5 to 14 tokens per second. Every run returned valid JSON with all nine fields. The raw output starts with a chat marker (`<|im_start|>assistant`), so replies are read with `parseJsonObject`. Field quality varied between runs (`needs_user`, `sensitive`, `amount`).
+  - **Against the 6 s target:** missed. Output length is the cost, so task A2.2 must cut it: a grammar that forbids whitespace, short keys mapped back in code, and a shorter summary should bring it to roughly 60 tokens, about 5 to 6 s. If that is not enough, try Qwen2.5 0.5B or widen the quick filter. The model file is at `~/Downloads/mira-model/` on Steve's machine and on the phone as `Android/data/com.mira.app/files/model.gguf`.
 
 - [ ] **Task A1.2: Log real notifications**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `mobile/android/app/src/main/java/com/mira/app/notifications/MiraNotificationListener.kt`, `mobile/android/app/src/main/AndroidManifest.xml`
   - **Do:** a `NotificationListenerService` that logs the spec 4.1 fields. Send real Messenger and Gmail messages to the phone.
   - **Done when:** this task records, for each app: how much text is exposed, whether the chat name is present, whether individual messages are listed, and whether a reply box is offered. Remove message text from logs before merging.
+  - **Result (2026-10-10, Infinix), Messenger:**
+    - Private chat: full text (39 of 39 characters), sender's name in `title`, no chat name, message listed individually, reply box offered.
+    - Group chat: chat name present in `title` and `conversationTitle`, group flag set, reply box offered. A three-sentence message arrived whole. The notification carried **3 individual messages** with sender and text separated. Its `text` field is prefixed with the sender ("Name: message"), so intake must read `messages[]` and use `text` only when that list is empty.
+    - End-to-end encrypted chats are readable (key tagged `ADVANCED_CRYPT`). English mixed with Filipino comes through unchanged.
+    - Infinix mutes app debug logs, so read the probe screen, not logcat.
+  - **Still open, Gmail:** no Gmail notification has been posted on the phone in three attempts, so nothing is known about what Gmail exposes. This does not block Phase 2; Messenger alone carries the core loop. Check Gmail's own notification settings before the demo, or demo with Messenger and SMS.
 
-- [ ] **Task A1.3: Reply through a notification, and the bytes-sent count**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task A1.3: Reply through a notification, and the bytes-sent count**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** the listener, plus a temporary test call
   - **Do:** send one reply through Messenger's notification reply box from a test build. Try reading the app's own bytes-sent count from Android.
   - **Done when:** this task records "reply works" or "use clipboard fallback", and "bytes count available" or "permission check only".
+  - **Result (2026-10-10, Infinix):** **Reply works.** `sendReply` through Messenger's reply box returned `sent` and the text arrived in the chat, so the clipboard fallback is not needed for Messenger. Bytes sent **is available** from Android (counted since the phone last started; 215,562 then 442,970 in a debug build talking to the development server), so Privacy proof can show a real number. The internet permission check works (`held` in debug).
 
 **Lane B**
 
@@ -184,31 +193,38 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 **Lane A**
 
-- [ ] **Task A2.1: Listener to app**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task A2.1: Listener to app**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `notifications/MiraNotificationListener.kt`, `notifications/NativeInbox.kt`, `MiraModule.kt`, `MiraPackage.kt`, `mobile/src/services/native/bridge.ts`
   - **Do:** drop notifications from switched-off apps before anything is stored (safety requirement 1). Store the rest in the native inbox and emit an event. Bridge methods: `isListenerEnabled`, `openListenerSettings`, `setEnabledPackages`, `listNotifyingApps`, `drainInbox`, `isOnline`.
   - **Done when:** `bridge.ts` implements `NativeBridge`, and a Messenger message arrives in JavaScript as a `CapturedNotification`.
+  - **State (2026-10-10):** built and installed on the Infinix. `NativeInbox.kt` keeps captured notifications on disk until JavaScript drains them; `EnabledPackages.kt` holds the switched-on apps (none by default, so nothing is captured until Channels or the probe switches some on); the module emits `MiraNotification` and `MiraOnline`; `bridge.ts` implements `NativeBridge` (`scheduleReminder` rejects until A3.2). It also has `inject()` for feeding fixtures on an emulator. Confirmed on the Infinix by Steve on 2026-10-10: with Messenger switched on, a real message arrived through the inbox.
 
-- [ ] **Task A2.2: Extraction**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task A2.2: Extraction**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/model/prompts.ts`, `mobile/src/services/model/index.ts`
   - **Do:** `extract(message)` returning a `MiraRecord`, output constrained to the spec 5.2 JSON form, the message inside a marked data block. One request at a time.
   - **Done when:** the fixture set runs on the phone from the developer screen; record accuracy, parse failures, and seconds per message here. Target: correct type on 85% or more, 6 seconds or less.
+  - **State (2026-10-10, Infinix, Qwen2.5 1.5B, 24 fixtures):** the model answers with one-letter keys under a grammar with no whitespace (`prompts.ts`), expanded back to the spec form and checked by `parseExtraction`. **Unreadable answers: 0 of 24** in every run, so the output constraint holds. **Speed: 6.1 to 7.1 s average** (the first message is 13 to 25 s because it also loads the model and reads the instructions). **Type right: 12 of 24 (50%)**, against a target of 85%. Summaries were accurate in every case read.
+  - **Where the type goes wrong:** neighbouring labels (question read as request, a cancelled class read as announcement, a greeting read as announcement) and the three hostile messages, which get an ordinary type. A first prompt with the type before the summary labelled everything `schedule_change`; putting the summary first and adding definitions and examples took it from 17% to 50%.
+  - **Decision (Steve, 2026-10-10):** accept the model's type as it is and backstop in code. The summary, date, and amount are what the user reads, and most misses fall between labels that share a report section. Safety does not rest on the type: the verifier flags instruction-like and sensitive messages from their own words, and the quick filter catches promotions and short chatter before the model. For Lane B: `verifyRecord` could also set the type to `other` when it flags a message as instruction-like. Revisit with a larger model only if the demo messages read wrong.
+  - **Build note:** `babel.config.js` needs `@babel/plugin-transform-export-namespace-from` for `chrono-node`; without it the app bundle fails and the phone silently keeps running its last good copy.
 
-- [ ] **Task A2.3: Switch to the real services**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task A2.3: Switch to the real services**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/index.ts`
   - **Do:** export the real bridge and model on a device; keep the fakes for tests.
   - **Done when:** the Phase 2 exit check passes.
+  - **State (2026-10-10):** `services/index.ts` uses the real bridge and the on-phone model whenever the native module exists, and the fakes under Jest. With no model file on the device the model falls back to the fake.
 
 **Lane B**
 
-- [ ] **Task B2.1: Intake pipeline**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B2.1: Intake pipeline**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/intake/index.ts`
   - **Do:** drain the inbox on launch, on return to the foreground, and on each event; split into messages; skip ones already stored; run filter → `extract` → verify → store. A record that fails twice is stored as `other` with status `failed`.
   - **Done when:** replaying the fixtures through the fake bridge fills the database, with tests for skipping a stored message and for the failed path.
+  - **State (2026-10-10):** built by Steve (crossing lanes, agreed) because it was the one missing link. `intake/split.ts` turns a notification into messages, reading the individual-message list first; `intake/index.ts` runs filter → model → verifier → storage with one retry; `intake/start.ts` runs it on launch, on return to the foreground, and on each capture, and is started from `mobile/index.js`. **Checked on the Infinix:** five real Messenger group messages were stored, three settled by the quick filter as chatter with no model call and two read by the model, each with its chat and sender. See them with the probe's **Show stored** button. Today (B2.3) can read these through `useDayItems`.
 
 - [x] **Task B2.2: Report builder**
   - **Priority:** P0 · **Status:** Done. `buildReport(items, actions, filter)`. Also lists undated schedule changes under Announcements, keeps instruction-like messages out of Needs you and Dates found, and counts messages still waiting for placeholder rows.
