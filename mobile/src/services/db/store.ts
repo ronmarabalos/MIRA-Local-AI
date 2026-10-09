@@ -44,7 +44,9 @@ export function createStore(db: SqlDatabase) {
     // Channels
 
     async getChannels(): Promise<Channel[]> {
-      const { rows } = await db.execute('SELECT * FROM channels ORDER BY label');
+      const { rows } = await db.execute(
+        'SELECT * FROM channels ORDER BY label',
+      );
       return rows.map(toChannel);
     },
 
@@ -55,7 +57,12 @@ export function createStore(db: SqlDatabase) {
             `INSERT INTO channels (package, label, enabled, level) VALUES (?, ?, ?, ?)
              ON CONFLICT (package) DO UPDATE SET label = excluded.label,
                enabled = excluded.enabled, level = excluded.level`,
-            [channel.packageName, channel.label, bit(channel.enabled), channel.level],
+            [
+              channel.packageName,
+              channel.label,
+              bit(channel.enabled),
+              channel.level,
+            ],
           )
           .then(() => undefined),
       );
@@ -63,16 +70,41 @@ export function createStore(db: SqlDatabase) {
 
     // Messages and records
 
-    async saveProcessingTime(messageId: string, durationMs: number): Promise<void> {
-      if (!Number.isFinite(durationMs) || durationMs < 0) throw new Error('Invalid processing duration');
-      await write(tx => tx.execute('INSERT OR REPLACE INTO processing_times (message_id, duration_ms) VALUES (?, ?)', [messageId, durationMs]).then(() => undefined));
+    async saveProcessingTime(
+      messageId: string,
+      durationMs: number,
+    ): Promise<void> {
+      if (!Number.isFinite(durationMs) || durationMs < 0)
+        throw new Error('Invalid processing duration');
+      await write(tx =>
+        tx
+          .execute(
+            'INSERT OR REPLACE INTO processing_times (message_id, duration_ms) VALUES (?, ?)',
+            [messageId, durationMs],
+          )
+          .then(() => undefined),
+      );
     },
 
-    async getProcessingStats(from: number, to: number): Promise<{ processed: number; averageMs: number | null; samples: number }> {
-      const { rows } = await db.execute(`SELECT COUNT(*) AS processed, AVG(p.duration_ms) AS average_ms, COUNT(p.duration_ms) AS samples
+    async getProcessingStats(
+      from: number,
+      to: number,
+    ): Promise<{
+      processed: number;
+      averageMs: number | null;
+      samples: number;
+    }> {
+      const { rows } = await db.execute(
+        `SELECT COUNT(*) AS processed, AVG(p.duration_ms) AS average_ms, COUNT(p.duration_ms) AS samples
         FROM messages m LEFT JOIN processing_times p ON p.message_id = m.id
-        WHERE m.posted_at >= ? AND m.posted_at < ? AND m.status IN ('processed', 'filtered')`, [from, to]);
-      return { processed: Number(rows[0]?.processed ?? 0), averageMs: optNum(rows[0]?.average_ms), samples: Number(rows[0]?.samples ?? 0) };
+        WHERE m.posted_at >= ? AND m.posted_at < ? AND m.status IN ('processed', 'filtered')`,
+        [from, to],
+      );
+      return {
+        processed: Number(rows[0]?.processed ?? 0),
+        averageMs: optNum(rows[0]?.average_ms),
+        samples: Number(rows[0]?.samples ?? 0),
+      };
     },
 
     /**
@@ -109,7 +141,10 @@ export function createStore(db: SqlDatabase) {
     },
 
     /** Messages waiting in a state, oldest first: intake's work queue. */
-    async getMessagesByStatus(status: MessageStatus, limit = DEFAULT_LIMIT): Promise<Message[]> {
+    async getMessagesByStatus(
+      status: MessageStatus,
+      limit = DEFAULT_LIMIT,
+    ): Promise<Message[]> {
       const { rows } = await db.execute(
         'SELECT * FROM messages WHERE status = ? ORDER BY posted_at LIMIT ?',
         [status, limit],
@@ -117,14 +152,25 @@ export function createStore(db: SqlDatabase) {
       return rows.map(toMessage);
     },
 
-    async setMessageStatus(messageId: string, status: MessageStatus): Promise<void> {
+    async setMessageStatus(
+      messageId: string,
+      status: MessageStatus,
+    ): Promise<void> {
       await write(tx =>
-        tx.execute('UPDATE messages SET status = ? WHERE id = ?', [status, messageId]).then(() => undefined),
+        tx
+          .execute('UPDATE messages SET status = ? WHERE id = ?', [
+            status,
+            messageId,
+          ])
+          .then(() => undefined),
       );
     },
 
     /** Stores a message's record and marks the message with its final status. */
-    async saveRecord(record: MiraRecord, status: 'processed' | 'failed' | 'filtered'): Promise<void> {
+    async saveRecord(
+      record: MiraRecord,
+      status: 'processed' | 'failed' | 'filtered',
+    ): Promise<void> {
       await write(async tx => {
         await tx.execute(
           `INSERT OR REPLACE INTO records (message_id, type, summary, needs_user, urgency, request,
@@ -145,12 +191,19 @@ export function createStore(db: SqlDatabase) {
             record.duplicateOf,
           ],
         );
-        await tx.execute('UPDATE messages SET status = ? WHERE id = ?', [status, record.messageId]);
+        await tx.execute('UPDATE messages SET status = ? WHERE id = ?', [
+          status,
+          record.messageId,
+        ]);
       });
     },
 
     /** Messages posted in [from, to), newest first, with chat and record. */
-    async getItems(from: number, to: number, limit = DEFAULT_LIMIT): Promise<StoredItem[]> {
+    async getItems(
+      from: number,
+      to: number,
+      limit = DEFAULT_LIMIT,
+    ): Promise<StoredItem[]> {
       const { rows } = await db.execute(
         `${ITEM_SELECT} WHERE m.posted_at >= ? AND m.posted_at < ?
          ORDER BY m.posted_at DESC LIMIT ?`,
@@ -159,8 +212,28 @@ export function createStore(db: SqlDatabase) {
       return rows.map(toItem);
     },
 
+    /**
+     * Messages posted in [from, to) whose record has a date phrase, newest
+     * first. Filtered here, not after loading, so an old deadline is not
+     * pushed out by newer chatter.
+     */
+    async getDatedItems(
+      from: number,
+      to: number,
+      limit = DEFAULT_LIMIT,
+    ): Promise<StoredItem[]> {
+      const { rows } = await db.execute(
+        `${ITEM_SELECT} WHERE m.posted_at >= ? AND m.posted_at < ? AND r.date_text IS NOT NULL
+         ORDER BY m.posted_at DESC LIMIT ?`,
+        [from, to, limit],
+      );
+      return rows.map(toItem);
+    },
+
     async getItem(messageId: string): Promise<StoredItem | null> {
-      const { rows } = await db.execute(`${ITEM_SELECT} WHERE m.id = ?`, [messageId]);
+      const { rows } = await db.execute(`${ITEM_SELECT} WHERE m.id = ?`, [
+        messageId,
+      ]);
       return rows.length ? toItem(rows[0]) : null;
     },
 
@@ -169,35 +242,43 @@ export function createStore(db: SqlDatabase) {
     async addDraft(draft: Draft): Promise<void> {
       await write(tx =>
         tx
-          .execute('INSERT INTO drafts (id, message_id, text, first_text, status) VALUES (?, ?, ?, ?, ?)', [
-            draft.id,
-            draft.messageId,
-            draft.text,
-            draft.firstText,
-            draft.status,
-          ])
+          .execute(
+            'INSERT INTO drafts (id, message_id, text, first_text, status) VALUES (?, ?, ?, ?, ?)',
+            [
+              draft.id,
+              draft.messageId,
+              draft.text,
+              draft.firstText,
+              draft.status,
+            ],
+          )
           .then(() => undefined),
       );
     },
 
     /** Changes a draft's text, its status, or both. `first_text` never changes. */
-    async updateDraft(id: string, change: { text?: string; status?: DraftStatus }): Promise<void> {
+    async updateDraft(
+      id: string,
+      change: { text?: string; status?: DraftStatus },
+    ): Promise<void> {
       await write(tx =>
         tx
-          .execute('UPDATE drafts SET text = COALESCE(?, text), status = COALESCE(?, status) WHERE id = ?', [
-            change.text ?? null,
-            change.status ?? null,
-            id,
-          ])
+          .execute(
+            'UPDATE drafts SET text = COALESCE(?, text), status = COALESCE(?, status) WHERE id = ?',
+            [change.text ?? null, change.status ?? null, id],
+          )
           .then(() => undefined),
       );
     },
 
-    async getDrafts(status: DraftStatus, limit = DEFAULT_LIMIT): Promise<Draft[]> {
-      const { rows } = await db.execute('SELECT * FROM drafts WHERE status = ? ORDER BY rowid LIMIT ?', [
-        status,
-        limit,
-      ]);
+    async getDrafts(
+      status: DraftStatus,
+      limit = DEFAULT_LIMIT,
+    ): Promise<Draft[]> {
+      const { rows } = await db.execute(
+        'SELECT * FROM drafts WHERE status = ? ORDER BY rowid LIMIT ?',
+        [status, limit],
+      );
       return rows.map(toDraft);
     },
 
@@ -227,22 +308,27 @@ export function createStore(db: SqlDatabase) {
 
     async updateAction(
       id: string,
-      change: { status: ActionStatus; reason?: string | null; doneAt?: number | null },
+      change: {
+        status: ActionStatus;
+        reason?: string | null;
+        doneAt?: number | null;
+      },
     ): Promise<void> {
       await write(tx =>
         tx
-          .execute('UPDATE actions SET status = ?, reason = ?, done_at = ? WHERE id = ?', [
-            change.status,
-            change.reason ?? null,
-            change.doneAt ?? null,
-            id,
-          ])
+          .execute(
+            'UPDATE actions SET status = ?, reason = ?, done_at = ? WHERE id = ?',
+            [change.status, change.reason ?? null, change.doneAt ?? null, id],
+          )
           .then(() => undefined),
       );
     },
 
     /** The log, newest first, one page at a time: pass the last `createdAt` seen. */
-    async getActions(before = Number.MAX_SAFE_INTEGER, limit = 50): Promise<Action[]> {
+    async getActions(
+      before = Number.MAX_SAFE_INTEGER,
+      limit = 50,
+    ): Promise<Action[]> {
       const { rows } = await db.execute(
         'SELECT * FROM actions WHERE created_at < ? ORDER BY created_at DESC LIMIT ?',
         [before, limit],
@@ -262,7 +348,9 @@ export function createStore(db: SqlDatabase) {
     // Rules
 
     async getRules(): Promise<Rule[]> {
-      const { rows } = await db.execute('SELECT * FROM rules ORDER BY created_at');
+      const { rows } = await db.execute(
+        'SELECT * FROM rules ORDER BY created_at',
+      );
       return rows.map(toRule);
     },
 
@@ -272,7 +360,14 @@ export function createStore(db: SqlDatabase) {
           .execute(
             `INSERT OR REPLACE INTO rules (id, sentence, definition, level, enabled, created_at)
              VALUES (?, ?, ?, ?, ?, ?)`,
-            [rule.id, rule.sentence, JSON.stringify(rule.definition), rule.level, bit(rule.enabled), rule.createdAt],
+            [
+              rule.id,
+              rule.sentence,
+              JSON.stringify(rule.definition),
+              rule.level,
+              bit(rule.enabled),
+              rule.createdAt,
+            ],
           )
           .then(() => undefined),
       );
@@ -280,7 +375,12 @@ export function createStore(db: SqlDatabase) {
 
     async setRuleEnabled(id: string, enabled: boolean): Promise<void> {
       await write(tx =>
-        tx.execute('UPDATE rules SET enabled = ? WHERE id = ?', [bit(enabled), id]).then(() => undefined),
+        tx
+          .execute('UPDATE rules SET enabled = ? WHERE id = ?', [
+            bit(enabled),
+            id,
+          ])
+          .then(() => undefined),
       );
     },
 
@@ -288,7 +388,9 @@ export function createStore(db: SqlDatabase) {
 
     async getPrefs(): Promise<Record<string, string>> {
       const { rows } = await db.execute('SELECT key, value FROM prefs');
-      return Object.fromEntries(rows.map(row => [str(row.key), str(row.value)]));
+      return Object.fromEntries(
+        rows.map(row => [str(row.key), str(row.value)]),
+      );
     },
 
     /** Not a report change, so screens are not told to reload. */
@@ -303,7 +405,9 @@ export function createStore(db: SqlDatabase) {
     async deleteAppData(packageName: string): Promise<void> {
       await write(async tx => {
         // Records, drafts, and actions go with their messages (ON DELETE CASCADE).
-        await tx.execute('DELETE FROM messages WHERE package = ?', [packageName]);
+        await tx.execute('DELETE FROM messages WHERE package = ?', [
+          packageName,
+        ]);
         await tx.execute('DELETE FROM chats WHERE package = ?', [packageName]);
       });
     },
@@ -323,8 +427,10 @@ const ITEM_SELECT = `SELECT m.*, c.title AS chat_title, c.kind AS chat_kind,
 const bit = (value: boolean) => (value ? 1 : 0);
 const str = (value: unknown) => value as string;
 const num = (value: unknown) => Number(value);
-const optStr = (value: unknown) => (value === null || value === undefined ? null : String(value));
-const optNum = (value: unknown) => (value === null || value === undefined ? null : Number(value));
+const optStr = (value: unknown) =>
+  value === null || value === undefined ? null : String(value);
+const optNum = (value: unknown) =>
+  value === null || value === undefined ? null : Number(value);
 const bool = (value: unknown) => Number(value) === 1;
 
 function toChannel(row: Row): Channel {

@@ -1,5 +1,11 @@
-import { resolveDate } from './dates';
-import type { ExtractedRecord, Message, MiraRecord, RecordType, Urgency } from './types';
+import { resolveInMessage } from './dates';
+import type {
+  ExtractedRecord,
+  Message,
+  MiraRecord,
+  RecordType,
+  Urgency,
+} from './types';
 
 const RECORD_TYPES: RecordType[] = [
   'request',
@@ -35,7 +41,8 @@ export function parseExtraction(raw: string): ParseResult {
   } catch {
     return { ok: false, reason: 'not_json' };
   }
-  if (typeof data !== 'object' || data === null) return { ok: false, reason: 'bad_shape' };
+  if (typeof data !== 'object' || data === null)
+    return { ok: false, reason: 'bad_shape' };
   const d = data as Record<string, unknown>;
 
   const valid =
@@ -87,9 +94,14 @@ export function verifyRecord(
     request: extracted.request,
     amount: appearsIn(extracted.amount, message.text),
     dateText,
-    dateAt: dateText ? resolveDate(dateText, message.postedAt) : null,
+    // With the message's help: the model often copies only the time of "oct 17 ... at 11:59pm".
+    dateAt: dateText
+      ? resolveInMessage(dateText, message.text, message.postedAt)
+      : null,
     sensitive: extracted.sensitive || SENSITIVE.test(message.text),
-    instructionLike: extracted.instruction_like || INSTRUCTION_LIKE.some(p => p.test(message.text)),
+    instructionLike:
+      extracted.instruction_like ||
+      INSTRUCTION_LIKE.some(p => p.test(message.text)),
     duplicateOf: null,
   };
 }

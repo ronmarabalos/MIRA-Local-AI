@@ -446,6 +446,9 @@ Not in this window. Take one only if Phase 5 is finished early and everything ab
   - **Priority:** P1
   - **Status:** Backlog
   - **Description:** The remaining P1 items in spec section 1.5.
+  - **Inbox and Planner tabs built (2026-10-10, Steve):** spec [`docs/specs/2026-10-10-inbox-planner-design.md`](specs/2026-10-10-inbox-planner-design.md), plan [`docs/specs/2026-10-10-inbox-planner-plan.md`](specs/2026-10-10-inbox-planner-plan.md). The Inbox lists every stored message from the last 30 days with filters, app pills, a label line, and 50 rows at a time (`core/inbox.ts`). The Planner shows the dates found in messages as a grouped list and a month grid (`core/planner.ts`). The calendar is MIRA's own: nothing is written to the phone's calendar, and there is no new permission.
+  - **A date now keeps its day.** The first phone check showed every dated message under Today, because the model copies only the time of "oct 17 ... at 11:59pm". `resolveWhen` in `core/dates.ts` takes the day from the message when the copied phrase names none, `verifyRecord` uses it, and dates stored in the last 48 hours are corrected on the next launch. This also corrects Today's "dates found" and reminders set from now on.
+  - **After an independent review:** the Planner follows the clock across midnight; a time is shown only when the message gave one; the Planner asks the database for dated messages (`store.getDatedItems`) so newer chatter cannot push a deadline out; Inbox rows from earlier days show their date; screen readers hear a row's label line. Twelve smaller findings were left for later.
 
 ---
 

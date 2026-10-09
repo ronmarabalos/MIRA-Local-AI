@@ -418,4 +418,53 @@ describe('intake', () => {
     expect(onDuplicateLinked).toHaveBeenCalledTimes(1);
     expect(onDuplicateLinked).toHaveBeenCalledWith('c', 'o');
   });
+
+  test('a date stored on the wrong day is corrected from its message on the next run', async () => {
+    const { store, records } = memoryStore();
+    const now = Date.now();
+    const posted = new Date(now);
+    posted.setMinutes(posted.getMinutes() - 5);
+    const [first] = splitNotification(fixture('proposal-due'));
+    const message = {
+      ...first.message,
+      id: 'dated',
+      text: 'oct 17, lets play tennis at 11:59pm',
+      postedAt: posted.getTime(),
+      status: 'processed' as const,
+    };
+    await store.addMessage(message, first.chat);
+    // As an earlier version stored it: the time alone, placed on the day it was posted.
+    const wrongDay = new Date(posted);
+    wrongDay.setHours(23, 59, 0, 0);
+    await store.saveRecord(
+      {
+        messageId: 'dated',
+        type: 'request',
+        summary: 'Tennis.',
+        needsUser: true,
+        urgency: 'normal',
+        request: null,
+        amount: null,
+        dateText: '11:59pm',
+        dateAt: wrongDay.getTime(),
+        sensitive: false,
+        instructionLike: false,
+        duplicateOf: null,
+      },
+      'processed',
+    );
+    const intake = createIntake({
+      bridge: createFakeBridge(),
+      model: createFakeModel(),
+      store,
+    });
+    await intake.drain();
+    const corrected = new Date(records.get('dated')!.dateAt!);
+    expect([
+      corrected.getMonth(),
+      corrected.getDate(),
+      corrected.getHours(),
+      corrected.getMinutes(),
+    ]).toEqual([9, 17, 23, 59]);
+  });
 });

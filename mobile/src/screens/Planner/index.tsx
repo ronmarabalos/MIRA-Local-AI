@@ -13,20 +13,39 @@ import { TasksView } from './TasksView';
 type View_ = 'tasks' | 'calendar';
 
 /** The Tasks / Calendar switch beside the title. */
-export function PlannerHeader({ view, onChange }: { view: View_; onChange(v: View_): void }) {
+export function PlannerHeader({
+  view,
+  onChange,
+}: {
+  view: View_;
+  onChange(v: View_): void;
+}) {
   const seg = (id: View_, label: string) =>
     view === id ? (
-      <View accessibilityState={{ selected: true }} className="h-36 justify-center rounded-11 bg-white/60 px-14" style={fx.segment}>
+      <View
+        accessibilityState={{ selected: true }}
+        className="h-36 justify-center rounded-11 bg-white/60 px-14"
+        style={fx.segment}
+      >
         <T className="text-13 font-bold">{label}</T>
       </View>
     ) : (
-      <Tap label={label} onPress={() => onChange(id)} className="h-36 justify-center rounded-11 px-14">
+      <Tap
+        label={label}
+        onPress={() => onChange(id)}
+        className="h-36 justify-center rounded-11 px-14"
+      >
         <T className="text-13 font-bold text-ink-body">{label}</T>
       </Tap>
     );
   return (
     <View className="flex-row items-center justify-between">
-      <T accessibilityRole="header" className="text-30 font-medium tracking-[-0.9px]">Planner</T>
+      <T
+        accessibilityRole="header"
+        className="text-30 font-medium tracking-[-0.9px]"
+      >
+        Planner
+      </T>
       <View className="flex-row rounded-14 bg-peri-tonal p-4">
         {seg('tasks', 'Tasks')}
         {seg('calendar', 'Calendar')}

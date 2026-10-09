@@ -1,3 +1,4 @@
+import { resolveInMessage } from '../../core/dates';
 import { DUPLICATE_WINDOW_MS, findDuplicate } from '../../core/dedupe';
 import { quickFilter } from '../../core/filter';
 import type { ExtractedRecord, Message, MiraRecord } from '../../core/types';
@@ -155,8 +156,9 @@ export function createIntake({
   }
 
   /**
-   * Links copies that were stored before duplicates were recognised, so a
-   * message that already appears twice becomes one report line. Runs once.
+   * Brings stored records up to date with what this version knows: links
+   * copies stored before duplicates were recognised, and corrects dates that
+   * lost their day. Runs once.
    */
   async function relinkStored(): Promise<void> {
     const now = Date.now();
@@ -167,6 +169,19 @@ export function createIntake({
       const { message, record } = item;
       if (!record || message.status !== 'processed') {
         continue;
+      }
+      // Dates stored by an earlier version could lose their day ("11:59pm"
+      // from "oct 17 ... at 11:59pm" landed on the day it was posted).
+      if (record.dateText) {
+        const at = resolveInMessage(
+          record.dateText,
+          message.text,
+          message.postedAt,
+        );
+        if (at !== record.dateAt) {
+          record.dateAt = at;
+          await store.saveRecord(record, 'processed');
+        }
       }
       if (record.duplicateOf !== null) {
         // Linked by an earlier version, before its draft or reminder was taken back.
