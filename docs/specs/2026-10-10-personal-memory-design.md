@@ -131,7 +131,7 @@ Both places that write a draft, the rule path (`runDecision`) and the request pa
 3. Pass their text to `draftReply`.
 4. Record how many were passed in the action's payload as `memories`, for example `"2"`. Nothing is recorded when none were passed.
 
-The Activity screen's result line for a drafted reply reads "Draft saved · not sent · used 2 things you told MIRA" when the count is present.
+The Activity screen shows one more line under a drafted reply when the count is present: "Used 2 things you told MIRA." ("Used 1 thing you told MIRA." for one).
 
 `ActionStore` gains `getMemories`.
 
@@ -207,7 +207,7 @@ Built from existing components (`Screen`, `Sheet`, `Dialog`, `Field`, `SearchFie
 | `mobile/src/services/model/prompts.ts`, `index.ts` | Memory block in the draft prompt |
 | `mobile/src/services/fakes/model.ts` | Accepts the parameter |
 | `mobile/src/services/actions/index.ts` | Loads, picks, passes, records |
-| `mobile/src/services/activity.ts` | The "used N things" result line |
+| `mobile/src/screens/Activity/index.tsx` | The "Used N things you told MIRA." line |
 | `mobile/src/screens/Memory/index.tsx` | Replaces the empty state |
 | `mobile/src/screens/Profile/index.tsx` | The count on the row |
 | `docs/PLAN.md` | Task entry |
