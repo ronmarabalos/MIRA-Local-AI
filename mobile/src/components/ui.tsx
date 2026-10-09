@@ -55,6 +55,7 @@ export function Tap({
       activeOpacity={0.75}
       accessibilityRole="button"
       accessibilityLabel={label}
+      hitSlop={{ top: 6, right: 6, bottom: 6, left: 6 }}
       {...props}
       className={`${glass ? GLASS_CLASS[glass] : ''} ${className}`}
       style={[glass ? GLASS_FX[glass] : null, style]}

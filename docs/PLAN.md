@@ -372,9 +372,11 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **State (2026-10-10):** onboarding reads the live listener state, explains on-device access, opens Android settings, rechecks on foreground return, exposes retryable errors, and continues through Connected Apps to Today with reset navigation. Focused interaction tests, full Tier 2 Baton verification, and changed-file lint pass. Physical fresh-install inspection remains part of B4.3's phone pass.
 
 - [ ] **Task B4.3: Visual pass**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
+  - **Implementation:** [visual and accessibility audit checklist](specs/2026-10-10-visual-accessibility-pass.md)
   - **Do:** compare each built screen with its board. Check 48 dp touch targets, contrast, labels for the screen reader, system Back, and 130% font size.
   - **Done when:** each screen has been checked on the phone beside its board.
+  - **State (2026-10-10):** shared `Tap` controls now add 6 dp hit slop so the smallest 36 dp controls expose a 48 dp Android touch target; the focused regression test passes. Static inspection found an accessible name on every `Tap`, scrolling and safe-area handling in the shared screen/list containers, reduced-motion support, semantic status text, and the existing navigation helpers. Scoped Tier 2 Baton verification and the full Baton regression/typecheck pass; changed-file ESLint reports zero errors and two pre-existing inline-style warnings in `ui.tsx`. On the connected M2102J20SG, Home was visually intact at the original 1.0 font scale. This phone blocks ADB input injection and `WRITE_SETTINGS`, so all-screen board comparison, system Back, and 130% font-size checks still require manual interaction on the device; its font scale remained 1.0.
 
 - [ ] **Task B4.4: Ask, lookup only (cut first if late)**
   - **Priority:** P0 · **Status:** Backlog
