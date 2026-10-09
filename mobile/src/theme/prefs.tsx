@@ -31,7 +31,7 @@ interface Prefs {
 const PrefsContext = createContext<Prefs | null>(null);
 
 export function PrefsProvider({ children }: { children: ReactNode }) {
-  const [name, setName] = useState('Alex');
+  const [name, setName] = useState('');
   const [theme, setTheme] = useState<ThemeChoice>('light');
   const [reduceMotionSetting, setReduceMotionSetting] = useState(false);
   const [systemReduceMotion, setSystemReduceMotion] = useState(false);
@@ -71,7 +71,7 @@ export function usePrefs(): Prefs {
   return prefs;
 }
 
-/** The name as typed, falling back to the design's placeholder. */
+/** The name as typed, or a plain word when none has been given. */
 export function useDisplayName(): string {
-  return usePrefs().name.trim() || 'Alex';
+  return usePrefs().name.trim() || 'You';
 }

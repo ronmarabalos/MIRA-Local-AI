@@ -13,7 +13,7 @@ import { useDisplayName } from '../../theme/prefs';
 const LINKS: { label: string; icon: IconName; to: Board; count?: string }[] = [
   { label: 'Personal information', icon: 'user', to: 'Setup' },
   { label: 'My preferences', icon: 'bulb', to: 'Teach' },
-  { label: 'Personal memory', icon: 'bookmark', to: 'Memory', count: '7' },
+  { label: 'Personal memory', icon: 'bookmark', to: 'Memory' },
   { label: 'Connected apps', icon: 'link', to: 'ConnectedApps' },
   { label: 'Privacy & permissions', icon: 'shield', to: 'Settings' },
   { label: 'Offline settings', icon: 'phone', to: 'OfflineSync' },
@@ -47,18 +47,15 @@ export default function ProfileScreen() {
       </View>
 
       <View className="flex-row gap-10">
-        <Tap label="Personalization" onPress={() => go('Teach')} glass="glass2" className="flex-1 gap-8 rounded-20 p-14">
-          <T className="text-12 font-bold text-ink-label">Personalization</T>
-          <T className="text-15 font-bold leading-[19.5px]">{'5 preferences\n3 automations'}</T>
-          <View className="h-6 overflow-hidden rounded-full bg-peri-tonal">
-            <View className="h-6 w-[62%] rounded-full bg-navy" />
-          </View>
+        <Tap label="My automations" onPress={() => go('Automations')} glass="glass2" className="flex-1 gap-8 rounded-20 p-14">
+          <T className="text-12 font-bold text-ink-label">Rules</T>
+          <T className="text-15 font-bold leading-[19.5px]">{'Switch rules\non or off'}</T>
         </Tap>
-        <Tap label="Local AI model" onPress={() => go('ModelSetup')} glass="glass2" className="flex-1 gap-8 rounded-20 p-14">
-          <T className="text-12 font-bold text-ink-label">Local AI model</T>
-          <T className="text-15 font-bold leading-[19.5px]">Demo mode</T>
-          <View className="self-start rounded-full bg-warning-bg px-8 py-4">
-            <T className="text-11 font-bold text-warning-ink">Simulated AI</T>
+        <Tap label="Where MIRA runs" onPress={() => go('ModelSetup')} glass="glass2" className="flex-1 gap-8 rounded-20 p-14">
+          <T className="text-12 font-bold text-ink-label">Where MIRA runs</T>
+          <T className="text-15 font-bold leading-[19.5px]">On this phone</T>
+          <View className="self-start rounded-full bg-success-bg px-8 py-4">
+            <T className="text-11 font-bold text-success-ink">Works offline</T>
           </View>
         </Tap>
       </View>

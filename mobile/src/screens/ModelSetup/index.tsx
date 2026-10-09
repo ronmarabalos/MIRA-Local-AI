@@ -117,15 +117,7 @@ export default function ModelSetupScreen() {
         ) : (
           <PrimaryButton label="Finish setup" onPress={finish} />
         )}
-        <SecondaryButton
-          label="Continue with demo"
-          onPress={finish}
-          right={
-            <View className="rounded-full bg-warning-bg px-8 py-3">
-              <T className="text-11 font-bold text-warning-ink">Simulated AI</T>
-            </View>
-          }
-        />
+        {phase === 'idle' ? <SecondaryButton label="Continue for now" onPress={finish} /> : null}
       </View>
     </Screen>
   );
