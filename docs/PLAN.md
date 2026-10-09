@@ -175,14 +175,14 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Do:** spec 4.4 and 4.6, tests first. Dates resolved by `chrono-node` relative to the post time.
   - **Done when:** tests cover each filter class, copied-field clearing, an unresolvable date phrase, and malformed model output.
 
-- [ ] **Task B1.3: Storage**
-  - **Priority:** P0 · **Status:** In Progress. Schema with numbered migrations, `createStore` over any SQLite database, `getStore()` on op-sqlite, and hooks for Today, Item detail, Channels, Approvals, Activity log, and Rules. Unit tests run the real SQL on Node's built-in SQLite (needs Node 22.13 or newer). Remaining: the on-device check.
+- [x] **Task B1.3: Storage**
+  - **Priority:** P0 · **Status:** Done; on the phone, intake (B2.1) writes and reads messages and records through it on the Infinix. Schema with numbered migrations, `createStore` over any SQLite database, `getStore()` on op-sqlite, and hooks for Today, Item detail, Channels, Approvals, Activity log, and Rules. Unit tests run the real SQL on Node's built-in SQLite (needs Node 22.13 or newer). Remaining: the on-device check.
   - **Files:** `mobile/src/services/db/schema.ts`, `mobile/src/services/db/index.ts`, query hooks in `mobile/src/services/db/hooks.ts`
   - **Do:** the tables in spec 5.1 except `memory` and `chats.enabled`; writes in transactions; one query hook per screen need.
   - **Done when:** a message and its record can be written and read back on the phone or an emulator.
 
-- [ ] **Task B1.4: Theme tokens and first components**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B1.4: Theme tokens and first components**
+  - **Priority:** P0 · **Status:** Done as part of Task UI.1: tokens in `mobile/src/theme/`, components in `mobile/src/components/`, under the design's own names.
   - **Files:** `mobile/src/theme/tokens.ts`, `mobile/src/components/SilkBackground.tsx`, `GlassCard.tsx`, `PillButton.tsx`, `StatusLabel.tsx`, `SourceQuote.tsx`, `TabBar.tsx`
   - **Do:** light-theme values from [`docs/design/README.md`](design/README.md) and board `00-foundations`. Glass is the translucent fill with the bright edge; no blur. `SourceQuote` shows the quoted original and the app and chat label (the source rule).
   - **Done when:** the tab shell shows the silk background and the floating tab bar, and no component contains a raw hex value.
