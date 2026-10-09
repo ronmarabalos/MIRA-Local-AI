@@ -9,6 +9,7 @@
 - **Sync Protocol:** [`scripts/baton.mjs`](../scripts/baton.mjs) via `npm run verify:agent`
 - **Spec:** [`docs/specs/2026-10-09-mira-design.md`](specs/2026-10-09-mira-design.md) (approved by both developers on 2026-10-10)
 - **Visual design:** [`docs/design/README.md`](design/README.md)
+- **Lane integration (2026-10-10):** [merge checklist](specs/2026-10-10-merge-lanes.md); combine Ronmar's Today/Item Detail with Steve's latest native work on local `main`.
 
 ---
 
@@ -235,7 +236,8 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 > **Screens follow the design's screen set** (decided 2026-10-10, spec section 7). Task names keep the spec's functions; the folders are the design's: Today is `Home`, Item detail is `EmailDetail`, Channels is `ConnectedApps`, Activity log is `Activity`, Rules are `Teach` and `Automations`, Ask is `Assistant`, Privacy proof is a section of `Settings`.
 
 - [ ] **Task B2.3: Today and Item detail**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
+  - **Implementation (2026-10-10):** [bounded spec](specs/2026-10-10-today-and-item-detail.md) and [execution checklist](specs/2026-10-10-today-and-item-detail-plan.md). Home now reads a paged SQLite report and refreshes after writes; every row opens its exact original in Item Detail. Includes source labels/quotes, pending and failed states, retry, offline wording, category correction preserving safety flags, and queued-action sources. Twelve integration tests, full Baton regression/typecheck, and changed-file lint pass. Android follow-up: continued Claude's blocked installation; debug APK installed on the M2102J20SG, restarted the hung Metro server, verified HTTP 200 for the Android bundle, and confirmed onboarding renders. Remaining: Home/Item Detail visual checks, system Back, and 130% font size.
   - **Files:** `mobile/src/screens/Home/`, `mobile/src/screens/Inbox/`, `mobile/src/screens/EmailDetail/`, `mobile/src/components/ReportItem.tsx`
   - **Do:** build to boards `05-home` and `14-email-and-ai-reply`. Every line carries its `SourceQuote`. Empty state and placeholder rows while the model works.
   - **Done when:** fixture data renders on Today, and tapping a line opens the original message.

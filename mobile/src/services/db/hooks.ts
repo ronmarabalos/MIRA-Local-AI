@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { buildReport } from '../../core/report';
 import type { Action, Channel, Draft, DraftStatus, Rule } from '../../core/types';
 import { getStore, type Store, type StoredItem } from './index';
 
 export interface QueryState<T> {
   data: T | undefined;
   error: Error | null;
+  retry(): void;
 }
 
 /**
@@ -12,19 +14,28 @@ export interface QueryState<T> {
  * always shows what is stored. `deps` are the values `load` reads.
  */
 export function useQuery<T>(load: (store: Store) => Promise<T>, deps: unknown[]): QueryState<T> {
-  const [state, setState] = useState<QueryState<T>>({ data: undefined, error: null });
+  const [state, setState] = useState<Omit<QueryState<T>, 'retry'>>({
+    data: undefined,
+    error: null,
+  });
+  const [attempt, setAttempt] = useState(0);
+  const retry = useCallback(() => setAttempt(value => value + 1), []);
   const loadRef = useRef(load);
   loadRef.current = load;
 
   useEffect(() => {
     let live = true;
     let unsubscribe = () => {};
+    let request = 0;
+    setState({ data: undefined, error: null });
 
-    const run = (store: Store) =>
-      loadRef.current(store).then(
-        data => live && setState({ data, error: null }),
-        error => live && setState(prev => ({ data: prev.data, error })),
+    const run = (store: Store) => {
+      const current = ++request;
+      return loadRef.current(store).then(
+        data => live && current === request && setState({ data, error: null }),
+        error => live && current === request && setState(prev => ({ data: prev.data, error })),
       );
+    };
 
     getStore().then(
       store => {
@@ -40,9 +51,37 @@ export function useQuery<T>(load: (store: Store) => Promise<T>, deps: unknown[])
       unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+  }, [attempt, ...deps]);
 
-  return state;
+  return { ...state, retry };
+}
+
+/** A consistent report query, refreshed after writes or a new local day. */
+export function useDayReport(day: number, limit: number) {
+  const from = startOfDay(day);
+  const next = new Date(from);
+  next.setDate(next.getDate() + 1);
+  const to = next.getTime();
+  return useQuery(
+    async store => {
+      const [page, actions, channels] = await Promise.all([
+        store.getItems(from, to, limit + 1),
+        store.getActionsBetween(from, to),
+        store.getChannels(),
+      ]);
+      const items = page.slice(0, limit);
+      const report = buildReport(items, actions);
+      // An action today can refer to a message captured on an earlier day.
+      report.handled = await Promise.all(
+        report.handled.map(async line => ({
+          ...line,
+          item: line.item ?? (await store.getItem(line.action.messageId)),
+        })),
+      );
+      return { report, items, channels, hasMore: page.length > limit };
+    },
+    [from, to, limit],
+  );
 }
 
 /** Midnight at the start of the day holding `time`, in local time. */

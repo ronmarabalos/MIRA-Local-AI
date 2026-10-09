@@ -52,7 +52,7 @@ export type RootStackParamList = {
   AutomationBuilder: undefined;
   AutomationReview: undefined;
   Automations: undefined;
-  EmailDetail: undefined;
+  EmailDetail: { messageId: string } | undefined;
   Approvals: undefined;
   Memory: undefined;
   ConnectedApps: undefined;

@@ -34,6 +34,8 @@ import TeachInstructionScreen from '../src/screens/TeachInstruction';
 
 const Stack = createNativeStackNavigator();
 
+jest.mock('../src/services/db', () => ({ getStore: jest.fn(() => new Promise(() => {})) }));
+
 async function render(component: ComponentType<any>, params?: object) {
   let tree: ReactTestRenderer.ReactTestRenderer;
   await ReactTestRenderer.act(() => {
@@ -49,9 +51,20 @@ async function render(component: ComponentType<any>, params?: object) {
       </SafeAreaProvider>,
     );
   });
-  const text = JSON.stringify(tree!.toJSON());
-  await ReactTestRenderer.act(() => tree!.unmount());
-  return text;
+  // Virtualized lists can carry circular context in props; assert on rendered copy.
+  const text = (
+    node: ReactTestRenderer.ReactTestRendererJSON | ReactTestRenderer.ReactTestRendererJSON[] | string | null,
+  ): string => {
+    if (node === null) return '';
+    if (typeof node === 'string') return node;
+    if (Array.isArray(node)) return node.map(text).join(' ');
+    return (node.children ?? []).map(text).join(' ');
+  };
+  try {
+    return text(tree!.toJSON());
+  } finally {
+    await ReactTestRenderer.act(() => tree!.unmount());
+  }
 }
 
 const BOARDS: [string, ComponentType<any>, string, object?][] = [
@@ -68,7 +81,7 @@ const BOARDS: [string, ComponentType<any>, string, object?][] = [
   ['11 review and approve', AutomationReviewScreen, 'PROPOSED · NOT ACTIVE'],
   ['12 my automations', AutomationsScreen, 'RECENT RUNS'],
   ['13 inbox', InboxScreen, 'Can we reschedule our meeting?'],
-  ['14 email and reply', EmailDetailScreen, 'MIRA SUMMARY'],
+  ['14 email and reply', EmailDetailScreen, 'Message not found'],
   ['15 approval center', ApprovalsScreen, 'Needs Your Approval'],
   ['16 tasks', PlannerScreen, 'Reply to Sam about dinner'],
   ['17 calendar', PlannerScreen, 'October 2026', { view: 'calendar' }],
