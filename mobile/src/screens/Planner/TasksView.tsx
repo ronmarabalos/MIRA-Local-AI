@@ -6,7 +6,13 @@ import { EmptyState } from '../../components/EmptyBoard';
 import { Screen } from '../../components/Screen';
 import { T } from '../../components/T';
 import { groupEntries, type Planner } from '../../core/planner';
-import { EntryRow, LoadState, usePlannerEntries } from './entries';
+import {
+  EntryRow,
+  LoadState,
+  useAppNames,
+  useNow,
+  usePlannerEntries,
+} from './entries';
 
 const GROUPS: [keyof Planner, string][] = [
   ['today', 'Today'],
@@ -19,7 +25,9 @@ const GROUPS: [keyof Planner, string][] = [
 
 export function TasksView({ header }: { header: ReactNode }) {
   const state = usePlannerEntries();
-  const groups = groupEntries(state.data ?? [], Date.now());
+  const now = useNow();
+  const appName = useAppNames();
+  const groups = groupEntries(state.data ?? [], now);
   const empty = GROUPS.every(([key]) => groups[key].length === 0);
 
   return (
@@ -40,7 +48,11 @@ export function TasksView({ header }: { header: ReactNode }) {
                 </T>
                 <View>
                   {groups[key].map(entry => (
-                    <EntryRow key={entry.item.message.id} entry={entry} />
+                    <EntryRow
+                      key={entry.item.message.id}
+                      entry={entry}
+                      appLabel={appName(entry.item.message.packageName)}
+                    />
                   ))}
                 </View>
               </View>

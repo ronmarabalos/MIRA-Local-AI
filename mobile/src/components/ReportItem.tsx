@@ -27,6 +27,8 @@ export function ReportItem({
   return (
     <Tap
       label={`Open message from ${item.message.sender}: ${summary}`}
+      // The label line is otherwise only visual: this is how a screen reader hears it.
+      accessibilityHint={label}
       onPress={() =>
         navigation.navigate('EmailDetail', { messageId: item.message.id })
       }

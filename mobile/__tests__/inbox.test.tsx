@@ -238,3 +238,67 @@ test('when storage cannot be read it offers to try again and does not crash', as
     tree!.root.findAllByProps({ accessibilityLabel: 'Try again' }).length,
   ).toBeGreaterThan(0);
 });
+
+test('a message from an earlier day shows its date as well as its time', async () => {
+  await add('old', 'From three days ago.', {}, { minutesAgo: 3 * 24 * 60 });
+  await add('new', 'From a minute ago.', {}, { minutesAgo: 1 });
+  await render();
+  const text = shown();
+  const day = new Date(now - 3 * 24 * 60 * 60_000).toLocaleDateString(
+    undefined,
+    {
+      month: 'short',
+      day: 'numeric',
+    },
+  );
+  expect(text).toContain(`Request · ${day} · `);
+  // Today's message carries a time only.
+  expect(text.split(`· ${day} ·`).length - 1).toBe(1);
+});
+
+test('a screen reader hears the label line of a row', async () => {
+  await add('m1', 'Project is due on October 12.', {
+    type: 'deadline',
+    needsUser: true,
+    dateText: 'oct 12',
+  });
+  await render();
+  const row = tree!.root
+    .findAllByProps({
+      accessibilityLabel:
+        'Open message from Carla: Project is due on October 12.',
+    })
+    .find(node => typeof node.props.accessibilityHint === 'string');
+  expect(row?.props.accessibilityHint).toContain(
+    'Deadline · Needs you · oct 12',
+  );
+});
+
+test('when there are more messages than are loaded, it says so', async () => {
+  const many = Array.from({ length: 2000 }, (_, i) => ({
+    message: {
+      id: `x${i}`,
+      notificationKey: `x${i}`,
+      packageName: 'com.facebook.orca',
+      chatId: 'c1',
+      sender: 'Carla',
+      text: `t${i}`,
+      postedAt: now - i * 1000,
+      truncated: false,
+      canReply: true,
+      status: 'processed' as const,
+    },
+    chat: {
+      id: 'c1',
+      packageName: 'com.facebook.orca',
+      title: 'ACM Org',
+      kind: 'group' as const,
+    },
+    record: null,
+  }));
+  jest
+    .mocked(getStore)
+    .mockResolvedValue({ ...db.store, getItems: async () => many } as never);
+  await render();
+  expect(shown()).toContain('Showing the latest 2,000 messages.');
+});

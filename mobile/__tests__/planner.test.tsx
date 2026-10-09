@@ -1,4 +1,5 @@
 import React from 'react';
+import { AppState } from 'react-native';
 import Renderer, { act } from 'react-test-renderer';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -45,6 +46,7 @@ async function add(
   summary: string,
   dateAt: number | null,
   dateText = 'a date',
+  text = `Original ${id}`,
 ) {
   await db.store.addMessage(
     {
@@ -53,7 +55,7 @@ async function add(
       packageName: 'com.facebook.orca',
       chatId: 'c1',
       sender: 'Carla',
-      text: `Original ${id}`,
+      text,
       postedAt: Date.now() - 60_000,
       truncated: false,
       canReply: true,
@@ -218,6 +220,57 @@ describe('Tasks', () => {
     jest.mocked(getStore).mockRejectedValue(new Error('disk'));
     await render();
     expect(shown()).toContain('Your messages could not be loaded.');
+  });
+});
+
+describe('Tasks, honest and current', () => {
+  test('a time is shown only when the message gave one', async () => {
+    await add('d1', 'Day only.', noon(3), 'oct 20', 'oct 20 is the deadline');
+    // Stored as the verifier would store it: 11:59 PM on that day.
+    await add(
+      'd2',
+      'Day and time.',
+      noon(4) + (11 * 60 + 59) * 60_000,
+      '11:59pm',
+      'submit it at 11:59pm',
+    );
+    await render();
+    const text = shown();
+    expect(text).not.toContain('12:00');
+    expect(text).toContain('11:59');
+  });
+
+  test('the app names are read once for the whole list, not once per row', async () => {
+    for (let i = 1; i <= 6; i += 1) await add(`c${i}`, `Entry ${i}.`, noon(i));
+    const getChannels = jest.spyOn(db.store, 'getChannels');
+    await render();
+    expect(shown()).toContain('Messenger · ACM Org');
+    expect(getChannels.mock.calls.length).toBeLessThanOrEqual(2);
+  });
+
+  test("after midnight, coming back to the app moves tomorrow's entry under Today", async () => {
+    const handlers: ((state: string) => void)[] = [];
+    jest.spyOn(AppState, 'addEventListener').mockImplementation(((
+      _event: string,
+      handler: (state: string) => void,
+    ) => {
+      handlers.push(handler);
+      return { remove: () => {} };
+    }) as never);
+    await add('t1', 'Due tomorrow.', noon(1));
+    await render();
+    expect(shown()).toContain('Tomorrow');
+
+    const real = Date.now();
+    jest.spyOn(Date, 'now').mockReturnValue(real + 24 * 60 * 60 * 1000);
+    await act(() => {
+      handlers.forEach(handler => handler('active'));
+    });
+    await settle();
+    const text = shown();
+    expect(text).toContain('Today');
+    expect(text).not.toContain('Tomorrow');
+    expect(text).toContain('Due tomorrow.');
   });
 });
 

@@ -1,12 +1,18 @@
 /** Board 17-calendar: a month of the dates MIRA found, with the chosen day's entries below. */
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 
 import { Screen } from '../../components/Screen';
 import { T } from '../../components/T';
 import { Tap } from '../../components/ui';
 import { entriesOn, monthGrid, startOfLocalDay } from '../../core/planner';
-import { EntryRow, LoadState, usePlannerEntries } from './entries';
+import {
+  EntryRow,
+  LoadState,
+  useAppNames,
+  useNow,
+  usePlannerEntries,
+} from './entries';
 
 const MONTHS = [
   'January',
@@ -27,13 +33,26 @@ const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 export function CalendarView({ header }: { header: ReactNode }) {
   const state = usePlannerEntries();
   const entries = state.data ?? [];
-  const now = Date.now();
+  const now = useNow();
+  const appName = useAppNames();
   const today = new Date(now);
   const [shownMonth, setShownMonth] = useState({
     year: today.getFullYear(),
     month: today.getMonth(),
   });
   const [selected, setSelected] = useState(startOfLocalDay(now));
+
+  // When the day turns over, a selection still sitting on the old today follows it.
+  const todayStart = startOfLocalDay(now);
+  const lastToday = useRef(todayStart);
+  useEffect(() => {
+    if (lastToday.current !== todayStart) {
+      setSelected(current =>
+        current === lastToday.current ? todayStart : current,
+      );
+      lastToday.current = todayStart;
+    }
+  }, [todayStart]);
 
   /** `new Date` rolls the month over, so stepping past December or before January just works. */
   const step = (by: number) => {
@@ -140,7 +159,11 @@ export function CalendarView({ header }: { header: ReactNode }) {
           ) : (
             <View>
               {onDay.map(entry => (
-                <EntryRow key={entry.item.message.id} entry={entry} />
+                <EntryRow
+                  key={entry.item.message.id}
+                  entry={entry}
+                  appLabel={appName(entry.item.message.packageName)}
+                />
               ))}
             </View>
           )}

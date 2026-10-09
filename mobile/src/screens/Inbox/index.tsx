@@ -17,11 +17,19 @@ const PAGE = 50;
 const MAX_ITEMS = 2000;
 const ALL_APPS = 'all';
 
-const timeOf = (at: number) =>
-  new Date(at).toLocaleTimeString(undefined, {
+/** "5:08 AM" for a message from today; "Oct 7 · 5:08 AM" for an earlier one. */
+function arrivalOf(at: number): string {
+  const date = new Date(at);
+  const time = date.toLocaleTimeString(undefined, {
     hour: 'numeric',
     minute: '2-digit',
   });
+  if (date.toDateString() === new Date().toDateString()) return time;
+  return `${date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+  })} · ${time}`;
+}
 
 export default function InboxScreen() {
   const [filter, setFilter] = useState<InboxFilter>('all');
@@ -118,7 +126,7 @@ export default function InboxScreen() {
               key={item.message.id}
               item={item}
               appLabel={appName(item.message.packageName)}
-              label={labelLine(item, timeOf(item.message.postedAt))}
+              label={labelLine(item, arrivalOf(item.message.postedAt))}
             />
           ))}
           {inbox.rows.length > shown ? (
@@ -129,6 +137,11 @@ export default function InboxScreen() {
             >
               <T className="text-15 font-bold">Show more</T>
             </Tap>
+          ) : null}
+          {stored.data.length >= MAX_ITEMS ? (
+            <T className="pt-10 text-center text-13 text-ink-2">
+              Showing the latest 2,000 messages.
+            </T>
           ) : null}
         </View>
       )}

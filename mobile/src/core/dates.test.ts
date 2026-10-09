@@ -1,4 +1,4 @@
-import { resolveDate, resolveInMessage } from './dates';
+import { resolveDate, resolveInMessage, resolveWhen } from './dates';
 
 // Local time, so the tests hold in any time zone. Saturday 10 October 2026.
 const posted = new Date(2026, 9, 10, 9, 0).getTime();
@@ -89,5 +89,27 @@ describe('resolveInMessage', () => {
 
   it('returns null when neither the phrase nor the message names a date or time', () => {
     expect(resolveInMessage('asap', 'do it asap', posted)).toBeNull();
+  });
+});
+
+describe('resolveWhen', () => {
+  it('says whether the message actually gave a time of day', () => {
+    expect(resolveWhen('oct 12', 'oct 12 is the deadline', posted)).toEqual({
+      at: local(10, 12),
+      hasTime: false,
+    });
+    expect(
+      resolveWhen('11:59pm', 'oct 12, Submit your project at 11:59pm', posted),
+    ).toEqual({
+      at: local(10, 12, 23, 59),
+      hasTime: true,
+    });
+    expect(resolveWhen('Friday', 'see you Friday', posted)?.hasTime).toBe(
+      false,
+    );
+    expect(
+      resolveWhen('this Friday, 5 PM', 'this Friday, 5 PM', posted)?.hasTime,
+    ).toBe(true);
+    expect(resolveWhen('asap', 'do it asap', posted)).toBeNull();
   });
 });

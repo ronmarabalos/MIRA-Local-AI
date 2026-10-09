@@ -51,22 +51,37 @@ const namesTime = (result: Parsed) => result.start.isCertain('hour');
  * often copies only the time ("11:59pm") from "oct 17, ... at 11:59pm"; read
  * alone, that would land on the day the message was posted. When the phrase
  * names no day, the day comes from the message, and the phrase keeps its time.
+ *
+ * `hasTime` says whether a time of day was actually written. Without one the
+ * library still fills in an hour (noon, or the hour the message arrived), which
+ * must not be shown as if the message had said it.
  */
-export function resolveInMessage(
+export function resolveWhen(
   phrase: string,
   messageText: string,
   postedAt: number,
-): number | null {
+): { at: number; hasTime: boolean } | null {
   const inPhrase = parse(phrase, postedAt);
   const phraseDay = inPhrase.find(namesDay);
-  if (phraseDay) return phraseDay.start.date().getTime();
+  if (phraseDay) {
+    return {
+      at: phraseDay.start.date().getTime(),
+      hasTime: namesTime(phraseDay),
+    };
+  }
 
   const inMessage = parse(messageText, postedAt);
   const messageDay = inMessage.find(namesDay);
-  if (!messageDay) return inPhrase[0]?.start.date().getTime() ?? null;
+  if (!messageDay) {
+    const alone = inPhrase[0];
+    return alone
+      ? { at: alone.start.date().getTime(), hasTime: namesTime(alone) }
+      : null;
+  }
 
   const date = messageDay.start.date();
-  if (!namesTime(messageDay)) {
+  let hasTime = namesTime(messageDay);
+  if (!hasTime) {
     const time = inPhrase.find(namesTime) ?? inMessage.find(namesTime);
     if (time) {
       date.setHours(
@@ -75,7 +90,17 @@ export function resolveInMessage(
         0,
         0,
       );
+      hasTime = true;
     }
   }
-  return date.getTime();
+  return { at: date.getTime(), hasTime };
+}
+
+/** The time `resolveWhen` gives, or null when nothing in the phrase or message names one. */
+export function resolveInMessage(
+  phrase: string,
+  messageText: string,
+  postedAt: number,
+): number | null {
+  return resolveWhen(phrase, messageText, postedAt)?.at ?? null;
 }
