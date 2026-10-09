@@ -255,27 +255,31 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 **Lane A**
 
 - [ ] **Task A3.1: Draft and send a reply**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `mobile/src/services/model/index.ts`, `MiraModule.kt`, `mobile/src/services/native/bridge.ts`
   - **Do:** `draftReply(message)`, at most 60 words. `sendReply(key, text)` returning `sent` or `gone`; the listener keeps reply handles by notification key. If A1.3 found replies do not work, `sendReply` copies the text and opens the chat.
   - **Done when:** a reply typed in the app reaches Messenger from the phone.
+  - **State (2026-10-10):** sending is confirmed on the Infinix (A1.3). `draftReply` is in `services/model/index.ts` (at most 60 words, message inside a data block). **Phone check handed to Ronmar:** with a Messenger notification showing, open the dev menu → **MIRA probe** → **Switch on Messenger + Gmail** → receive a new message → **Refresh** → **Draft a reply** on its card. Record the draft's quality and seconds here. Without a model file on the phone the draft is the fake one-liner.
 
 - [ ] **Task A3.2: Reminders**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `MiraModule.kt`, a small Kotlin alarm receiver, `bridge.ts`
   - **Do:** `scheduleReminder(title, at)` posts a local notification at the given time with `NotificationCompat`.
   - **Done when:** a reminder set one minute ahead appears on the phone.
+  - **State (2026-10-10):** `reminders/ReminderReceiver.kt` sets an alarm and shows a "Reminder" notification that opens MIRA; `bridge.scheduleReminder` asks for the notification permission on Android 13 and later. Reminders do not survive a phone restart. **Phone check handed to Ronmar:** in the probe tap **Remind in 1 min**, allow notifications if asked, and confirm the reminder appears about a minute later.
 
 - [ ] **Task A3.3: Release build with no internet permission, and proof facts**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `mobile/android/app/src/main/AndroidManifest.xml`, `mobile/android/app/src/debug/AndroidManifest.xml`, `mobile/android/app/build.gradle`, `MiraModule.kt`
   - **Do:** move `INTERNET` to the debug manifest only. `getProofFacts()` returns whether the installed app holds the permission, and the bytes-sent count if A1.3 found it.
   - **Done when:** the release build's merged manifest has no `android.permission.INTERNET` (safety requirement 6) and the release app runs on the phone.
+  - **State (2026-10-10):** `INTERNET` is declared only in `src/debug/AndroidManifest.xml`; `src/release/AndroidManifest.xml` removes it even if a library asks for it. **Verified on the built release APK** with `aapt2 dump permissions`: it declares `POST_NOTIFICATIONS`, `USE_EXACT_ALARM`, `SCHEDULE_EXACT_ALARM` (to API 32), and `ACCESS_NETWORK_STATE`, and **no `android.permission.INTERNET`** (safety requirement 6). `getProofFacts()` returns the permission check, bytes sent since the phone last started, and the build type. Build with `cd mobile/android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a`; the first run compiles llama.rn for about 25 minutes. **Still to do:** install the release APK on a phone and confirm it starts (it replaces the debug app, so the probe is gone until the debug app is reinstalled).
 
-- [ ] **Task A3.4: Wire the new bridge methods**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task A3.4: Wire the new bridge methods**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/index.ts`
   - **Done when:** the Phase 3 exit check passes on the phone.
+  - **State (2026-10-10):** nothing further to wire: `bridge.ts` already passes `sendReply`, `scheduleReminder`, and `getProofFacts` through, and `services/index.ts` uses it on a device.
 
 **Lane B**
 

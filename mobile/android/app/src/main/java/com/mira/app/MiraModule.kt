@@ -21,6 +21,7 @@ import com.facebook.react.bridge.ReadableArray
 import com.mira.app.notifications.EnabledPackages
 import com.mira.app.notifications.MiraNotificationListener
 import com.mira.app.notifications.NativeInbox
+import com.mira.app.reminders.ReminderReceiver
 import java.io.File
 
 /** Bridge methods. Kotlin holds no product logic: it only reports and acts for JavaScript. */
@@ -114,9 +115,11 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
     promise.resolve(currentlyOnline())
   }
 
+  /** Posts a local notification at the given time (epoch milliseconds). */
   @ReactMethod
   fun scheduleReminder(title: String, at: Double, promise: Promise) {
-    promise.reject("not_built", "Reminders arrive with task A3.2.")
+    ReminderReceiver.schedule(reactApplicationContext, title, at.toLong())
+    promise.resolve(null)
   }
 
   /** The model file's path, or null when it has not been copied to the phone. */
