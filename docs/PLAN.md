@@ -283,17 +283,19 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 **Lane B**
 
-- [ ] **Task B3.1: Rule engine with hard limits**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B3.1: Rule engine with hard limits**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/core/rules.ts`, `mobile/src/core/builtinRules.ts`, tests beside them
   - **Do:** spec 4.8, tests first, one test per hard limit. Three built-in rules, off by default: remind me about deadlines and payments; draft replies to private questions; alert me on urgent messages.
   - **Done when:** all six hard-limit tests pass, including: sending is never `do`, and an instruction-like message produces no action and a log entry.
+  - **State (2026-10-10):** built by Steve (crossing lanes, agreed; logic only). `core/rules.ts` exports `decide(input)`; `core/rules.test.ts` has one test per hard limit in spec 4.8 plus the per-rule daily cap. `core/builtinRules.ts` holds the three rules, all off: `builtin-remind` (deadlines and payments), `builtin-draft` (questions in private chats, prepare only), `builtin-alert` (urgent messages). The runner saves them to storage on first use, so the Rules screen reads them with `useRules()` and switches them with `store.setRuleEnabled(id, on)`.
 
 - [ ] **Task B3.2: Action runner and activity log**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `mobile/src/services/actions/index.ts`, `mobile/src/screens/Activity/`
   - **Do:** write every action to the `actions` table before it runs and update it with the result (safety requirement 8). Log screen to board `21-activity-history`, showing the rule and, for blocked actions, the reason.
   - **Done when:** a hostile fixture message shows in the log as blocked, with the reason.
+  - **State (2026-10-10):** the action runner is built by Steve; **the Activity screen is still Ronmar's.** `services/actions/index.ts` logs every action before it runs and updates it with the result (safety requirement 8), with the rule that caused it and, for blocked ones, the reason. A message that tries to give instructions is logged as blocked even when no rule matches. Intake calls it after each message the model reads. For screens: `getActionRunner()` in `services/actions/runner.ts`; the log is `useActions()`. Calendar actions are logged as blocked (not in this build). See the log on a phone with the probe's **Show log** button.
 
 - [ ] **Task B3.3: Rules screen**
   - **Priority:** P0 · **Status:** Backlog
@@ -334,10 +336,11 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 **Lane B**
 
 - [ ] **Task B4.1: Offline queue**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `mobile/src/core/queue.ts`, test beside it, `mobile/src/services/actions/index.ts`
   - **Do:** an approved reply while offline is stored as `queued`. On reconnect, recheck: the draft still exists, the notification is still showing, the channel still permits drafts. Send, or mark `needs you` and offer to copy the text and open the chat.
   - **Done when:** tests cover each recheck outcome, and the Approvals screen shows "Queued".
+  - **State (2026-10-10):** the queue logic is built by Steve; **showing "Queued" on the Approvals screen is still Ronmar's.** `core/queue.ts` has `recheckQueued` and `reminderTime`, with tests for each outcome. `(await getActionRunner()).sendDraft(draftId)` sends a confirmed draft and returns `sent`, `queued` (offline), or `needs_you`; the Approvals screen calls it only after the user's tap and confirmation (safety requirement 2). `flushQueue()` runs by itself when the phone comes back online. **Not yet run on a phone.**
 
 - [ ] **Task B4.2: Onboarding, permission step**
   - **Priority:** P0 · **Status:** Backlog

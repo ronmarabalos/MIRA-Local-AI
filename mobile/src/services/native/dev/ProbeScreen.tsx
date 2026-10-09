@@ -16,6 +16,7 @@ import {
 import { FIXTURES, fixtureText } from '../../../core/__fixtures__/messages';
 import type { CapturedNotification, Message } from '../../../core/types';
 import type { ProofFacts } from '../../contracts';
+import { getActionRunner } from '../../actions/runner';
 import { getStore } from '../../db';
 import { bridge, model } from '../../index';
 import { complete, loadModel } from '../../model/llama';
@@ -178,6 +179,14 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
       'com.facebook.orca',
       'com.google.android.gm',
     ]);
+    // Also stored as channels that allow drafts, as the Channels screen would.
+    const store = await getStore();
+    for (const [packageName, label] of [
+      ['com.facebook.orca', 'Messenger'],
+      ['com.google.android.gm', 'Gmail'],
+    ]) {
+      await store.saveChannel({ packageName, label, enabled: true, level: 2 });
+    }
     say('Messenger and Gmail are switched on for capture.');
   };
 
@@ -243,6 +252,32 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
     } catch (error) {
       setReplyLog(lines => [...lines, `Draft failed: ${String(error)}`]);
     }
+  };
+
+  const showLog = async () => {
+    const store = await getStore();
+    const actions = await store.getActions();
+    say(
+      `Activity log, newest first: ${actions.length}\n` +
+        actions
+          .slice(0, 12)
+          .map(
+            a =>
+              `[${a.status}] ${a.kind} ${a.ruleId ?? 'no rule'}${
+                a.reason ? ` | ${a.reason}` : ''
+              }`,
+          )
+          .join('\n'),
+    );
+  };
+
+  const switchOnRules = async () => {
+    await getActionRunner();
+    const store = await getStore();
+    for (const rule of await store.getRules()) {
+      await store.setRuleEnabled(rule.id, true);
+    }
+    say('All rules are switched on.');
   };
 
   const injectFixtures = () => {
@@ -313,6 +348,8 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
         />
         <Button label="Show stored" onPress={showStored} />
         <Button label="Remind in 1 min" onPress={remindInOneMinute} />
+        <Button label="Switch on rules" onPress={switchOnRules} />
+        <Button label="Show log" onPress={showLog} />
       </View>
       {notifications.map(n => (
         <View key={n.key} style={styles.card}>

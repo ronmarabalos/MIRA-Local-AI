@@ -7,6 +7,7 @@ import type {
 } from '../../core/types';
 import { createFakeBridge } from '../fakes/bridge';
 import { createFakeModel } from '../fakes/model';
+import type { StoredItem } from '../db';
 import { createIntake, type IntakeStore } from './index';
 import { splitNotification } from './split';
 
@@ -227,5 +228,44 @@ describe('intake', () => {
     expect([...messages.values()].every(m => m.status === 'processed')).toBe(
       true,
     );
+  });
+
+  test('a message the model read is handed on for rules; a filtered one is not', async () => {
+    const onProcessed = jest.fn(async (_item: StoredItem) => {});
+    const { store } = memoryStore();
+    const intake = createIntake({
+      bridge: createFakeBridge([
+        fixture('proposal-due'),
+        fixture('chatter-reaction'),
+      ]),
+      model: createFakeModel(),
+      store,
+      onProcessed,
+    });
+    await intake.drain();
+    expect(onProcessed).toHaveBeenCalledTimes(1);
+    expect(onProcessed.mock.calls[0][0].record?.messageId).toBe(
+      onProcessed.mock.calls[0][0].message.id,
+    );
+  });
+
+  test('a failure while applying rules does not stop the next message', async () => {
+    const { store, messages } = memoryStore();
+    const intake = createIntake({
+      bridge: createFakeBridge([
+        fixture('proposal-due'),
+        fixture('lab-report'),
+      ]),
+      model: createFakeModel(),
+      store,
+      onProcessed: async () => {
+        throw new Error('rule failed');
+      },
+    });
+    await intake.drain();
+    expect([...messages.values()].map(m => m.status)).toEqual([
+      'processed',
+      'processed',
+    ]);
   });
 });

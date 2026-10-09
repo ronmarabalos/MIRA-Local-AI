@@ -2,7 +2,7 @@ import { quickFilter } from '../../core/filter';
 import type { ExtractedRecord, Message, MiraRecord } from '../../core/types';
 import { failedRecord, verifyRecord } from '../../core/verify';
 import type { MessageContext, ModelService, NativeBridge } from '../contracts';
-import type { Store } from '../db';
+import type { Store, StoredItem } from '../db';
 import { splitNotification } from './split';
 
 export type IntakeStore = Pick<
@@ -14,6 +14,8 @@ export interface IntakeDeps {
   bridge: Pick<NativeBridge, 'drainInbox'>;
   model: Pick<ModelService, 'extract'>;
   store: IntakeStore;
+  /** Called after a message has been read by the model and stored, to apply the rules. */
+  onProcessed?: (item: StoredItem) => Promise<void>;
 }
 
 const SUMMARY_MAX = 120;
@@ -45,7 +47,12 @@ function filteredRecord(
  * filter → model → verifier → storage. One run at a time; a call made while
  * a run is in progress makes it go round once more.
  */
-export function createIntake({ bridge, model, store }: IntakeDeps) {
+export function createIntake({
+  bridge,
+  model,
+  store,
+  onProcessed,
+}: IntakeDeps) {
   let running: Promise<void> | null = null;
   let again = false;
 
@@ -87,7 +94,12 @@ export function createIntake({ bridge, model, store }: IntakeDeps) {
         chatKind: item?.chat.kind ?? 'private',
       });
       if (extracted) {
-        await store.saveRecord(verifyRecord(extracted, message), 'processed');
+        const record = verifyRecord(extracted, message);
+        await store.saveRecord(record, 'processed');
+        if (onProcessed && item) {
+          // A failing rule or action must not stop the next message being read.
+          await onProcessed({ ...item, record }).catch(() => {});
+        }
       } else {
         await store.saveRecord(failedRecord(message.id), 'failed');
       }
