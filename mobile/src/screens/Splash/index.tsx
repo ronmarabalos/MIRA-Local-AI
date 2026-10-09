@@ -1,5 +1,5 @@
 /** Board 01-splash. */
-import { useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -20,32 +20,38 @@ export default function SplashScreen() {
   const insets = useSafeAreaInsets();
   useStatusBar(false);
 
+  // Someone who has already set MIRA up goes straight to their day, whether
+  // they wait or tap. `left` stops a tap and the timer from both navigating.
+  const ready = useRef<Promise<boolean> | null>(null);
+  const left = useRef(false);
+  const leave = useCallback(async () => {
+    const setUp = await ready.current;
+    if (left.current) return;
+    left.current = true;
+    go(setUp ? 'Home' : 'Onboarding', setUp ? { reset: true } : { replace: true });
+  }, [go]);
+
   useEffect(() => {
-    let live = true;
-    // Someone who has already set MIRA up goes straight to their day.
-    const next = getStore()
+    left.current = false;
+    ready.current = Promise.resolve()
+      .then(() => getStore())
       .then(store => isSetUp(bridge, store))
       .catch(() => false);
-    const timer = setTimeout(async () => {
-      const ready = await next;
-      if (live) {
-        go(ready ? 'Home' : 'Onboarding', ready ? { reset: true } : { replace: true });
-      }
-    }, 2600);
+    const timer = setTimeout(leave, 2600);
     return () => {
-      live = false;
+      left.current = true;
       clearTimeout(timer);
     };
-  }, [go]);
+  }, [leave]);
 
   return (
     <View className="flex-1 bg-silk-base">
       <SilkBackground />
       <View pointerEvents="none" className="absolute h-520 w-520 rounded-full" style={[fx.glowSplash, { left: -65, top: 120 }]} />
       <Tap
-        label="Continue to onboarding"
+        label="Continue"
         activeOpacity={1}
-        onPress={() => go('Onboarding', { replace: true })}
+        onPress={leave}
         className="absolute inset-0 items-center justify-center gap-28"
       >
         <Companion size={160} />

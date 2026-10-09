@@ -1,17 +1,29 @@
 /**
  * App-wide preferences the screens share: the name typed during setup, the
  * theme chosen in Settings, and reduced motion (the system setting or the
- * switch in Settings). Kept in memory for now; storage is task B1.3.
+ * switch in Settings). Stored on the phone, so they survive a restart.
  */
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
 import { AccessibilityInfo, useColorScheme } from 'react-native';
+
+type PrefKey = 'name' | 'theme' | 'reduceMotion';
+
+const THEMES: readonly string[] = ['light', 'dark', 'system'];
+
+/** Where the choices are kept. Without it they last only for this session. */
+export interface PrefsStorage {
+  load(): Promise<Record<string, string>>;
+  save(key: string, value: string): Promise<void>;
+}
 
 export type ThemeChoice = 'light' | 'dark' | 'system';
 
@@ -30,15 +42,62 @@ interface Prefs {
 
 const PrefsContext = createContext<Prefs | null>(null);
 
-export function PrefsProvider({ children }: { children: ReactNode }) {
-  const [name, setName] = useState('');
-  const [theme, setTheme] = useState<ThemeChoice>('light');
-  const [reduceMotionSetting, setReduceMotionSetting] = useState(false);
+export function PrefsProvider({ children, storage }: { children: ReactNode; storage?: PrefsStorage }) {
+  const [name, setNameState] = useState('');
+  const [theme, setThemeState] = useState<ThemeChoice>('light');
+  const [reduceMotionSetting, setReduceMotionState] = useState(false);
   const [systemReduceMotion, setSystemReduceMotion] = useState(false);
   const scheme = useColorScheme();
+  // Choices made before the stored ones load are kept, not overwritten.
+  const touched = useRef(new Set<PrefKey>());
+  const storageRef = useRef(storage);
+  storageRef.current = storage;
+
+  // A choice that fails to save stays for this session.
+  const persist = useCallback((key: PrefKey, value: string) => {
+    const target = storageRef.current;
+    if (target) {
+      Promise.resolve().then(() => target.save(key, value)).catch(() => {});
+    }
+  }, []);
 
   useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setSystemReduceMotion);
+    let live = true;
+    const target = storageRef.current;
+    if (!target) return;
+    Promise.resolve()
+      .then(() => target.load())
+      .then(stored => {
+        if (!live || !stored) return;
+        const fresh = (key: PrefKey) => stored[key] !== undefined && !touched.current.has(key);
+        if (fresh('name')) setNameState(stored.name);
+        if (fresh('theme') && THEMES.includes(stored.theme)) setThemeState(stored.theme as ThemeChoice);
+        if (fresh('reduceMotion')) setReduceMotionState(stored.reduceMotion === '1');
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const setName = useCallback((next: string) => {
+    touched.current.add('name');
+    setNameState(next);
+    persist('name', next);
+  }, [persist]);
+  const setTheme = useCallback((next: ThemeChoice) => {
+    touched.current.add('theme');
+    setThemeState(next);
+    persist('theme', next);
+  }, [persist]);
+  const setReduceMotionSetting = useCallback((on: boolean) => {
+    touched.current.add('reduceMotion');
+    setReduceMotionState(on);
+    persist('reduceMotion', on ? '1' : '0');
+  }, [persist]);
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setSystemReduceMotion).catch(() => {});
     const sub = AccessibilityInfo.addEventListener(
       'reduceMotionChanged',
       setSystemReduceMotion,
@@ -57,7 +116,7 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
       setReduceMotionSetting,
       reduceMotion: systemReduceMotion || reduceMotionSetting,
     }),
-    [name, theme, scheme, reduceMotionSetting, systemReduceMotion],
+    [name, setName, theme, setTheme, scheme, reduceMotionSetting, setReduceMotionSetting, systemReduceMotion],
   );
 
   return <PrefsContext.Provider value={value}>{children}</PrefsContext.Provider>;

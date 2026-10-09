@@ -98,6 +98,8 @@ export const MIGRATIONS: string[][] = [
       duration_ms REAL NOT NULL CHECK(duration_ms >= 0)
     )`,
   ],
+  // 3: the name, theme, and reduce-motion choices, kept across restarts.
+  ['CREATE TABLE prefs (key TEXT PRIMARY KEY, value TEXT NOT NULL)'],
 ];
 
 /** Applies every migration newer than the database, each in one transaction. */

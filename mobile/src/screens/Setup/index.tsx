@@ -1,13 +1,11 @@
 /** Board 03-initial-setup. */
-import { useState } from 'react';
 import { View } from 'react-native';
 
-import { Icon } from '../../components/Icon';
 import { useGo } from '../../components/nav';
 import { Screen } from '../../components/Screen';
 import { Steps } from '../../components/Steps';
 import { T } from '../../components/T';
-import { BackButton, Field, Glass, IconTile, PrimaryButton, Rows, Switch, Tap } from '../../components/ui';
+import { BackButton, Field, Glass, IconTile, PrimaryButton, Rows } from '../../components/ui';
 import palette from '../../theme/palette';
 import { usePrefs } from '../../theme/prefs';
 
@@ -22,7 +20,6 @@ function Badge({ text }: { text: string }) {
 export default function SetupScreen() {
   const go = useGo();
   const { name, setName } = usePrefs();
-  const [notif, setNotif] = useState(true);
   const initial = (name.trim()[0] || 'A').toUpperCase();
 
   return (
@@ -43,13 +40,7 @@ export default function SetupScreen() {
         <View className="h-72 w-72 items-center justify-center rounded-24 bg-peri-tonal">
           <T className="text-26 font-bold text-navy">{initial}</T>
         </View>
-        <View className="gap-4">
-          <Tap label="Add photo" className="h-44 flex-row items-center gap-8 rounded-14 border border-white/80 bg-white/60 px-16">
-            <Icon name="camera" size={18} />
-            <T className="text-14 font-semibold">Add photo</T>
-          </Tap>
-          <T className="text-12 text-ink-muted">Optional</T>
-        </View>
+        <T className="flex-1 text-14 leading-[21px] text-ink-2">MIRA uses your name on Today and in your profile. It stays on this phone.</T>
       </View>
 
       <View className="gap-8">
@@ -69,21 +60,16 @@ export default function SetupScreen() {
         <Rows>
           <View className="flex-row items-center gap-12 py-12">
             <IconTile name="bell" fg={palette.warning.ink} bg={palette.warning.bg} />
-            <T className="flex-1 text-14 font-bold">Notifications</T>
-            <Switch on={notif} onPress={() => setNotif(!notif)} label="Allow notifications" />
+            <View className="flex-1 gap-2">
+              <T className="text-14 font-bold">Reminders</T>
+              <T className="text-12 leading-[16.8px] text-ink-muted">Android may ask before the first one</T>
+            </View>
+            <Badge text="Later" />
           </View>
           <View className="flex-row items-center gap-12 py-12">
             <IconTile name="phone" fg={palette.navy.DEFAULT} bg={palette.peri.tonal} />
             <T className="flex-1 text-14 font-bold">Runs on this phone</T>
             <Badge text="Next" />
-          </View>
-          <View className="flex-row items-center gap-12 py-12">
-            <IconTile name="link" fg={palette.mint.ink} bg={palette.mint.bg} />
-            <View className="flex-1 gap-2">
-              <T className="text-14 font-bold">Connect email & calendar</T>
-              <T className="text-12 leading-[16.8px] text-ink-muted">Optional</T>
-            </View>
-            <Badge text="Later" />
           </View>
         </Rows>
       </Glass>

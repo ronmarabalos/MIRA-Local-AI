@@ -69,7 +69,7 @@ describe('migrate', () => {
     const { db } = await setup();
     await migrate(db);
     const { rows } = await db.execute('PRAGMA user_version');
-    expect(Number(rows[0].user_version)).toBe(2);
+    expect(Number(rows[0].user_version)).toBe(3);
   });
 });
 
@@ -182,5 +182,16 @@ describe('store', () => {
     unsubscribe();
     await store.setMessageStatus('m1', 'filtered');
     expect(listener).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps preferences, replacing a value in place, without telling report subscribers', async () => {
+    const { store } = await setup();
+    const listener = jest.fn();
+    store.subscribe(listener);
+    await store.setPref('name', 'Alex');
+    await store.setPref('name', 'Sam');
+    await store.setPref('theme', 'dark');
+    expect(await store.getPrefs()).toEqual({ name: 'Sam', theme: 'dark' });
+    expect(listener).not.toHaveBeenCalled();
   });
 });

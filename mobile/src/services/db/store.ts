@@ -284,6 +284,21 @@ export function createStore(db: SqlDatabase) {
       );
     },
 
+    // Preferences (name, theme, reduce motion)
+
+    async getPrefs(): Promise<Record<string, string>> {
+      const { rows } = await db.execute('SELECT key, value FROM prefs');
+      return Object.fromEntries(rows.map(row => [str(row.key), str(row.value)]));
+    },
+
+    /** Not a report change, so screens are not told to reload. */
+    async setPref(key: string, value: string): Promise<void> {
+      await db.execute(
+        'INSERT INTO prefs (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value',
+        [key, value],
+      );
+    },
+
     /** Removes everything stored from one app, together. */
     async deleteAppData(packageName: string): Promise<void> {
       await write(async tx => {
