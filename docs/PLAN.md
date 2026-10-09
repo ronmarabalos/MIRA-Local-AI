@@ -185,12 +185,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 **Lane A**
 
-- [ ] **Task A2.1: Listener to app**
-  - **Priority:** P0 · **Status:** In Progress
+- [x] **Task A2.1: Listener to app**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `notifications/MiraNotificationListener.kt`, `notifications/NativeInbox.kt`, `MiraModule.kt`, `MiraPackage.kt`, `mobile/src/services/native/bridge.ts`
   - **Do:** drop notifications from switched-off apps before anything is stored (safety requirement 1). Store the rest in the native inbox and emit an event. Bridge methods: `isListenerEnabled`, `openListenerSettings`, `setEnabledPackages`, `listNotifyingApps`, `drainInbox`, `isOnline`.
   - **Done when:** `bridge.ts` implements `NativeBridge`, and a Messenger message arrives in JavaScript as a `CapturedNotification`.
-  - **State (2026-10-10):** built and installed on the Infinix. `NativeInbox.kt` keeps captured notifications on disk until JavaScript drains them; `EnabledPackages.kt` holds the switched-on apps (none by default, so nothing is captured until Channels or the probe switches some on); the module emits `MiraNotification` and `MiraOnline`; `bridge.ts` implements `NativeBridge` (`scheduleReminder` rejects until A3.2). It also has `inject()` for feeding fixtures on an emulator. **Still to confirm on the phone:** a real message arriving through the inbox (probe: Switch on Messenger + Gmail, send a message, Drain inbox).
+  - **State (2026-10-10):** built and installed on the Infinix. `NativeInbox.kt` keeps captured notifications on disk until JavaScript drains them; `EnabledPackages.kt` holds the switched-on apps (none by default, so nothing is captured until Channels or the probe switches some on); the module emits `MiraNotification` and `MiraOnline`; `bridge.ts` implements `NativeBridge` (`scheduleReminder` rejects until A3.2). It also has `inject()` for feeding fixtures on an emulator. Confirmed on the Infinix by Steve on 2026-10-10: with Messenger switched on, a real message arrived through the inbox.
 
 - [x] **Task A2.2: Extraction**
   - **Priority:** P0 · **Status:** Done
