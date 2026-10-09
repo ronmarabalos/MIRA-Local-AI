@@ -192,14 +192,14 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Done when:** `bridge.ts` implements `NativeBridge`, and a Messenger message arrives in JavaScript as a `CapturedNotification`.
   - **State (2026-10-10):** built and installed on the Infinix. `NativeInbox.kt` keeps captured notifications on disk until JavaScript drains them; `EnabledPackages.kt` holds the switched-on apps (none by default, so nothing is captured until Channels or the probe switches some on); the module emits `MiraNotification` and `MiraOnline`; `bridge.ts` implements `NativeBridge` (`scheduleReminder` rejects until A3.2). It also has `inject()` for feeding fixtures on an emulator. **Still to confirm on the phone:** a real message arriving through the inbox (probe: Switch on Messenger + Gmail, send a message, Drain inbox).
 
-- [ ] **Task A2.2: Extraction**
-  - **Priority:** P0 · **Status:** In Progress
+- [x] **Task A2.2: Extraction**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/model/prompts.ts`, `mobile/src/services/model/index.ts`
   - **Do:** `extract(message)` returning a `MiraRecord`, output constrained to the spec 5.2 JSON form, the message inside a marked data block. One request at a time.
   - **Done when:** the fixture set runs on the phone from the developer screen; record accuracy, parse failures, and seconds per message here. Target: correct type on 85% or more, 6 seconds or less.
   - **State (2026-10-10, Infinix, Qwen2.5 1.5B, 24 fixtures):** the model answers with one-letter keys under a grammar with no whitespace (`prompts.ts`), expanded back to the spec form and checked by `parseExtraction`. **Unreadable answers: 0 of 24** in every run, so the output constraint holds. **Speed: 6.1 to 7.1 s average** (the first message is 13 to 25 s because it also loads the model and reads the instructions). **Type right: 12 of 24 (50%)**, against a target of 85%. Summaries were accurate in every case read.
   - **Where the type goes wrong:** neighbouring labels (question read as request, a cancelled class read as announcement, a greeting read as announcement) and the three hostile messages, which get an ordinary type. A first prompt with the type before the summary labelled everything `schedule_change`; putting the summary first and adding definitions and examples took it from 17% to 50%.
-  - **Open decision:** accept this with code backstops (the verifier already flags instruction-like and sensitive messages from their own words, and the quick filter catches promotions and short chatter), tune the prompt further, or try a larger model at roughly twice the time per message.
+  - **Decision (Steve, 2026-10-10):** accept the model's type as it is and backstop in code. The summary, date, and amount are what the user reads, and most misses fall between labels that share a report section. Safety does not rest on the type: the verifier flags instruction-like and sensitive messages from their own words, and the quick filter catches promotions and short chatter before the model. For Lane B: `verifyRecord` could also set the type to `other` when it flags a message as instruction-like. Revisit with a larger model only if the demo messages read wrong.
   - **Build note:** `babel.config.js` needs `@babel/plugin-transform-export-namespace-from` for `chrono-node`; without it the app bundle fails and the phone silently keeps running its last good copy.
 
 - [x] **Task A2.3: Switch to the real services**
