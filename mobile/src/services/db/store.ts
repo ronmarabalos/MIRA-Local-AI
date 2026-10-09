@@ -10,14 +10,11 @@ import type {
   MiraRecord,
   Rule,
 } from '../../core/types';
+import type { ReportItem } from '../../core/report';
 import type { Row, SqlDatabase, SqlExecutor } from './schema';
 
 /** A stored message with its chat and, once processed, its record. */
-export interface StoredItem {
-  message: Message;
-  chat: Chat;
-  record: MiraRecord | null;
-}
+export type StoredItem = ReportItem;
 
 export type Store = ReturnType<typeof createStore>;
 

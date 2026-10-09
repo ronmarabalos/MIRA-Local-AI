@@ -202,8 +202,8 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Do:** drain the inbox on launch, on return to the foreground, and on each event; split into messages; skip ones already stored; run filter → `extract` → verify → store. A record that fails twice is stored as `other` with status `failed`.
   - **Done when:** replaying the fixtures through the fake bridge fills the database, with tests for skipping a stored message and for the failed path.
 
-- [ ] **Task B2.2: Report builder**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B2.2: Report builder**
+  - **Priority:** P0 · **Status:** Done. `buildReport(items, actions, filter)`. Also lists undated schedule changes under Announcements, keeps instruction-like messages out of Needs you and Dates found, and counts messages still waiting for placeholder rows.
   - **Files:** `mobile/src/core/report.ts`, test beside it
   - **Do:** spec 4.10 sections: Needs you, Dates found, Announcements, Handled for you, Ignored (a count), Couldn't read. No duplicate merging, no clash check.
   - **Done when:** tests cover section membership and ordering.
