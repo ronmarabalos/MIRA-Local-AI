@@ -1,3 +1,4 @@
+import { DUPLICATE_WINDOW_MS, findDuplicate } from '../../core/dedupe';
 import { quickFilter } from '../../core/filter';
 import type { ExtractedRecord, Message, MiraRecord } from '../../core/types';
 import { failedRecord, verifyRecord } from '../../core/verify';
@@ -7,7 +8,13 @@ import { splitNotification } from './split';
 
 export type IntakeStore = Pick<
   Store,
-  'addMessage' | 'saveRecord' | 'getMessagesByStatus' | 'getItem' | 'getChannels' | 'saveProcessingTime'
+  | 'addMessage'
+  | 'saveRecord'
+  | 'getMessagesByStatus'
+  | 'getItem'
+  | 'getItems'
+  | 'getChannels'
+  | 'saveProcessingTime'
 >;
 
 export interface IntakeDeps {
@@ -55,11 +62,17 @@ export function createIntake({
 }: IntakeDeps) {
   let running: Promise<void> | null = null;
   let again = false;
+  let relinked = false;
 
   async function takeIn(): Promise<void> {
     for (const notification of await bridge.drainInbox()) {
       const channels = await store.getChannels();
-      if (!channels.some(c => c.packageName === notification.packageName && c.enabled)) continue;
+      if (
+        !channels.some(
+          c => c.packageName === notification.packageName && c.enabled,
+        )
+      )
+        continue;
       for (const { message, chat } of splitNotification(notification)) {
         const started = Date.now();
         const route = quickFilter(notification, message.text);
@@ -69,7 +82,10 @@ export function createIntake({
         const added = await store.addMessage(message, chat);
         if (added && route !== 'model') {
           await store.saveRecord(filteredRecord(message, route), 'filtered');
-          await store.saveProcessingTime(message.id, Math.max(0, Date.now() - started));
+          await store.saveProcessingTime(
+            message.id,
+            Math.max(0, Date.now() - started),
+          );
         }
       }
     }
@@ -93,7 +109,25 @@ export function createIntake({
   async function process(): Promise<void> {
     for (const message of await store.getMessagesByStatus('new')) {
       const channels = await store.getChannels();
-      if (!channels.some(c => c.packageName === message.packageName && c.enabled)) continue;
+      if (
+        !channels.some(c => c.packageName === message.packageName && c.enabled)
+      )
+        continue;
+      // A repeat of a message already read takes that message's record: no
+      // second model call, no second reminder or draft, and one report line.
+      const earlier = await store.getItems(
+        message.postedAt - DUPLICATE_WINDOW_MS,
+        message.postedAt + 1,
+      );
+      const originalId = findDuplicate(message, earlier);
+      const original = earlier.find(e => e.message.id === originalId)?.record;
+      if (originalId && original) {
+        await store.saveRecord(
+          { ...original, messageId: message.id, duplicateOf: originalId },
+          'processed',
+        );
+        continue;
+      }
       const item = await store.getItem(message.id);
       const started = Date.now();
       const extracted = await extractWithRetry(message, {
@@ -103,7 +137,10 @@ export function createIntake({
       if (extracted) {
         const record = verifyRecord(extracted, message);
         await store.saveRecord(record, 'processed');
-        await store.saveProcessingTime(message.id, Math.max(0, Date.now() - started));
+        await store.saveProcessingTime(
+          message.id,
+          Math.max(0, Date.now() - started),
+        );
         if (onProcessed && item) {
           // A failing rule or action must not stop the next message being read.
           await onProcessed({ ...item, record }).catch(() => {});
@@ -114,7 +151,37 @@ export function createIntake({
     }
   }
 
+  /**
+   * Links copies that were stored before duplicates were recognised, so a
+   * message that already appears twice becomes one report line. Runs once.
+   */
+  async function relinkStored(): Promise<void> {
+    const now = Date.now();
+    const recent = (
+      await store.getItems(now - DUPLICATE_WINDOW_MS, now + 1)
+    ).sort((a, b) => a.message.postedAt - b.message.postedAt);
+    for (const item of recent) {
+      const { message, record } = item;
+      if (
+        !record ||
+        record.duplicateOf !== null ||
+        message.status !== 'processed'
+      ) {
+        continue;
+      }
+      const originalId = findDuplicate(message, recent);
+      if (originalId) {
+        record.duplicateOf = originalId;
+        await store.saveRecord(record, 'processed');
+      }
+    }
+  }
+
   async function run(): Promise<void> {
+    if (!relinked) {
+      relinked = true;
+      await relinkStored().catch(() => {});
+    }
     do {
       again = false;
       await takeIn();

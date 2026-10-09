@@ -27,7 +27,14 @@ function memoryStore() {
   const store: IntakeStore = {
     async saveProcessingTime() {},
     async getChannels() {
-      return [...new Set(FIXTURES.map(f => f.notification.packageName))].map(packageName => ({ packageName, label: packageName, enabled: true, level: 1 as const }));
+      return [...new Set(FIXTURES.map(f => f.notification.packageName))].map(
+        packageName => ({
+          packageName,
+          label: packageName,
+          enabled: true,
+          level: 1 as const,
+        }),
+      );
     },
     async addMessage(message, chat) {
       if ([...messages.values()].some(m => identity(m) === identity(message)))
@@ -43,6 +50,15 @@ function memoryStore() {
     },
     async getMessagesByStatus(status) {
       return [...messages.values()].filter(m => m.status === status);
+    },
+    async getItems(from, to) {
+      return [...messages.values()]
+        .filter(m => m.postedAt >= from && m.postedAt < to)
+        .map(m => ({
+          message: m,
+          chat: chats.get(m.chatId)!,
+          record: records.get(m.id) ?? null,
+        }));
     },
     async getItem(messageId) {
       const message = messages.get(messageId);
@@ -271,5 +287,81 @@ describe('intake', () => {
       'processed',
       'processed',
     ]);
+  });
+
+  test('the same message sent twice is read once, and the copy is linked to the first', async () => {
+    const first = fixture('proposal-due');
+    const again = {
+      ...first,
+      key: 'sent-again',
+      postedAt: first.postedAt + 60_000,
+      messages: first.messages.map(m => ({ ...m, time: m.time + 60_000 })),
+    };
+    const extract = jest.fn(createFakeModel().extract);
+    const onProcessed = jest.fn(async (_item: StoredItem) => {});
+    const { store, messages, records } = memoryStore();
+    const intake = createIntake({
+      bridge: createFakeBridge([first, again]),
+      model: { extract },
+      store,
+      onProcessed,
+    });
+    await intake.drain();
+
+    const [original, copy] = [...messages.values()].sort(
+      (a, b) => a.postedAt - b.postedAt,
+    );
+    expect(extract).toHaveBeenCalledTimes(1);
+    expect(onProcessed).toHaveBeenCalledTimes(1);
+    expect(records.get(original.id)?.duplicateOf).toBeNull();
+    expect(records.get(copy.id)?.duplicateOf).toBe(original.id);
+    expect(copy.status).toBe('processed');
+  });
+
+  test('copies stored before duplicates were recognised are linked on the next run', async () => {
+    const { store, messages, records } = memoryStore();
+    const now = Date.now();
+    const [first] = splitNotification(fixture('proposal-due'));
+    const original = {
+      ...first.message,
+      id: 'old-1',
+      postedAt: now - 120_000,
+      status: 'processed' as const,
+    };
+    const copy = {
+      ...first.message,
+      id: 'old-2',
+      postedAt: now - 60_000,
+      status: 'processed' as const,
+    };
+    for (const message of [original, copy]) {
+      await store.addMessage(message, first.chat);
+      await store.saveRecord(
+        {
+          messageId: message.id,
+          type: 'deadline',
+          summary: 'Proposal due.',
+          needsUser: true,
+          urgency: 'normal',
+          request: null,
+          amount: null,
+          dateText: null,
+          dateAt: null,
+          sensitive: false,
+          instructionLike: false,
+          duplicateOf: null,
+        },
+        'processed',
+      );
+    }
+    const intake = createIntake({
+      bridge: createFakeBridge(),
+      model: createFakeModel(),
+      store,
+    });
+    await intake.drain();
+    expect(records.get('old-1')?.duplicateOf).toBeNull();
+    expect(records.get('old-2')?.duplicateOf).toBe('old-1');
+    expect(messages.size).toBe(2);
   });
 });

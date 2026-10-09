@@ -419,6 +419,7 @@ Not in this window. Take one only if Phase 5 is finished early and everything ab
   - **Priority:** P1
   - **Status:** Backlog
   - **Description:** Spec 4.7 and the clash check in 4.10.
+  - **Duplicate merging done (2026-10-10, Steve), after Steve saw the same message listed twice on the phone:** `core/dedupe.ts` treats a message as a copy when an earlier message from the last 48 hours has the same words (case, punctuation, and spacing ignored) or, for messages of eight words or more, at least 80% of its words. Intake links the copy to the first message with `duplicateOf`, without a second model call or a second reminder or draft, and the report already hides linked copies. Unlike spec 4.7 it also covers the same message sent twice in one chat. Copies stored earlier are linked the next time the app opens. Not done: showing "seen in N chats", and calendar clash warnings.
 
 - [ ] **Task 2.5: Rules proposed from corrections, share an image in, catch-up brief, memory screen**
   - **Priority:** P1
