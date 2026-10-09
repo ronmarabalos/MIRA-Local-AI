@@ -146,14 +146,14 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 **Lane B**
 
-- [ ] **Task B1.1: Fixture messages**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B1.1: Fixture messages**
+  - **Priority:** P0 · **Status:** Done. 36 fixtures: 24 for the model (including three hostile), 12 the quick filter handles. Each has its expected filter route and, for model messages, the key fields.
   - **Files:** `mobile/src/core/__fixtures__/messages.ts`
   - **Do:** about 30 messages for the student scenario with the expected type and key fields: announcements, a payment reminder, questions, promotions, short chatter, English mixed with the local language, and three hostile messages that try to give instructions.
   - **Done when:** the file type-checks against `CapturedNotification` and `MiraRecord`.
 
-- [ ] **Task B1.2: Quick filter and verifier**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B1.2: Quick filter and verifier**
+  - **Priority:** P0 · **Status:** Done. `parseExtraction` (lenient JSON, fixed failure codes), `verifyRecord`, `failedRecord`. Tagalog day words are put into English before `chrono-node`. Code also sets `sensitive` and `instructionLike` from keyword lists, so the model is not the only guard.
   - **Files:** `mobile/src/core/filter.ts`, `mobile/src/core/verify.ts`, `mobile/src/core/dates.ts`, tests beside each
   - **Do:** spec 4.4 and 4.6, tests first. Dates resolved by `chrono-node` relative to the post time.
   - **Done when:** tests cover each filter class, copied-field clearing, an unresolvable date phrase, and malformed model output.
