@@ -1,10 +1,18 @@
 import type { Action, Chat, Message, MiraRecord, Urgency } from './types';
 
 /** A stored message with its chat and, once processed, its record. */
+/** How often a message arrived: in total, and in how many chats. */
+export interface Seen {
+  times: number;
+  chats: number;
+}
+
 export interface ReportItem {
   message: Message;
   chat: Chat;
   record: MiraRecord | null;
+  /** Set on report lines whose message was repeated (spec 4.7). */
+  seen?: Seen;
 }
 
 /** A report line always has its record, and through it its source message. */
@@ -51,11 +59,27 @@ export function buildReport(
   const byId = new Map(items.map(i => [i.message.id, i]));
 
   // Lines the model read, minus copies linked to an earlier message.
-  const lines = shown.filter(
-    (i): i is ReportLine =>
-      i.record !== null && i.message.status !== 'failed' && i.record.duplicateOf === null,
-  );
-  const ignoredTypes = (l: ReportLine) => l.record.type === 'promotion' || l.record.type === 'chatter';
+  const copies = new Map<string, ReportItem[]>();
+  for (const item of items) {
+    const originalId = item.record?.duplicateOf;
+    if (originalId)
+      copies.set(originalId, [...(copies.get(originalId) ?? []), item]);
+  }
+  const lines = shown
+    .filter(
+      (i): i is ReportLine =>
+        i.record !== null &&
+        i.message.status !== 'failed' &&
+        i.record.duplicateOf === null,
+    )
+    .map(line => {
+      const again = copies.get(line.message.id);
+      if (!again) return line;
+      const chats = new Set([line.chat.id, ...again.map(copy => copy.chat.id)]);
+      return { ...line, seen: { times: again.length + 1, chats: chats.size } };
+    });
+  const ignoredTypes = (l: ReportLine) =>
+    l.record.type === 'promotion' || l.record.type === 'chatter';
   const readable = lines.filter(l => !ignoredTypes(l));
   // A message that tries to give MIRA orders is never presented as a to-do.
   const trusted = readable.filter(l => !l.record.instructionLike);
@@ -65,20 +89,30 @@ export function buildReport(
       .filter(l => l.record.needsUser)
       .sort(
         (a, b) =>
-          URGENCY_RANK[a.record.urgency] - URGENCY_RANK[b.record.urgency] || newestFirst(a, b),
+          URGENCY_RANK[a.record.urgency] - URGENCY_RANK[b.record.urgency] ||
+          newestFirst(a, b),
       ),
     datesFound: trusted
       .filter(l => l.record.dateAt !== null)
       .sort((a, b) => a.record.dateAt! - b.record.dateAt!),
     announcements: readable
-      .filter(l => l.record.type === 'announcement' || l.record.type === 'schedule_change')
+      .filter(
+        l =>
+          l.record.type === 'announcement' ||
+          l.record.type === 'schedule_change',
+      )
       .sort(newestFirst),
     handled: actions
       .filter(a => a.status === 'done' || a.status === 'queued')
       .map(action => ({ action, item: byId.get(action.messageId) ?? null }))
-      .filter(h => filter.kind === 'all' || (h.item !== null && matches(h.item, filter))),
+      .filter(
+        h =>
+          filter.kind === 'all' || (h.item !== null && matches(h.item, filter)),
+      ),
     ignored: lines.filter(ignoredTypes).length,
-    couldNotRead: shown.filter(i => i.message.status === 'failed').sort(newestFirst),
+    couldNotRead: shown
+      .filter(i => i.message.status === 'failed')
+      .sort(newestFirst),
     waiting: shown.filter(i => i.message.status === 'new').length,
   };
 }

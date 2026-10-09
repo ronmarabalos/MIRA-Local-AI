@@ -18,6 +18,7 @@ export interface MiraNativeModule {
   drainInbox(): Promise<string>;
   isOnline(): Promise<boolean>;
   scheduleReminder(title: string, at: number): Promise<void>;
+  cancelReminder(title: string, at: number): Promise<void>;
 }
 
 export const MiraModule: MiraNativeModule = NativeModules.MiraModule;

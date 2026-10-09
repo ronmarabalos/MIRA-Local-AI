@@ -26,6 +26,8 @@ export function startIntake(): () => void {
         model,
         store,
         onProcessed: item => runner.onRecord(item),
+        onDuplicateLinked: (copyId, originalId) =>
+          runner.retract(copyId, originalId),
       });
       flush = () => {
         runner

@@ -8,12 +8,13 @@ const message = (
   text: string,
   postedAt: number,
   chatId = 'c1',
+  sender = 'Maya',
 ): Message => ({
   id,
   notificationKey: id,
   packageName: 'com.facebook.orca',
   chatId,
-  sender: 'Maya',
+  sender,
   text,
   postedAt,
   truncated: false,
@@ -117,5 +118,34 @@ describe('findDuplicate', () => {
         stored('a', TEXT, 0),
       ]),
     ).toBeNull();
+  });
+
+  test('the same short message from two people is two messages', () => {
+    const first = {
+      message: message('a', 'Are you coming?', 0, 'c1', 'Maya'),
+      record: record('a'),
+    };
+    expect(
+      findDuplicate(message('b', 'Are you coming?', HOUR, 'c2', 'Jun'), [
+        first,
+      ]),
+    ).toBeNull();
+    expect(
+      findDuplicate(message('c', 'Are you coming?', HOUR, 'c1', 'Maya'), [
+        first,
+      ]),
+    ).toBe('a');
+  });
+
+  test('the same long notice passed on by someone else is still one notice', () => {
+    const notice =
+      'No classes on Monday, the campus is closed for the holiday, please tell your blockmates.';
+    const first = {
+      message: message('a', notice, 0, 'g1', 'Prof. Reyes'),
+      record: record('a'),
+    };
+    expect(
+      findDuplicate(message('b', notice, HOUR, 'g2', 'Carla'), [first]),
+    ).toBe('a');
   });
 });

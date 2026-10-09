@@ -76,6 +76,10 @@ export function createFakeBridge(seed: CapturedNotification[] = []): FakeBridge 
     async scheduleReminder(title, at) {
       reminders.push({ title, at });
     },
+    async cancelReminder(title, at) {
+      const index = reminders.findIndex(r => r.title === title && r.at === at);
+      if (index !== -1) reminders.splice(index, 1);
+    },
     async isOnline() {
       return online;
     },

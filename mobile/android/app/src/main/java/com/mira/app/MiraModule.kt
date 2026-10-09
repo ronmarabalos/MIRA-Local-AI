@@ -140,6 +140,12 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
     promise.resolve(null)
   }
 
+  @ReactMethod
+  fun cancelReminder(title: String, at: Double, promise: Promise) {
+    ReminderReceiver.cancel(reactApplicationContext, title, at.toLong())
+    promise.resolve(null)
+  }
+
   /** The model file's path, or null when it has not been copied to the phone. */
   @ReactMethod
   fun getModelPath(promise: Promise) {

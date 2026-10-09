@@ -50,15 +50,24 @@ class ReminderReceiver : BroadcastReceiver() {
     private const val EXTRA_TITLE = "title"
     private const val EXTRA_ID = "id"
 
-    fun schedule(context: Context, title: String, at: Long) {
+    /** The same title and time always give the same alarm, so it can be found again. */
+    private fun pendingFor(context: Context, title: String, at: Long): PendingIntent {
       val id = (title.hashCode() * 31 + at.hashCode())
       val intent =
           Intent(context, ReminderReceiver::class.java)
               .putExtra(EXTRA_TITLE, title)
               .putExtra(EXTRA_ID, id)
-      val pending =
-          PendingIntent.getBroadcast(
-              context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+      return PendingIntent.getBroadcast(
+          context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    fun cancel(context: Context, title: String, at: Long) {
+      val alarms = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+      alarms.cancel(pendingFor(context, title, at))
+    }
+
+    fun schedule(context: Context, title: String, at: Long) {
+      val pending = pendingFor(context, title, at)
       val alarms = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
       val exact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarms.canScheduleExactAlarms()
       if (exact) {

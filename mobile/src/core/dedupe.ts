@@ -15,6 +15,11 @@ function words(text: string): string[] {
     .filter(Boolean);
 }
 
+/** Long enough that two people sending the same words means a forwarded notice, not chance. */
+export function isLongMessage(text: string): boolean {
+  return words(text).length >= MIN_WORDS_FOR_OVERLAP;
+}
+
 /**
  * True when two messages say the same thing: the same words once case,
  * punctuation, and spacing are ignored, or, for longer messages, at least
@@ -49,7 +54,8 @@ export interface DuplicateCandidate {
  * The id of the earlier message this one repeats, or null. Only messages the
  * model has already read count as originals, and a copy of a copy points at
  * the first message. Spec 4.7 speaks of the same notice in two chats; the
- * same message sent twice in one chat is treated the same way.
+ * same message sent twice in one chat is treated the same way. A short
+ * message only repeats one from the same sender.
  */
 export function findDuplicate(
   message: Message,
@@ -64,7 +70,10 @@ export function findDuplicate(
       candidate.record.duplicateOf !== null ||
       other.postedAt > message.postedAt ||
       message.postedAt - other.postedAt > DUPLICATE_WINDOW_MS ||
-      !isSameText(message.text, other.text)
+      !isSameText(message.text, other.text) ||
+      // Two people sending the same short message ("Are you coming?") mean two
+      // things; the same long notice from two people is one notice passed on.
+      (other.sender !== message.sender && !isLongMessage(message.text))
     ) {
       continue;
     }

@@ -25,7 +25,10 @@ export type ActionStore = Pick<
 >;
 
 export interface ActionDeps {
-  bridge: Pick<NativeBridge, 'sendReply' | 'scheduleReminder' | 'isOnline'>;
+  bridge: Pick<
+    NativeBridge,
+    'sendReply' | 'scheduleReminder' | 'cancelReminder' | 'isOnline'
+  >;
   model: Pick<ModelService, 'draftReply'>;
   store: ActionStore;
   now?: () => number;
@@ -213,6 +216,52 @@ export function createActionRunner({
   }
 
   return {
+    /**
+     * Takes back what was done for a message that turned out to repeat an
+     * earlier one: its waiting draft is discarded and its reminder cancelled,
+     * unless the first message has the very same reminder.
+     */
+    async retract(copyId: string, originalId: string): Promise<void> {
+      const reason =
+        'This message repeats an earlier one, so this was taken back.';
+      for (const draft of await store.getDrafts('waiting')) {
+        if (draft.messageId === copyId) {
+          await store.updateDraft(draft.id, { status: 'discarded' });
+        }
+      }
+      const all = await store.getActions(Number.MAX_SAFE_INTEGER, 500);
+      const sameReminder = (a: Action, b: Action) =>
+        a.payload.title === b.payload.title && a.payload.at === b.payload.at;
+      const kept = all.filter(
+        a =>
+          a.messageId === originalId &&
+          a.status === 'done' &&
+          a.payload.at !== undefined,
+      );
+      for (const action of all) {
+        if (
+          action.messageId !== copyId ||
+          action.status !== 'done' ||
+          action.kind === 'send'
+        ) {
+          continue;
+        }
+        const at = Number(action.payload.at);
+        if (
+          action.payload.title &&
+          at > now() &&
+          !kept.some(k => sameReminder(k, action))
+        ) {
+          await bridge.cancelReminder(action.payload.title, at);
+        }
+        await store.updateAction(action.id, {
+          status: 'undone',
+          reason,
+          doneAt: now(),
+        });
+      }
+    },
+
     /** Applies the user's rules to a message that has just been read. */
     async onRecord(item: StoredItem): Promise<void> {
       const { message, chat, record } = item;

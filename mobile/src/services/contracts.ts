@@ -39,6 +39,8 @@ export interface NativeBridge {
   sendReply(notificationKey: string, text: string): Promise<ReplyResult>;
   /** Posts a local notification at the given time (epoch milliseconds). */
   scheduleReminder(title: string, at: number): Promise<void>;
+  /** Cancels a reminder set with the same title and time. Does nothing if it has already fired. */
+  cancelReminder(title: string, at: number): Promise<void>;
   isOnline(): Promise<boolean>;
   onOnlineChange(listener: (online: boolean) => void): Unsubscribe;
   getProofFacts(): Promise<ProofFacts>;

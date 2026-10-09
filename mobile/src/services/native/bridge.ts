@@ -51,6 +51,7 @@ export function createNativeBridge(
       };
     },
     sendReply: (key, text) => native.sendReply(key, text),
+    cancelReminder: (title, at) => native.cancelReminder(title, at),
     async scheduleReminder(title, at) {
       // Android 13 and later ask the user before an app may post notifications.
       if (Platform.OS === 'android' && Number(Platform.Version) >= 33) {

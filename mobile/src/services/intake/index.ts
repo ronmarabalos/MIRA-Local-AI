@@ -23,6 +23,8 @@ export interface IntakeDeps {
   store: IntakeStore;
   /** Called after a message has been read by the model and stored, to apply the rules. */
   onProcessed?: (item: StoredItem) => Promise<void>;
+  /** Called when an already stored message is found to repeat an earlier one. */
+  onDuplicateLinked?: (copyId: string, originalId: string) => Promise<void>;
 }
 
 const SUMMARY_MAX = 120;
@@ -59,6 +61,7 @@ export function createIntake({
   model,
   store,
   onProcessed,
+  onDuplicateLinked,
 }: IntakeDeps) {
   let running: Promise<void> | null = null;
   let again = false;
@@ -162,17 +165,25 @@ export function createIntake({
     ).sort((a, b) => a.message.postedAt - b.message.postedAt);
     for (const item of recent) {
       const { message, record } = item;
-      if (
-        !record ||
-        record.duplicateOf !== null ||
-        message.status !== 'processed'
-      ) {
+      if (!record || message.status !== 'processed') {
+        continue;
+      }
+      if (record.duplicateOf !== null) {
+        // Linked by an earlier version, before its draft or reminder was taken back.
+        if (onDuplicateLinked) {
+          await onDuplicateLinked(message.id, record.duplicateOf).catch(
+            () => {},
+          );
+        }
         continue;
       }
       const originalId = findDuplicate(message, recent);
       if (originalId) {
         record.duplicateOf = originalId;
         await store.saveRecord(record, 'processed');
+        if (onDuplicateLinked) {
+          await onDuplicateLinked(message.id, originalId).catch(() => {});
+        }
       }
     }
   }

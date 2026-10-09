@@ -132,7 +132,10 @@ describe('rules to actions', () => {
   test('two concurrent confirmations send a draft only once', async () => {
     const { runner, bridge, drafts } = setup();
     await runner.onRecord(item());
-    await Promise.all([runner.sendDraft(drafts[0].id), runner.sendDraft(drafts[0].id)]);
+    await Promise.all([
+      runner.sendDraft(drafts[0].id),
+      runner.sendDraft(drafts[0].id),
+    ]);
     expect(bridge.sentReplies).toHaveLength(1);
   });
 
@@ -277,5 +280,45 @@ describe('sending a draft', () => {
     const { runner, bridge } = setup();
     expect(await runner.sendDraft('missing')).toBe('needs_you');
     expect(bridge.sentReplies).toEqual([]);
+  });
+});
+
+describe('taking back what a repeated message caused', () => {
+  test('the copy loses its waiting draft and its reminder; the log says why', async () => {
+    const { runner, bridge, actions, drafts } = setup();
+    await runner.onRecord(item());
+    await runner.onRecord(item({ type: 'deadline', dateAt: NOW + 5 * HOUR }));
+    expect(drafts[0].status).toBe('waiting');
+    expect(bridge.reminders).toHaveLength(1);
+
+    await runner.retract('m1', 'the-original');
+
+    expect(drafts[0].status).toBe('discarded');
+    expect(bridge.reminders).toEqual([]);
+    const undone = actions.filter(a => a.status === 'undone');
+    expect(undone).toHaveLength(2);
+    expect(undone[0].reason).toMatch(/repeats an earlier one/);
+  });
+
+  test('a reminder the first message also has is left in place', async () => {
+    const { runner, bridge, actions } = setup();
+    await runner.onRecord(item({ type: 'deadline', dateAt: NOW + 5 * HOUR }));
+    // The first message has the same reminder: same words, same time.
+    actions.push({ ...actions[0], id: 'kept', messageId: 'the-original' });
+
+    await runner.retract('m1', 'the-original');
+
+    expect(bridge.reminders).toHaveLength(1);
+    expect(actions.find(a => a.id === 'kept')?.status).toBe('done');
+    expect(actions[0].status).toBe('undone');
+  });
+
+  test('a reply that was already sent is not touched', async () => {
+    const { runner, actions, drafts } = setup();
+    await runner.onRecord(item());
+    await runner.sendDraft(drafts[0].id);
+    await runner.retract('m1', 'the-original');
+    expect(drafts[0].status).toBe('sent');
+    expect(actions.find(a => a.kind === 'send')?.status).toBe('done');
   });
 });
