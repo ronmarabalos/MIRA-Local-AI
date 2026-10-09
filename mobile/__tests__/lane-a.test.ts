@@ -3,6 +3,7 @@ import type { CapturedNotification, Message } from '../src/core/types';
 import { parseExtraction } from '../src/core/verify';
 import {
   EXTRACT_GRAMMAR,
+  cleanDraft,
   expandShortRecord,
   messageBlock,
 } from '../src/services/model/prompts';
@@ -64,6 +65,29 @@ describe('extraction prompt', () => {
       expect(EXTRACT_GRAMMAR).toContain(`"\\"${type}\\""`);
     }
     expect(EXTRACT_GRAMMAR).not.toMatch(/\bws\b|space/);
+  });
+});
+
+describe('reply drafts', () => {
+  test('a draft is tidied: chat marker, quotes, and space removed', () => {
+    expect(
+      cleanDraft('<|im_start|>assistant\n"Sure, 3 PM works for me."  '),
+    ).toBe('Sure, 3 PM works for me.');
+  });
+
+  test('a refusal or an empty answer is an error, never a draft', () => {
+    expect(() =>
+      cleanDraft("I'm sorry, but I can't assist with that."),
+    ).toThrow();
+    expect(() => cleanDraft('I cannot help with this request.')).toThrow();
+    expect(() => cleanDraft('As an AI, I am not able to reply.')).toThrow();
+    expect(() => cleanDraft('   ')).toThrow();
+  });
+
+  test('a reply that merely starts politely is kept', () => {
+    expect(cleanDraft('Sorry for the late reply! Yes, I can come.')).toBe(
+      'Sorry for the late reply! Yes, I can come.',
+    );
   });
 });
 

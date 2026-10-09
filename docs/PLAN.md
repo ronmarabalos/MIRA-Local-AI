@@ -256,12 +256,13 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 **Lane A**
 
-- [ ] **Task A3.1: Draft and send a reply**
-  - **Priority:** P0 · **Status:** In Progress
+- [x] **Task A3.1: Draft and send a reply**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/model/index.ts`, `MiraModule.kt`, `mobile/src/services/native/bridge.ts`
   - **Do:** `draftReply(message)`, at most 60 words. `sendReply(key, text)` returning `sent` or `gone`; the listener keeps reply handles by notification key. If A1.3 found replies do not work, `sendReply` copies the text and opens the chat.
   - **Done when:** a reply typed in the app reaches Messenger from the phone.
   - **State (2026-10-10):** sending is confirmed on the Infinix (A1.3). `draftReply` is in `services/model/index.ts` (at most 60 words, message inside a data block). **Phone check handed to Ronmar:** with a Messenger notification showing, open the dev menu → **MIRA probe** → **Switch on Messenger + Gmail** → receive a new message → **Refresh** → **Draft a reply** on its card. Record the draft's quality and seconds here. Without a model file on the phone the draft is the fake one-liner.
+  - **Draft quality (2026-10-10, Infinix):** after the prompt fix, "Can we move our group meeting to tomorrow at 3 PM?" drafted "Sure, tomorrow at 3 PM works for me. See you then!" in 2.5 s. Filipino small talk gets a Filipino reply that is usable but can read stiffly. Check any draft before it is shown in the demo.
 
 - [x] **Task A3.2: Reminders**
   - **Priority:** P0 · **Status:** Done
@@ -336,9 +337,19 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **State (2026-10-10):** the code has been in place since A2.1: `isOnline()` and the `MiraOnline` event in `MiraModule.kt`, passed through by `bridge.ts` and covered by a unit test. Online means a network that Android has validated as reaching the internet. The probe's section 3 shows the live state and counts changes. **Checked on the Infinix (2026-10-10):** with airplane mode on and Wi-Fi off the probe read `online: no`, and `online: yes` again after reconnecting, with exactly one change each way. The model loaded and answered while offline. Two findings: (1) the first version reported `yes` while offline, because Android announces a lost network before it stops being the active one; the module now reads the state half a second later and tells JavaScript only when it changes. (2) **On this phone, airplane mode leaves Wi-Fi connected**, so airplane mode alone does not take it offline. For demo step 8, turn Wi-Fi off as well, or the reply will send instead of queueing.
 
 - [ ] **Task A4.2: Fix what the phone shows**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Do:** run the whole demo script on the release build and fix native or model problems. Tune the prompt only against the fixture set.
   - **Done when:** demo steps 1 to 3 and 6 to 9 pass on the release build.
+  - **First walkthrough on the Infinix (2026-10-10, debug build of `main` at da1b098):**
+    - **Working:** Home shows real items with MIRA's summary and the quoted source. Privacy proof reads live facts and says "Development build: internet permission present". Approvals shows a real draft with its original message and the rule that caused it. Connected Apps lists the phone's apps with both levels.
+    - **Fixed (Lane A):** the waiting draft read "I'm sorry, but I can't assist with that." The draft prompt now has examples and asks for the student's own voice, and `cleanDraft` rejects a refusal or an empty answer so it is logged as failed instead of shown. On the phone the three sample drafts now read naturally (2 to 13 seconds each; the first is slower because the instructions are read once).
+    - **For Lane B:**
+      1. Onboarding and setup show on every launch; completing them is not remembered.
+      2. Setup step 2 shows design sample text, "Download size 1.8 GB" and "Wi-Fi recommended", which contradicts the no-internet claim. Onboarding also says "Meet your personal AI", against the wording rule.
+      3. Approvals buttons show the draft's internal id: "Send reply d-mv1ecjkc-8", "Discard draft d-mv1ecjkc-8".
+      4. Connected Apps lists every installed app alphabetically, so Messenger is far down; switched-on and message apps should come first.
+      5. Privacy proof shows "Average processing time: no timed messages yet" with 48 messages processed; either record the time or drop the line.
+    - **Not yet walked:** Automations, Activity, sending a reply from Approvals, and the airplane-mode step. Screens with a moving companion cannot be read by the automation helper, so these need a person or screenshots.
 
 **Lane B**
 

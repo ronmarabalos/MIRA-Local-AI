@@ -6,6 +6,7 @@ import {
   DRAFT_SYSTEM,
   EXTRACT_GRAMMAR,
   EXTRACT_SYSTEM,
+  cleanDraft,
   expandShortRecord,
   messageBlock,
 } from './prompts';
@@ -72,7 +73,7 @@ export function createDeviceModel(fallback: ModelService): ModelService {
             maxTokens: 110,
           },
         );
-        return text.trim();
+        return cleanDraft(text);
       }),
   };
 }

@@ -280,6 +280,49 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
     say('All rules are switched on.');
   };
 
+  /** Drafts replies to a few typical messages, to judge wording and time. */
+  const draftSamples = async () => {
+    const samples: [string, string][] = [
+      ['Bea', 'hahaha grabe yung prof kanina sobrang strict talaga'],
+      [
+        'Maya',
+        'Can we move our group meeting to tomorrow at 3 PM? I have a conflict in the morning.',
+      ],
+      ['Jun', 'Pwede mo ba i-send yung notes natin sa Data Structures?'],
+    ];
+    for (const [sender, text] of samples) {
+      const started = Date.now();
+      try {
+        const draft = await model.draftReply(
+          {
+            id: sender,
+            notificationKey: sender,
+            packageName: 'com.facebook.orca',
+            chatId: sender,
+            sender,
+            text,
+            postedAt: Date.now(),
+            truncated: false,
+            canReply: true,
+            status: 'new',
+          },
+          { chatTitle: sender, chatKind: 'private' },
+        );
+        say(
+          `DRAFT for ${sender} in ${((Date.now() - started) / 1000).toFixed(
+            1,
+          )} s: ${draft}`,
+        );
+      } catch (error) {
+        say(
+          `DRAFT for ${sender} failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
+  };
+
   const injectFixtures = () => {
     if ('inject' in bridge) {
       (bridge as { inject(n: CapturedNotification[]): void }).inject(
@@ -321,6 +364,7 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
         <Button label="Run fixtures" onPress={() => runFixtures()} />
         <Button label="Run 6" onPress={() => runFixtures(6)} />
         <Button label="Inject fixtures" onPress={injectFixtures} />
+        <Button label="Draft samples" onPress={draftSamples} />
       </View>
       {modelLog.map((line, index) => (
         <Text key={index} style={styles.mono}>
