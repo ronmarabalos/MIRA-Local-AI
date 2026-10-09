@@ -274,6 +274,7 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Do:** move `INTERNET` to the debug manifest only. `getProofFacts()` returns whether the installed app holds the permission, and the bytes-sent count if A1.3 found it.
   - **Done when:** the release build's merged manifest has no `android.permission.INTERNET` (safety requirement 6) and the release app runs on the phone.
   - **State (2026-10-10):** `INTERNET` is declared only in `src/debug/AndroidManifest.xml`; `src/release/AndroidManifest.xml` removes it even if a library asks for it. **Verified on the built release APK** with `aapt2 dump permissions`: it declares `POST_NOTIFICATIONS`, `USE_EXACT_ALARM`, `SCHEDULE_EXACT_ALARM` (to API 32), and `ACCESS_NETWORK_STATE`, and **no `android.permission.INTERNET`** (safety requirement 6). `getProofFacts()` returns the permission check, bytes sent since the phone last started, and the build type. Build with `cd mobile/android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a`; the first run compiles llama.rn for about 25 minutes. **Still to do:** install the release APK on a phone and confirm it starts (it replaces the debug app, so the probe is gone until the debug app is reinstalled).
+  - **Rebuilt from `main` at 8f10ba3 (with the design screens):** 2 minutes 21 seconds, 120 MB, and the same permission list with **no `INTERNET`**.
 
 - [x] **Task A3.4: Wire the new bridge methods**
   - **Priority:** P0 · **Status:** Done
@@ -296,6 +297,7 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Do:** write every action to the `actions` table before it runs and update it with the result (safety requirement 8). Log screen to board `21-activity-history`, showing the rule and, for blocked actions, the reason.
   - **Done when:** a hostile fixture message shows in the log as blocked, with the reason.
   - **State (2026-10-10):** the action runner is built by Steve; **the Activity screen is still Ronmar's.** `services/actions/index.ts` logs every action before it runs and updates it with the result (safety requirement 8), with the rule that caused it and, for blocked ones, the reason. A message that tries to give instructions is logged as blocked even when no rule matches. Intake calls it after each message the model reads. For screens: `getActionRunner()` in `services/actions/runner.ts`; the log is `useActions()`. Calendar actions are logged as blocked (not in this build). See the log on a phone with the probe's **Show log** button.
+  - **Checked on the Infinix (2026-10-10):** with the three rules switched on and the 35 fixtures injected, the log held 11 entries: 3 reminders set, 1 reply drafted and left waiting, 3 reminders blocked with "No date was found to remind you about", and 4 hostile-message entries blocked with "The message tries to give instructions, so nothing was done" (three with no rule involved, one where the reminder rule had matched). Nothing was sent. The fixture alarms were cancelled afterwards.
 
 - [ ] **Task B3.3: Rules screen**
   - **Priority:** P0 · **Status:** Backlog
