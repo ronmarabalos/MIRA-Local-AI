@@ -159,7 +159,7 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Done when:** tests cover each filter class, copied-field clearing, an unresolvable date phrase, and malformed model output.
 
 - [ ] **Task B1.3: Storage**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress. Schema with numbered migrations, `createStore` over any SQLite database, `getStore()` on op-sqlite, and hooks for Today, Item detail, Channels, Approvals, Activity log, and Rules. Unit tests run the real SQL on Node's built-in SQLite (needs Node 22.13 or newer). Remaining: the on-device check.
   - **Files:** `mobile/src/services/db/schema.ts`, `mobile/src/services/db/index.ts`, query hooks in `mobile/src/services/db/hooks.ts`
   - **Do:** the tables in spec 5.1 except `memory` and `chats.enabled`; writes in transactions; one query hook per screen need.
   - **Done when:** a message and its record can be written and read back on the phone or an emulator.
