@@ -1,34 +1,66 @@
 /**
- * Every screen is registered here in Phase 0, so each lane fills in files
- * that already exist. Only Lane B edits this file afterwards.
+ * Every board in docs/design/screens is a screen here, linked the way the
+ * boards link to each other. Home, Inbox, Teach, and Planner are tabs; the
+ * floating tab bar is drawn by each screen that shows it, as on the boards.
  */
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import ActivityLogScreen from './screens/ActivityLog';
+import palette from './theme/palette';
+import ActivityScreen from './screens/Activity';
 import ApprovalsScreen from './screens/Approvals';
-import AskScreen from './screens/Ask';
-import ChannelsScreen from './screens/Channels';
-import ItemDetailScreen from './screens/ItemDetail';
+import AssistantScreen from './screens/Assistant';
+import AutomationBuilderScreen from './screens/AutomationBuilder';
+import AutomationReviewScreen from './screens/AutomationReview';
+import AutomationsScreen from './screens/Automations';
+import ConnectedAppsScreen from './screens/ConnectedApps';
+import EmailDetailScreen from './screens/EmailDetail';
+import HomeScreen from './screens/Home';
+import InboxScreen from './screens/Inbox';
+import MemoryScreen from './screens/Memory';
+import ModelSetupScreen from './screens/ModelSetup';
+import NotificationsScreen from './screens/Notifications';
+import OfflineSyncScreen from './screens/OfflineSync';
 import OnboardingScreen from './screens/Onboarding';
-import PrivacyProofScreen from './screens/PrivacyProof';
-import RulesScreen from './screens/Rules';
-import TodayScreen from './screens/Today';
+import PlannerScreen from './screens/Planner';
+import ProfileScreen from './screens/Profile';
+import SettingsScreen from './screens/Settings';
+import SetupScreen from './screens/Setup';
+import SplashScreen from './screens/Splash';
+import TeachScreen from './screens/Teach';
+import TeachExampleScreen from './screens/TeachExample';
+import TeachInstructionScreen from './screens/TeachInstruction';
 
 export type TabParamList = {
-  Today: undefined;
-  Ask: undefined;
-  Approvals: undefined;
-  Rules: undefined;
+  Home: undefined;
+  Inbox: undefined;
+  Teach: undefined;
+  /** Tasks (board 16) or Calendar (board 17). */
+  Planner: { view?: 'tasks' | 'calendar' } | undefined;
 };
 
 export type RootStackParamList = {
-  Tabs: undefined;
-  ItemDetail: { messageId: string };
-  Channels: undefined;
-  ActivityLog: undefined;
-  PrivacyProof: undefined;
+  Splash: undefined;
   Onboarding: undefined;
+  Setup: undefined;
+  ModelSetup: undefined;
+  Tabs: NavigatorScreenParams<TabParamList> | undefined;
+  Assistant: undefined;
+  TeachInstruction: undefined;
+  TeachExample: undefined;
+  AutomationBuilder: undefined;
+  AutomationReview: undefined;
+  Automations: undefined;
+  EmailDetail: undefined;
+  Approvals: undefined;
+  Memory: undefined;
+  ConnectedApps: undefined;
+  OfflineSync: undefined;
+  Activity: undefined;
+  Notifications: undefined;
+  Profile: undefined;
+  Settings: undefined;
 };
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -36,24 +68,41 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function Tabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen name="Today" component={TodayScreen} />
-      <Tab.Screen name="Ask" component={AskScreen} />
-      <Tab.Screen name="Approvals" component={ApprovalsScreen} />
-      <Tab.Screen name="Rules" component={RulesScreen} />
+    <Tab.Navigator tabBar={() => null} screenOptions={{ headerShown: false, animation: 'fade' }}>
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Inbox" component={InboxScreen} />
+      <Tab.Screen name="Teach" component={TeachScreen} />
+      <Tab.Screen name="Planner" component={PlannerScreen} />
     </Tab.Navigator>
   );
 }
 
 export function RootNavigator() {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
-      <Stack.Screen name="ItemDetail" component={ItemDetailScreen} options={{ title: 'Message' }} />
-      <Stack.Screen name="Channels" component={ChannelsScreen} />
-      <Stack.Screen name="ActivityLog" component={ActivityLogScreen} options={{ title: 'Activity' }} />
-      <Stack.Screen name="PrivacyProof" component={PrivacyProofScreen} options={{ title: 'Privacy' }} />
-      <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ headerShown: false }} />
+    <Stack.Navigator
+      initialRouteName="Splash"
+      screenOptions={{ headerShown: false, contentStyle: { backgroundColor: palette.silk.base } }}
+    >
+      <Stack.Screen name="Splash" component={SplashScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="Onboarding" component={OnboardingScreen} options={{ animation: 'fade' }} />
+      <Stack.Screen name="Setup" component={SetupScreen} />
+      <Stack.Screen name="ModelSetup" component={ModelSetupScreen} />
+      <Stack.Screen name="Tabs" component={Tabs} options={{ animation: 'fade' }} />
+      <Stack.Screen name="Assistant" component={AssistantScreen} options={{ animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="TeachInstruction" component={TeachInstructionScreen} />
+      <Stack.Screen name="TeachExample" component={TeachExampleScreen} />
+      <Stack.Screen name="AutomationBuilder" component={AutomationBuilderScreen} />
+      <Stack.Screen name="AutomationReview" component={AutomationReviewScreen} />
+      <Stack.Screen name="Automations" component={AutomationsScreen} />
+      <Stack.Screen name="EmailDetail" component={EmailDetailScreen} />
+      <Stack.Screen name="Approvals" component={ApprovalsScreen} />
+      <Stack.Screen name="Memory" component={MemoryScreen} />
+      <Stack.Screen name="ConnectedApps" component={ConnectedAppsScreen} />
+      <Stack.Screen name="OfflineSync" component={OfflineSyncScreen} />
+      <Stack.Screen name="Activity" component={ActivityScreen} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
     </Stack.Navigator>
   );
 }

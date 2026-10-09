@@ -1,0 +1,91 @@
+/**
+ * Every ported board renders on its own and shows its own copy.
+ */
+import React, { type ComponentType } from 'react';
+import ReactTestRenderer from 'react-test-renderer';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { PrefsProvider } from '../src/theme/prefs';
+import ActivityScreen from '../src/screens/Activity';
+import ApprovalsScreen from '../src/screens/Approvals';
+import AssistantScreen from '../src/screens/Assistant';
+import AutomationBuilderScreen from '../src/screens/AutomationBuilder';
+import AutomationReviewScreen from '../src/screens/AutomationReview';
+import AutomationsScreen from '../src/screens/Automations';
+import ConnectedAppsScreen from '../src/screens/ConnectedApps';
+import EmailDetailScreen from '../src/screens/EmailDetail';
+import HomeScreen from '../src/screens/Home';
+import InboxScreen from '../src/screens/Inbox';
+import MemoryScreen from '../src/screens/Memory';
+import ModelSetupScreen from '../src/screens/ModelSetup';
+import NotificationsScreen from '../src/screens/Notifications';
+import OfflineSyncScreen from '../src/screens/OfflineSync';
+import OnboardingScreen from '../src/screens/Onboarding';
+import PlannerScreen from '../src/screens/Planner';
+import ProfileScreen from '../src/screens/Profile';
+import SettingsScreen from '../src/screens/Settings';
+import SetupScreen from '../src/screens/Setup';
+import SplashScreen from '../src/screens/Splash';
+import TeachScreen from '../src/screens/Teach';
+import TeachExampleScreen from '../src/screens/TeachExample';
+import TeachInstructionScreen from '../src/screens/TeachInstruction';
+
+const Stack = createNativeStackNavigator();
+
+async function render(component: ComponentType<any>, params?: object) {
+  let tree: ReactTestRenderer.ReactTestRenderer;
+  await ReactTestRenderer.act(() => {
+    tree = ReactTestRenderer.create(
+      <SafeAreaProvider>
+        <PrefsProvider>
+          <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="Board" component={component} initialParams={params} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </PrefsProvider>
+      </SafeAreaProvider>,
+    );
+  });
+  const text = JSON.stringify(tree!.toJSON());
+  await ReactTestRenderer.act(() => tree!.unmount());
+  return text;
+}
+
+const BOARDS: [string, ComponentType<any>, string, object?][] = [
+  ['01 splash', SplashScreen, 'Waking up your on-device assistant'],
+  ['02 onboarding', OnboardingScreen, 'Meet your personal AI.'],
+  ['03 initial setup', SetupScreen, 'What should MIRA call you?'],
+  ['04 model setup', ModelSetupScreen, 'Your AI runs on this device'],
+  ['05 home', HomeScreen, 'Here’s what matters today'],
+  ['06 assistant', AssistantScreen, 'how can I help you this morning?'],
+  ['07 teach', TeachScreen, 'Three ways to teach'],
+  ['08 teach by instruction', TeachInstructionScreen, 'What would you like MIRA to learn?'],
+  ['09 teach by example', TeachExampleScreen, 'Show MIRA an example.'],
+  ['10 automation builder', AutomationBuilderScreen, 'Create an Automation'],
+  ['11 review and approve', AutomationReviewScreen, 'PROPOSED · NOT ACTIVE'],
+  ['12 my automations', AutomationsScreen, 'RECENT RUNS'],
+  ['13 inbox', InboxScreen, 'Can we reschedule our meeting?'],
+  ['14 email and reply', EmailDetailScreen, 'MIRA SUMMARY'],
+  ['15 approval center', ApprovalsScreen, 'Needs Your Approval'],
+  ['16 tasks', PlannerScreen, 'Reply to Sam about dinner'],
+  ['17 calendar', PlannerScreen, 'October 2026', { view: 'calendar' }],
+  ['18 personal memory', MemoryScreen, 'What MIRA Remembers'],
+  ['19 connected apps', ConnectedAppsScreen, 'Choose what MIRA can access.'],
+  ['20 offline and sync', OfflineSyncScreen, 'Pending When Online'],
+  ['21 activity history', ActivityScreen, 'Drafted reply to Jordan Lee'],
+  ['22 notifications', NotificationsScreen, 'Mark all read'],
+  ['23 profile', ProfileScreen, 'Personal memory'],
+  ['24 settings', SettingsScreen, 'PERSONALIZATION'],
+];
+
+// Each row is passed as one object: with spread rows, Jest reads a missing
+// trailing argument as a `done` callback and waits for it.
+test.each(BOARDS.map(([name, component, expected, params]) => ({ name, component, expected, params })))(
+  'board $name renders',
+  async ({ component, expected, params }) => {
+    expect(await render(component, params)).toContain(expected);
+  },
+);

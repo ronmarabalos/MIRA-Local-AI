@@ -121,6 +121,14 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
     - `navigation.tsx`: bottom bar with Today, Ask, Approvals, Rules; a stack with Item detail, Channels, Activity log, Privacy proof, Onboarding. Each screen file renders its own name.
   - **Done when:** `npm run verify:agent` passes and the four tabs open on the Infinix.
 
+- [x] **Task UI.1: Every design board ported to React Native with Tailwind (NativeWind)**
+  - **Priority:** P0 · **Status:** Done (Android verified on the emulator; iOS not yet built) · **Lane:** B, with a Lane A dependency change to announce
+  - **What it is:** one screen folder per board, named as in "Screens follow the design's screen set" (Phase 2) and the table in [`docs/design/README.md`](design/README.md), with the floating tab bar (Home, Inbox, MIRA, Teach, Planner). The seven spec placeholder screens (Today, Ask, Rules, ItemDetail, Channels, ActivityLog, PrivacyProof) are removed. Each screen still shows the board's own demo copy and data; tasks B2.3 onwards replace that with stored data and drop board features the spec does not have (calendar sync, cloud accounts), per the design README.
+  - **Files:** `mobile/src/screens/**` (one folder per board; `Planner` holds boards 16 and 17), `mobile/src/components/**`, `mobile/src/theme/**`, `mobile/src/navigation.tsx`, `mobile/App.tsx`, `mobile/tailwind.config.js`, `mobile/global.css`, `mobile/babel.config.js`, `mobile/metro.config.js`, `mobile/jest.config.js`, `mobile/__tests__/screens.test.tsx`.
+  - **Libraries added (Lane A owns `package.json`; tell Steve):** `nativewind` 4.2, `tailwindcss` 3.4 (dev), `react-native-reanimated` 4.7 and `react-native-worklets` 0.13 (NativeWind needs them), `react-native-svg` 15.15 (icons and companion). Native rebuild required.
+  - **Design notes:** colour tokens live in `mobile/src/theme/palette.js` (shared by Tailwind and code); multi-layer shadows and gradients in `theme/effects.ts` (React Native draws them natively). Glass has no backdrop blur, as B1.4 says. The companion (`Mira-lbou`) is referenced by the design file but not included in it, so `components/Companion.tsx` rebuilds it from the five states and keyframes on the boards. Demo state on each board (switches, drafts, filters) works in memory; nothing is stored yet (B1.3).
+  - **Done when:** `npm run verify:agent` passes (24 board render tests) and the app runs on Android.
+
 ### Phase 1: Prove the risky parts (T+0:30 to T+2:30)
 
 **Lane A**
@@ -378,4 +386,4 @@ Not in this window. Take one only if Phase 5 is finished early and everything ab
 - [ ] **Task 3.2: iPhone version**
   - **Priority:** P2
   - **Status:** In Progress (scaffold restored on `main`, not yet agreed with Steve)
-  - **Description:** The iOS project, Gemfile, and `cli-platform-ios` are back in `mobile/`. Remaining, on a Mac: `pod install` and a first build; register the Onest fonts in `Info.plist`; share-in intake (message, email, or screenshot shared into MIRA) in place of the notification listener; replies copied to the clipboard; Privacy proof reduced to what iOS can show. Everything after intake is the shared TypeScript.
+  - **Description:** The iOS project, Gemfile, and `cli-platform-ios` are back in `mobile/`. The Onest fonts are now registered in `Info.plist` and the Xcode target (Task UI.1). Remaining, on a Mac: `pod install` and a first build; share-in intake (message, email, or screenshot shared into MIRA) in place of the notification listener; replies copied to the clipboard; Privacy proof reduced to what iOS can show. Everything after intake is the shared TypeScript.
