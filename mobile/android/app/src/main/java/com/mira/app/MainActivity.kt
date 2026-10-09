@@ -1,11 +1,18 @@
 package com.mira.app
 
+import android.os.Bundle
 import com.facebook.react.ReactActivity
+import android.os.Bundle
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 class MainActivity : ReactActivity() {
+
+  /** react-native-screens restores its own state, so the saved state is not passed on. */
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(null)
+  }
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
