@@ -1,0 +1,109 @@
+{
+  "status": "initialized",
+  "project": {
+    "name": "mira",
+    "description": "MIRA: a private on-device assistant that reads notifications from the apps you choose, reports what matters, and handles what you have approved. No internet access of its own.",
+    "archetype": "mobile-local-ai",
+    "stack": {
+      "frontend": "React Native 0.87 (TypeScript), Android",
+      "backend": "None \u2014 fully on-device",
+      "database": "SQLite on device",
+      "ai": "Local LLM via llama.rn; Android NotificationListenerService (Kotlin native module)",
+      "auth": "None"
+    },
+    "team": {
+      "dev1": {
+        "name": "Steve",
+        "role": "Full Stack"
+      },
+      "dev2": {
+        "name": "Ronmar",
+        "role": "Full Stack"
+      }
+    }
+  },
+  "archetypes": {
+    "fullstack-web": {
+      "name": "Full-Stack Web Application (Next.js / Vite + Backend)",
+      "keep_skills": [
+        "caveman",
+        "ponytail",
+        "ui-ux-pro-max",
+        "impeccable",
+        "archify",
+        "webapp-testing",
+        "owasp-security",
+        "varlock",
+        "pitch-architect",
+        "demo-seed-data",
+        "fast-track"
+      ],
+      "rules_preset": "fullstack-web"
+    },
+    "ai-agent-app": {
+      "name": "AI Agent / LLM Pipeline (FastAPI / Node + Multi-Agent)",
+      "keep_skills": [
+        "caveman",
+        "ponytail",
+        "prompt-engineer",
+        "agentic-eval",
+        "varlock",
+        "owasp-security",
+        "pitch-architect",
+        "demo-seed-data",
+        "archify",
+        "fast-track"
+      ],
+      "rules_preset": "ai-agent"
+    },
+    "frontend-dashboard": {
+      "name": "Frontend Dashboard / SPA (Vite + React + Tailwind)",
+      "keep_skills": [
+        "caveman",
+        "ponytail",
+        "ui-ux-pro-max",
+        "impeccable",
+        "design-system",
+        "slides",
+        "banner-design",
+        "demo-seed-data",
+        "pitch-architect",
+        "webapp-testing",
+        "fast-track"
+      ],
+      "rules_preset": "frontend-dashboard"
+    },
+    "minimal-hackathon": {
+      "name": "Ultra-Lean Hackathon Sprint (Core Essentials Only)",
+      "keep_skills": [
+        "caveman",
+        "ponytail",
+        "ui-ux-pro-max",
+        "impeccable",
+        "pitch-architect",
+        "demo-seed-data",
+        "fast-track"
+      ],
+      "rules_preset": "minimal"
+    },
+    "mobile-local-ai": {
+      "name": "On-Device AI Mobile App (React Native + Local LLM)",
+      "keep_skills": [
+        "caveman",
+        "ponytail",
+        "ui-ux-pro-max",
+        "impeccable",
+        "design-system",
+        "prompt-engineer",
+        "agentic-eval",
+        "owasp-security",
+        "varlock",
+        "pitch-architect",
+        "demo-seed-data",
+        "archify",
+        "fast-track"
+      ],
+      "rules_preset": "minimal"
+    }
+  }
+}

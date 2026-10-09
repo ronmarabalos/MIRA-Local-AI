@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · What MIRA remembers</title>
+<script src="241989aa-ab17-49ac-8ef3-cbe904c5fe1c"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button,input{font-family:inherit}
+button{cursor:pointer}
+input:focus{outline:2px solid #6A79CF;outline-offset:1px}
+@keyframes mira-in{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+.mira-in{animation:mira-in .25s ease-out both}
+@media (prefers-reduced-motion:reduce){.mira-in{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1400px; position: relative; overflow: hidden; box-sizing: border-box; padding: 52px 20px 40px; display: flex; flex-direction: column; gap: 16px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <a href="Profile.dc.html" aria-label="Back to Profile" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></a>
+    <a href="TeachInstruction.dc.html" style="height: 44px; padding: 0 14px; border-radius: 14px; background: #2E3A78; color: #FFFFFF; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px"><svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>Add memory</a>
+  </div>
+
+  <header style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.03em">What MIRA Remembers</h1>
+    <div style="font-size: 15px; color: #465071">Everything MIRA learns is yours to control.</div>
+  </header>
+
+  <div style="display: flex; gap: 12px; align-items: center; background: #1C2140; color: #FFFFFF; border-radius: 20px; padding: 14px 16px">
+    <div style="width: 40px; height: 40px; border-radius: 13px; background: rgba(104,207,193,0.18); color: #8FE3D7; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"></rect><path d="M11 18h2"></path></svg></div>
+    <div style="display: flex; flex-direction: column; gap: 2px"><div style="font-size: 14px; font-weight: 700">{{count}} memories · stored on this device</div><div style="font-size: 12px; color: #CBD2EA; line-height: 1.45">Only what you teach or approve.</div></div>
+  </div>
+
+  <div style="position: relative">
+    <label for="mem-search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search memories</label>
+    <svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="#515A7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 14px; top: 15px"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+    <input id="mem-search" value="{{q}}" sc-camel-on-change="{{setQ}}" placeholder="Search what MIRA remembers" style="width: 100%; box-sizing: border-box; height: 48px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); padding: 0 14px 0 42px; font-size: 14px; color: #1C2140">
+  </div>
+
+  <div role="tablist" aria-label="Categories" style="display: flex; gap: 8px; overflow-x: auto; margin: 0 -20px; padding: 0 20px 2px">
+    <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+      <button role="tab" aria-selected="{{c.sel}}" sc-camel-on-click="{{c.pick}}" style="flex-shrink: 0; height: 38px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 700; border: {{c.border}}; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <sc-for list="{{items}}" as="m" hint-placeholder-count="6">
+      <sc-if value="{{m.showHead}}" hint-placeholder-val="{{ false }}"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #444C6C; padding: 6px 2px 0">{{m.catUpper}}</div></sc-if>
+      <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+        <sc-if value="{{m.notEditing}}" hint-placeholder-val="{{ true }}">
+          <div style="font-size: 15px; font-weight: 700; line-height: 1.4">{{m.text}}</div>
+        </sc-if>
+        <sc-if value="{{m.editing}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; gap: 8px">
+            <label for="{{m.inputId}}" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Edit memory</label>
+            <input id="{{m.inputId}}" value="{{draft}}" sc-camel-on-change="{{setDraft}}" style="flex: 1; min-width: 0; height: 44px; border-radius: 12px; border: 1.5px solid #6A79CF; padding: 0 12px; font-size: 14px; font-weight: 600; color: #1C2140">
+            <button sc-camel-on-click="{{m.saveEdit}}" style="height: 44px; padding: 0 14px; border: 0; border-radius: 12px; background: #2E3A78; color: #FFFFFF; font-size: 13px; font-weight: 700">Save</button>
+          </div>
+        </sc-if>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <div style="font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; display: flex; align-items: center; gap: 4px; color: {{m.srcFg}}; background: {{m.srcBg}}"><svg width="11" height="11" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{m.srcIcon}}"></path></svg>{{m.src}}</div>
+          <div style="font-size: 12px; color: #515A7A">{{m.date}}</div>
+          <div style="flex: 1"></div>
+          <button sc-camel-on-click="{{m.edit}}" aria-label="Edit memory" style="width: 40px; height: 40px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.55); color: #2E3A78; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="17" height="17" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg></button>
+          <button sc-camel-on-click="{{m.askDelete}}" aria-label="Delete memory" style="width: 40px; height: 40px; border: 0; border-radius: 12px; background: #FBE9EB; color: #B23A4A; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="17" height="17" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button>
+        </div>
+      </div>
+    </sc-for>
+    <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+      <div style="border: 1.5px dashed #C9D1EC; border-radius: 20px; padding: 24px; text-align: center; font-size: 14px; color: #465071">No memories match. Try another word.</div>
+    </sc-if>
+  </div>
+
+  <a href="Teach.dc.html" style="height: 52px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box">Review saved memories with MIRA</a>
+
+  <sc-if value="{{confirming}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; z-index: 10; background: rgba(28,33,64,0.42); display: flex; align-items: flex-start; justify-content: center; padding: 300px 24px 0">
+      <div class="mira-in" role="alertdialog" aria-label="Delete memory" style="width: 100%; background: rgba(242,244,250,0.9); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.9); border-radius: 28px; padding: 22px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 30px 60px rgba(28,33,64,0.25)">
+        <div style="width: 48px; height: 48px; border-radius: 16px; background: #FBE9EB; color: #B23A4A; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></div>
+        <div style="font-size: 19px; font-weight: 700">Delete this memory?</div>
+        <div style="font-size: 14px; line-height: 1.5; color: #343B5C">“{{confirmText}}” will be removed.</div>
+        <div style="display: flex; gap: 8px">
+          <button sc-camel-on-click="{{cancelDelete}}" style="flex: 1; height: 50px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 15px; font-weight: 700">Keep</button>
+          <button sc-camel-on-click="{{doDelete}}" style="flex: 1; height: 50px; border: 0; border-radius: 16px; background: #B23A4A; color: #FFFFFF; font-size: 15px; font-weight: 700">Delete</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1400}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      q: '', cat: 'All', editing: null, draft: '', confirm: null,
+      list: [
+        { id: 'm1', cat: 'Communication Style', text: 'Write emails in a friendly, concise tone', src: 'taught', date: 'Saved 2 Oct' },
+        { id: 'm2', cat: 'Communication Style', text: 'Keep email replies short', src: 'taught', date: 'Saved today' },
+        { id: 'm3', cat: 'Personal Preferences', text: 'Prefers meetings after 10 AM', src: 'approved', date: 'Saved 5 Oct' },
+        { id: 'm4', cat: 'Personal Preferences', text: 'Call me Alex', src: 'taught', date: 'Saved 1 Oct' },
+        { id: 'm5', cat: 'Routines and Habits', text: 'Morning brief at 7:30 AM', src: 'approved', date: 'Saved 3 Oct' },
+        { id: 'm6', cat: 'Important Information', text: 'The Q3 report goes to Priya Nair', src: 'approved', date: 'Saved today' },
+        { id: 'm7', cat: 'Saved Instructions', text: 'Sign emails “Best, Alex”', src: 'taught', date: 'Saved 4 Oct' }
+      ]
+    };
+  }
+  renderVals() {
+    const st = this.state;
+    const catNames = ['All', 'Personal Preferences', 'Communication Style', 'Important Information', 'Routines and Habits', 'Saved Instructions'];
+    const order = catNames.slice(1);
+    const vis = st.list
+      .filter((m) => (st.cat === 'All' || m.cat === st.cat) && m.text.toLowerCase().indexOf(st.q.toLowerCase()) >= 0)
+      .sort((a, b) => order.indexOf(a.cat) - order.indexOf(b.cat));
+    let last = null;
+    const conf = st.list.find((m) => m.id === st.confirm);
+    return {
+      q: st.q, setQ: (e) => this.setState({ q: e.target.value }),
+      count: st.list.length,
+      cats: catNames.map((c) => {
+        const sel = st.cat === c;
+        return { label: c === 'All' ? 'All' : c, sel: sel ? 'true' : 'false', bg: sel ? '#1C2140' : '#FFFFFF', fg: sel ? '#FFFFFF' : '#1C2140', border: sel ? '1px solid #1C2140' : '1px solid rgba(255,255,255,0.8)', pick: () => this.setState({ cat: c }) };
+      }),
+      empty: vis.length === 0,
+      draft: st.draft, setDraft: (e) => this.setState({ draft: e.target.value }),
+      items: vis.map((m) => {
+        const showHead = m.cat !== last; last = m.cat;
+        const taught = m.src === 'taught';
+        const editing = st.editing === m.id;
+        return Object.assign({}, m, {
+          showHead, catUpper: m.cat.toUpperCase(),
+          src: taught ? 'You taught' : 'You approved',
+          srcFg: taught ? '#232C5E' : '#1E7F73', srcBg: taught ? 'rgba(222,228,250,0.85)' : '#E2F6F3',
+          srcIcon: taught ? 'M4 20h4L19 9l-4-4L4 16z' : 'm5 12 5 5 9-10',
+          editing, notEditing: !editing, inputId: 'edit-' + m.id,
+          edit: () => this.setState({ editing: editing ? null : m.id, draft: m.text }),
+          saveEdit: () => this.setState({ editing: null, list: st.list.map((x) => (x.id === m.id ? Object.assign({}, x, { text: st.draft.trim() || x.text, date: 'Edited just now' }) : x)) }),
+          askDelete: () => this.setState({ confirm: m.id })
+        });
+      }),
+      confirming: !!conf, confirmText: conf ? conf.text : '',
+      cancelDelete: () => this.setState({ confirm: null }),
+      doDelete: () => this.setState({ list: st.list.filter((m) => m.id !== st.confirm), confirm: null })
+    };
+  }
+}
+</script>
+
+
+</body></html>

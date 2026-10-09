@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Notifications</title>
+<script src="2c7ad6d1-ea7b-4f84-8d0f-4c3a4d7f4c5b"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 1100px; position: relative; overflow: hidden; box-sizing: border-box; padding: 52px 20px 40px; display: flex; flex-direction: column; gap: 16px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <a href="Home.dc.html" aria-label="Back to Home" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></a>
+    <div style="display: flex; gap: 8px">
+      <button sc-camel-on-click="{{markAll}}" style="height: 44px; padding: 0 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #2E3A78; font-size: 13px; font-weight: 700">Mark all read</button>
+      <a href="Settings.dc.html" aria-label="Notification preferences" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg></a>
+    </div>
+  </div>
+
+  <header style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.03em">Notifications</h1>
+    <div style="font-size: 15px; color: #465071">{{unreadText}}</div>
+  </header>
+
+  <div role="tablist" aria-label="Categories" style="display: flex; gap: 8px; overflow-x: auto; margin: 0 -20px; padding: 0 20px 2px">
+    <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+      <button role="tab" aria-selected="{{c.sel}}" sc-camel-on-click="{{c.pick}}" style="flex-shrink: 0; height: 38px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 700; border: {{c.border}}; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <sc-for list="{{items}}" as="n" hint-placeholder-count="6">
+      <a href="{{n.href}}" style="display: flex; gap: 12px; align-items: flex-start; background: {{n.cardBg}}; border: 1px solid {{n.cardBorder}}; border-radius: 18px; padding: 14px; color: #1C2140">
+        <div style="position: relative; width: 40px; height: 40px; border-radius: 13px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: {{n.iconBg}}; color: {{n.iconFg}}"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{n.icon}}"></path></svg></div>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; justify-content: space-between; gap: 8px"><div style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: #444C6C">{{n.catUpper}}</div><div style="font-size: 12px; color: #515A7A">{{n.time}}</div></div>
+          <div style="font-size: 14px; line-height: 1.4; font-weight: {{n.weight}}">{{n.text}}</div>
+        </div>
+        <sc-if value="{{n.unread}}" hint-placeholder-val="{{ false }}"><div style="width: 10px; height: 10px; border-radius: 50%; background: #2E3A78; margin-top: 6px; flex-shrink: 0" role="img" aria-label="Unread"></div></sc-if>
+      </a>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1100}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 'All', allRead: false };
+  }
+  renderVals() {
+    const st = this.state;
+    const ic = {
+      'Pending Approvals': ['M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z', '#FCF1E0', '#8A5A12'],
+      'Reminders': ['M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 0 0 4 0', 'rgba(222,228,250,0.85)', '#2E3A78'],
+      'Emails': ['M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM4 7l8 6 8-6', 'rgba(255,255,255,0.55)', '#2E3A78'],
+      'Automation Activities': ['M13 3 4 14h7l-1 7 9-11h-7z', '#E2F6F3', '#1E7F73'],
+      'System Updates': ['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8v5M12 16h.01', 'rgba(255,255,255,0.6)', '#444C6C']
+    };
+    const all = [
+      { cat: 'Pending Approvals', text: 'Your reply to Maya Chen is ready for your OK.', time: '8:44 AM', unread: true, href: 'Approvals.dc.html' },
+      { cat: 'Reminders', text: 'Call Mom at 8:00 PM tonight.', time: '8:00 AM', unread: true, href: 'Tasks.dc.html' },
+      { cat: 'Emails', text: 'Priya Nair: “Q3 report: final numbers”', time: '8:15 AM', unread: true, href: 'Inbox.dc.html' },
+      { cat: 'Automation Activities', text: 'Draft routine email replies prepared 1 draft.', time: '8:50 AM', unread: false, href: 'Automations.dc.html' },
+      { cat: 'System Updates', text: 'Calendar refresh failed. MIRA will retry when you’re online.', time: '9:12 AM', unread: false, href: 'OfflineSync.dc.html' },
+      { cat: 'Automation Activities', text: 'MIRA suggests a new automation: Sunday week planning.', time: '7:31 AM', unread: false, href: 'Teach.dc.html' },
+      { cat: 'System Updates', text: 'Your on-device model is up to date.', time: 'Yesterday', unread: false, href: 'Settings.dc.html' }
+    ];
+    const cats = ['All', 'Reminders', 'Emails', 'Automation Activities', 'Pending Approvals', 'System Updates'];
+    const vis = all.filter((n) => st.cat === 'All' || n.cat === st.cat);
+    const unreadN = st.allRead ? 0 : all.filter((n) => n.unread).length;
+    return {
+      unreadText: unreadN ? unreadN + ' unread' : 'You’re all caught up.',
+      markAll: () => this.setState({ allRead: true }),
+      cats: cats.map((c) => {
+        const sel = st.cat === c;
+        return { label: c, sel: sel ? 'true' : 'false', bg: sel ? '#1C2140' : '#FFFFFF', fg: sel ? '#FFFFFF' : '#1C2140', border: sel ? '1px solid #1C2140' : '1px solid rgba(255,255,255,0.8)', pick: () => this.setState({ cat: c }) };
+      }),
+      items: vis.map((n) => {
+        const u = n.unread && !st.allRead;
+        return Object.assign({}, n, {
+          unread: u, weight: u ? '700' : '500',
+          cardBg: u ? '#FFFFFF' : 'rgba(255,255,255,0.5)', cardBorder: u ? '#C9D1EC' : 'rgba(255,255,255,0.8)',
+          catUpper: n.cat.toUpperCase(),
+          icon: ic[n.cat][0], iconBg: ic[n.cat][1], iconFg: ic[n.cat][2]
+        });
+      })
+    };
+  }
+}
+</script>
+
+
+</body></html>

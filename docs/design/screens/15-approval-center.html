@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Approval center</title>
+<script src="2ff05da8-2036-423c-aa38-a8588ad27723"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 1500px; position: relative; overflow: hidden; box-sizing: border-box; padding: 52px 20px 40px; display: flex; flex-direction: column; gap: 18px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <a href="Home.dc.html" aria-label="Back to Home" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></a>
+    <a href="Activity.dc.html" style="font-size: 14px; font-weight: 700; padding: 12px 4px">Activity history</a>
+  </div>
+
+  <header style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.03em">Needs Your Approval</h1>
+    <div style="font-size: 15px; color: #465071">{{pendingText}}</div>
+  </header>
+
+  <sc-if value="{{canBatch}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; align-items: center; gap: 10px; background: #1C2140; color: #FFFFFF; border-radius: 16px; padding: 10px 10px 10px 14px">
+      <div style="flex: 1; font-size: 13px; font-weight: 600">{{batchText}}</div>
+      <button sc-camel-on-click="{{approveBatch}}" style="height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: rgba(255,255,255,0.6); color: #1C2140; font-size: 13px; font-weight: 700">Approve selected</button>
+    </div>
+  </sc-if>
+
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <sc-for list="{{items}}" as="it" hint-placeholder-count="4">
+      <article style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid {{it.border}}; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: flex-start; gap: 12px">
+          <sc-if value="{{it.batchable}}" hint-placeholder-val="{{ false }}">
+            <button sc-camel-on-click="{{it.pick}}" role="checkbox" aria-checked="{{it.pickedStr}}" aria-label="Select for batch approval" style="width: 44px; height: 44px; margin: -6px -6px 0 -10px; border: 0; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><div style="width: 22px; height: 22px; border-radius: 7px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; color: #FFFFFF; background: {{it.boxBg}}; border: {{it.boxBorder}}"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg></div></button>
+          </sc-if>
+          <div style="width: 40px; height: 40px; border-radius: 13px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: {{it.iconBg}}; color: {{it.iconFg}}"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{it.icon}}"></path></svg></div>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: #444C6C">{{it.kind}}</div>
+            <div style="font-size: 15px; font-weight: 700; line-height: 1.35">{{it.title}}</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap">
+          <div style="font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; color: {{it.sFg}}; background: {{it.sBg}}">{{it.status}}</div>
+          <div style="font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; color: {{it.rFg}}; background: {{it.rBg}}">{{it.risk}}</div>
+          <div style="font-size: 12px; color: #515A7A">{{it.app}}</div>
+        </div>
+        <div style="font-size: 13px; line-height: 1.5; color: #343B5C"><strong style="color: #1C2140">Why: </strong>{{it.why}}</div>
+        <sc-if value="{{it.open}}" hint-placeholder-val="{{ false }}">
+          <div style="background: rgba(255,255,255,0.5); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 13px">
+            <div style="display: flex; justify-content: space-between; gap: 12px"><div style="color: #465071">Proposed change</div><div style="font-weight: 700; text-align: right">{{it.change}}</div></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px"><div style="color: #465071">Permission needed</div><div style="font-weight: 700; text-align: right">{{it.perm}}</div></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px"><div style="color: #465071">Needs internet</div><div style="font-weight: 700">{{it.netText}}</div></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{it.pending}}" hint-placeholder-val="{{ true }}">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr 0.8fr 0.9fr; gap: 6px">
+            <button sc-camel-on-click="{{it.approve}}" style="height: 42px; border: 0; border-radius: 12px; background: #2E3A78; color: #FFFFFF; font-size: 13px; font-weight: 700">Approve</button>
+            <button sc-camel-on-click="{{it.toggleOpen}}" aria-expanded="{{it.openStr}}" style="height: 42px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 13px; font-weight: 700">{{it.detailsLabel}}</button>
+            <a href="{{it.editHref}}" style="height: 42px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); color: #1C2140; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-sizing: border-box">Edit</a>
+            <button sc-camel-on-click="{{it.reject}}" style="height: 42px; border-radius: 12px; border: 1px solid #F3CDD2; background: rgba(255,255,255,0.6); color: #B23A4A; font-size: 13px; font-weight: 700">Reject</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{it.decided}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px"><div style="font-size: 13px; color: #343B5C">{{it.outcome}}</div><button sc-camel-on-click="{{it.undo}}" style="height: 40px; padding: 0 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 13px; font-weight: 700">Undo</button></div>
+        </sc-if>
+      </article>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1500}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { decisions: {}, picked: {}, open: { p1: true } };
+  }
+  renderVals() {
+    const st = this.state;
+    const defs = [
+      { id: 'p1', kind: 'EMAIL REPLY', title: 'Send your reply to Maya Chen', app: 'Demo mailbox', why: 'Drafted by “Draft routine email replies” for her meeting request.', change: 'Sends 1 email to maya@northwind.example', perm: 'Send email', net: true, low: false, editHref: 'EmailDetail.dc.html', icon: 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM4 7l8 6 8-6', iconBg: 'rgba(222,228,250,0.85)', iconFg: '#2E3A78' },
+      { id: 'p2', kind: 'PROPOSED AUTOMATION', title: 'Sunday week planning', app: 'On this device', why: 'You planned your week by hand three Sundays in a row.', change: 'New automation · reminders only', perm: 'Create reminders', net: false, low: true, editHref: 'AutomationBuilder.dc.html', icon: 'M13 3 4 14h7l-1 7 9-11h-7z', iconBg: '#E2F6F3', iconFg: '#1E7F73' },
+      { id: 'p3', kind: 'CALENDAR UPDATE', title: 'Move “Design review” to 11:00 AM', app: 'Demo calendar', why: 'It overlaps the focus block you asked for before the Q3 report deadline.', change: 'Tomorrow 10:00 → 11:00 AM', perm: 'Modify events', net: true, low: false, editHref: 'Calendar.dc.html', icon: 'M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM8 3v4M16 3v4M3 11h18', iconBg: '#FCF1E0', iconFg: '#8A5A12' },
+      { id: 'p4', kind: 'SCHEDULED ONLINE ACTION', title: 'Refresh calendars when you reconnect', app: 'Demo calendar', why: 'Your calendar hasn’t synced since 8:45 AM.', change: 'Downloads new events, changes nothing', perm: 'Read events', net: true, low: true, editHref: 'OfflineSync.dc.html', icon: 'M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4', iconBg: 'rgba(255,255,255,0.6)', iconFg: '#444C6C' }
+    ];
+    const set = (patch) => this.setState(patch);
+    const decide = (ids, val) => { const d = Object.assign({}, st.decisions); ids.forEach((i) => { d[i] = val; }); set({ decisions: d, picked: {} }); };
+    const pendingN = defs.filter((d) => !st.decisions[d.id]).length;
+    const pickedIds = Object.keys(st.picked).filter((k) => st.picked[k] && !st.decisions[k]);
+    return {
+      pendingText: pendingN ? pendingN + ' waiting for you' : 'All caught up',
+      canBatch: pickedIds.length > 0,
+      batchText: pickedIds.length + ' low-risk selected',
+      approveBatch: () => decide(pickedIds, 'approved'),
+      items: defs.map((d) => {
+        const dec = st.decisions[d.id];
+        const open = !!st.open[d.id];
+        let status = 'Awaiting approval', sFg = '#8A5A12', sBg = '#FCF1E0', outcome = '';
+        if (dec === 'approved' && d.net) { status = 'Approved · queued'; sFg = '#444C6C'; sBg = 'rgba(255,255,255,0.6)'; outcome = 'Runs when online'; }
+        if (dec === 'approved' && !d.net) { status = 'Completed'; sFg = '#1F7A62'; sBg = '#E3F5EF'; outcome = 'Done'; }
+        if (dec === 'rejected') { status = 'Rejected'; sFg = '#B23A4A'; sBg = '#FBE9EB'; outcome = 'Won’t happen'; }
+        const picked = !!st.picked[d.id];
+        return Object.assign({}, d, {
+          status, sFg, sBg, outcome,
+          risk: d.low ? 'Low risk' : 'Review carefully', rFg: d.low ? '#1E7F73' : '#B23A4A', rBg: d.low ? '#E2F6F3' : '#FBE9EB',
+          netText: d.net ? 'Yes' : 'No',
+          pending: !dec, decided: !!dec,
+          border: dec ? 'rgba(255,255,255,0.8)' : '#F5DEB9',
+          batchable: d.low && !dec,
+          pickedStr: picked ? 'true' : 'false', boxBg: picked ? '#2E3A78' : '#FFFFFF', boxBorder: picked ? '0' : '2px solid #BCC6EA',
+          pick: () => { const p = Object.assign({}, st.picked); p[d.id] = !picked; set({ picked: p }); },
+          open: open, openStr: open ? 'true' : 'false', detailsLabel: open ? 'Hide' : 'Details',
+          toggleOpen: () => { const o = Object.assign({}, st.open); o[d.id] = !open; set({ open: o }); },
+          approve: () => decide([d.id], 'approved'),
+          reject: () => decide([d.id], 'rejected'),
+          undo: () => { const x = Object.assign({}, st.decisions); delete x[d.id]; set({ decisions: x }); }
+        });
+      })
+    };
+  }
+}
+</script>
+
+
+</body></html>

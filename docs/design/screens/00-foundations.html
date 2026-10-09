@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Design system</title>
+<script src="ee1110e3-f749-4889-bbbc-e8ec8bab17dc"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button,input{font-family:inherit}
+@keyframes mira-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes mira-ring{0%{transform:scale(.92);opacity:.7}100%{transform:scale(1.6);opacity:0}}
+@keyframes mira-spin{to{transform:rotate(360deg)}}
+@keyframes mira-pulse{0%,100%{transform:scale(1)}25%{transform:scale(1.07)}50%{transform:scale(.98)}75%{transform:scale(1.05)}}
+@keyframes mira-shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+.mira-breathe{animation:mira-breathe 4s ease-in-out infinite}
+.mira-ring{animation:mira-ring 2.4s ease-out infinite}
+.mira-spin{animation:mira-spin 2.4s linear infinite}
+.mira-pulse{animation:mira-pulse 1.4s ease-in-out infinite}
+.mira-shimmer{background:linear-gradient(90deg,#EFEDF8 0%,#F8F7FD 50%,#EFEDF8 100%);background-size:400px 100%;animation:mira-shimmer 1.4s linear infinite}
+@keyframes lq-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+@keyframes lq-drift{0%{transform:translate(0,0) scale(1)}33%{transform:translate(14px,-10px) scale(1.15)}66%{transform:translate(-10px,8px) scale(.9)}100%{transform:translate(0,0) scale(1)}}
+@keyframes lq-morph{0%,100%{border-radius:44% 56% 54% 46%/50% 44% 56% 50%}25%{border-radius:56% 44% 46% 54%/56% 56% 44% 44%}50%{border-radius:48% 52% 60% 40%/42% 54% 46% 58%}75%{border-radius:54% 46% 42% 58%/48% 40% 60% 52%}}
+@keyframes lq-ripple{0%{transform:scale(.9);opacity:.75}100%{transform:scale(1.75);opacity:0}}
+@keyframes lq-spin{to{transform:rotate(360deg)}}
+@keyframes lq-spin-r{to{transform:rotate(-360deg)}}
+@keyframes lq-wave{to{transform:translateX(-50%) rotate(360deg)}}
+@keyframes lq-rise{0%,100%{transform:translateY(10px)}30%{transform:translateY(-6px)}55%{transform:translateY(4px)}80%{transform:translateY(-10px)}}
+@keyframes lq-pulse{0%,100%{transform:scale(1)}18%{transform:scale(1.06)}36%{transform:scale(.985)}54%{transform:scale(1.04)}72%{transform:scale(1)}}
+@keyframes lq-sweep{0%{transform:translateX(-160%) rotate(22deg)}55%,100%{transform:translateX(160%) rotate(22deg)}}
+.lq-breathe{animation:lq-breathe 6s ease-in-out infinite}
+.lq-drift{animation:lq-drift 11s ease-in-out infinite}
+.lq-morph{animation:lq-morph 2.6s ease-in-out infinite}
+.lq-ripple{animation:lq-ripple 2.4s cubic-bezier(.2,.6,.3,1) infinite}
+.lq-spin{animation:lq-spin 2.2s linear infinite}
+.lq-spin-r{animation:lq-spin-r 3.6s linear infinite}
+.lq-wave{animation:lq-wave 4.5s linear infinite}
+.lq-rise{animation:lq-rise 2.2s ease-in-out infinite}
+.lq-pulse{animation:lq-pulse 1.6s ease-in-out infinite}
+.lq-sweep{animation:lq-sweep 4.5s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.lq-breathe,.lq-drift,.lq-morph,.lq-ripple,.lq-spin,.lq-spin-r,.lq-wave,.lq-rise,.lq-pulse,.lq-sweep{animation:none}}
+@media (prefers-reduced-motion:reduce){.mira-breathe,.mira-ring,.mira-spin,.mira-pulse,.mira-shimmer{animation:none}}
+.m-breathe{animation:m-breathe 4s ease-in-out infinite}
+@keyframes m-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+.m-blink{animation:m-blink 15s linear infinite}
+@keyframes m-blink{0%,28.6%,30%,62.4%,63.8%,98.6%,100%{transform:scaleY(1)}29.3%,63.1%,99.3%{transform:scaleY(0.08)}}
+.m-swell{animation:m-swell 3.2s ease-in-out infinite}
+@keyframes m-swell{0%{transform:scale(1)}8%{transform:scale(1.025)}16%{transform:scale(1.012)}26%{transform:scale(1.04)}36%{transform:scale(1.018)}46%{transform:scale(1.034)}56%{transform:scale(1.01)}64%{transform:scale(1.028)}74%,100%{transform:scale(1)}}
+.m-lvl{animation:m-lvl 3.2s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes m-lvl{0%{transform:scaleY(.25)}8%{transform:scaleY(.7)}16%{transform:scaleY(.45)}26%{transform:scaleY(1)}36%{transform:scaleY(.5)}46%{transform:scaleY(.85)}56%{transform:scaleY(.35)}64%{transform:scaleY(.75)}74%,100%{transform:scaleY(.18)}}
+.m-scan{animation:m-scan 1.5s ease-in-out infinite alternate}
+@keyframes m-scan{from{transform:translateX(0)}to{transform:translateX(14px)}}
+.m-tilt{animation:m-tilt 1.5s ease-in-out infinite alternate}
+@keyframes m-tilt{from{transform:rotate(0deg)}to{transform:rotate(3deg)}}
+.m-nod{animation:m-nod 6s ease-out infinite}
+@keyframes m-nod{0%,3.3%{transform:translateY(0) rotate(0deg)}5.4%{transform:translateY(1.9%) rotate(1.5deg)}7.5%,100%{transform:translateY(0) rotate(0deg)}}
+@media (prefers-reduced-motion: reduce){.m-breathe,.m-blink,.m-swell,.m-lvl,.m-scan,.m-tilt,.m-nod{animation:none!important}}
+</style>
+</helmet>
+<div style="position: relative; width: 1440px; height: 1580px; box-sizing: border-box; padding: 72px 80px; display: flex; flex-direction: column; gap: 56px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <header style="display: flex; align-items: center; gap: 24px">
+    <dc-import name="Mira-lbou" mode="idle" size="72" theme="light" hint-size="72px,86px"></dc-import>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <div style="font-size: 44px; font-weight: 700; letter-spacing: -0.02em">MIRA design system</div>
+      <div style="font-size: 18px; color: #465071">Frosted glass over soft silver silk. Calm, light type and honest AI states. Onest · radius 16–32 · light by default.</div>
+    </div>
+  </header>
+
+  <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px">
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 700">Color</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+        <sc-for list="{{colors}}" as="c" hint-placeholder-count="12">
+          <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 18px; overflow: hidden">
+            <div style="height: 64px; background: {{c.hex}}; border-bottom: 1px solid rgba(255,255,255,0.8)"></div>
+            <div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 2px"><div style="font-size: 13px; font-weight: 700">{{c.name}}</div><div style="font-size: 12px; color: #465071">{{c.hex}}</div></div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size: 13px; line-height: 1.5; color: #343B5C; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 16px; padding: 12px 14px">Glass surfaces are white at 46% over the silk background with a bright 1px edge. Text stays dark ink (#1C2140, secondary #465071) for 4.5:1 on glass; primary buttons are deep navy pills under white text; status labels use darker inks (success #1F7A62, warning #8A5A12, error #B23A4A).</div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <h2 style="margin: 0; font-size: 20px; font-weight: 700">Type · Onest</h2>
+      <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 22px; padding: 8px 20px">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(28,33,64,0.08)"><div style="font-size: 32px; font-weight: 700; letter-spacing: -0.02em">Meet your personal AI.</div><div style="font-size: 12px; color: #465071; flex-shrink: 0">Display 32/800</div></div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(28,33,64,0.08)"><div style="font-size: 30px; font-weight: 500; letter-spacing: -0.03em">Teach MIRA</div><div style="font-size: 12px; color: #465071; flex-shrink: 0">Screen title 28/800</div></div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(28,33,64,0.08)"><div style="font-size: 18px; font-weight: 700">Smart suggestions</div><div style="font-size: 12px; color: #465071; flex-shrink: 0">Section 18/800</div></div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(28,33,64,0.08)"><div style="font-size: 15px; line-height: 1.5">Show MIRA your preferences, routines, and instructions.</div><div style="font-size: 12px; color: #465071; flex-shrink: 0">Body 15/400</div></div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 0"><div style="font-size: 12px; font-weight: 700; color: #465071">Routine email replies · 8:50 AM</div><div style="font-size: 12px; color: #465071; flex-shrink: 0">Caption 12–13</div></div>
+      </div>
+    </section>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-size: 20px; font-weight: 700">MIRA · five states</h2>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+      <div style="border-radius: 26px; padding: 24px 16px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; background: linear-gradient(165deg, #B3BEDA 0%, #D3D9E9 55%, #ECEEF5 100%); border: 1px solid rgba(255,255,255,0.8); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 30px rgba(40,52,100,0.10)">
+        <dc-import name="Mira-lbou" mode="idle" size="140" theme="light" hint-size="140px,168px"></dc-import>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center"><div style="font-size: 15px; font-weight: 700; color: #1C2140">Idle</div><div style="font-size: 13px; color: #343B5C">Waiting, blinks now and then</div></div>
+        <div style="display: flex; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(28,33,64,0.08); width: 100%; justify-content: center"><dc-import name="Mira-lbou" mode="idle" size="32" theme="light" hint-size="32px,32px"></dc-import><span style="font-size: 12px; color: #465071">32 px</span></div>
+      </div>
+      <div style="border-radius: 26px; padding: 24px 16px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; background: linear-gradient(165deg, #B3BEDA 0%, #D3D9E9 55%, #ECEEF5 100%); border: 1px solid rgba(255,255,255,0.8); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 30px rgba(40,52,100,0.10)">
+        <dc-import name="Mira-lbou" mode="listening" size="140" theme="light" hint-size="140px,168px"></dc-import>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center"><div style="font-size: 15px; font-weight: 700; color: #1C2140">Listening</div><div style="font-size: 13px; color: #343B5C">Leans in, level bars</div></div>
+        <div style="display: flex; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(28,33,64,0.08); width: 100%; justify-content: center"><dc-import name="Mira-lbou" mode="listening" size="32" theme="light" hint-size="32px,32px"></dc-import><span style="font-size: 12px; color: #465071">32 px</span></div>
+      </div>
+      <div style="border-radius: 26px; padding: 24px 16px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; background: linear-gradient(165deg, #B3BEDA 0%, #D3D9E9 55%, #ECEEF5 100%); border: 1px solid rgba(255,255,255,0.8); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 30px rgba(40,52,100,0.10)">
+        <dc-import name="Mira-lbou" mode="thinking" size="140" theme="light" hint-size="140px,168px"></dc-import>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center"><div style="font-size: 15px; font-weight: 700; color: #1C2140">Thinking</div><div style="font-size: 13px; color: #343B5C">Eyes sweep, slight tilt</div></div>
+        <div style="display: flex; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(28,33,64,0.08); width: 100%; justify-content: center"><dc-import name="Mira-lbou" mode="thinking" size="32" theme="light" hint-size="32px,32px"></dc-import><span style="font-size: 12px; color: #465071">32 px</span></div>
+      </div>
+      <div style="border-radius: 26px; padding: 24px 16px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; background: linear-gradient(165deg, #B3BEDA 0%, #D3D9E9 55%, #ECEEF5 100%); border: 1px solid rgba(255,255,255,0.8); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 30px rgba(40,52,100,0.10)">
+        <dc-import name="Mira-lbou" mode="responding" size="140" theme="light" hint-size="140px,168px"></dc-import>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center"><div style="font-size: 15px; font-weight: 700; color: #1C2140">Responding</div><div style="font-size: 13px; color: #343B5C">One nod, then still</div></div>
+        <div style="display: flex; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(28,33,64,0.08); width: 100%; justify-content: center"><dc-import name="Mira-lbou" mode="responding" size="32" theme="light" hint-size="32px,32px"></dc-import><span style="font-size: 12px; color: #465071">32 px</span></div>
+      </div>
+      <div style="border-radius: 26px; padding: 24px 16px 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; background: linear-gradient(165deg, #B3BEDA 0%, #D3D9E9 55%, #ECEEF5 100%); border: 1px solid rgba(255,255,255,0.8); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 30px rgba(40,52,100,0.10)">
+        <dc-import name="Mira-lbou" mode="offline" size="140" theme="light" hint-size="140px,168px"></dc-import>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center"><div style="font-size: 15px; font-weight: 700; color: #1C2140">Offline</div><div style="font-size: 13px; color: #343B5C">Idle + on-device home mark</div></div>
+        <div style="display: flex; align-items: center; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(28,33,64,0.08); width: 100%; justify-content: center"><dc-import name="Mira-lbou" mode="offline" size="32" theme="light" hint-size="32px,32px"></dc-import><span style="font-size: 12px; color: #465071">32 px</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-size: 20px; font-weight: 700">Components</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+      <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #444C6C">BUTTONS</div>
+        <button style="height: 56px; border: 0; border-radius: 18px; background: linear-gradient(180deg, #343F78 0%, #1C2245 100%); color: #FFFFFF; font-size: 16px; font-weight: 700; box-shadow: 0 12px 28px rgba(40,52,100,0.32)">Primary · Approve &amp; activate</button>
+        <button style="height: 52px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 15px; font-weight: 700">Secondary · Edit rule</button>
+        <div style="display: flex; gap: 8px">
+          <button style="flex: 1; height: 40px; border: 0; border-radius: 12px; background: rgba(222,228,250,0.85); color: #232C5E; font-size: 13px; font-weight: 700">Tonal</button>
+          <button style="flex: 1; height: 40px; border-radius: 12px; border: 1px solid #F3CDD2; background: rgba(255,255,255,0.6); color: #B23A4A; font-size: 13px; font-weight: 700">Destructive</button>
+        </div>
+      </div>
+      <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #444C6C">ACTION STATUS · LABEL + ICON, NEVER COLOR ALONE</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <div style="height: 30px; padding: 0 10px; border-radius: 999px; border: 1.5px dashed #9DAAE6; color: #2E3A78; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px; box-sizing: border-box"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Suggested</div>
+          <div style="height: 30px; padding: 0 10px; border-radius: 999px; background: rgba(222,228,250,0.85); color: #232C5E; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path></svg>Approved</div>
+          <div style="height: 30px; padding: 0 10px; border-radius: 999px; background: rgba(255,255,255,0.6); color: #444C6C; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Queued</div>
+          <div style="height: 30px; padding: 0 10px; border-radius: 999px; background: #FCF1E0; color: #8A5A12; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px"><div class="mira-spin" style="width: 10px; height: 10px; border-radius: 50%; border: 2px solid rgba(138,90,18,0.3); border-top-color: #8A5A12"></div>Running</div>
+          <div style="height: 30px; padding: 0 10px; border-radius: 999px; background: #E3F5EF; color: #1F7A62; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg>Completed</div>
+          <div style="height: 30px; padding: 0 10px; border-radius: 999px; background: #FBE9EB; color: #B23A4A; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>Failed</div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px">
+          <div style="height: 32px; padding: 0 12px; border-radius: 999px; background: #E2F6F3; color: #1E7F73; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg>Offline ready</div>
+          <div style="height: 32px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,0.6); color: #444C6C; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px"><div style="width: 7px; height: 7px; border-radius: 50%; background: #34A889"></div>Connected</div>
+          <div style="width: 52px; height: 32px; border-radius: 999px; padding: 3px; box-sizing: border-box; display: flex; justify-content: flex-end; background: #2E3A78" role="img" aria-label="Toggle, on"><div style="width: 26px; height: 26px; border-radius: 50%; background: #FFFFFF"></div></div>
+        </div>
+      </div>
+      <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #444C6C">FEEDBACK</div>
+        <div style="display: flex; align-items: center; gap: 10px; background: #1C2140; color: #FFFFFF; border-radius: 16px; padding: 12px 14px; font-size: 14px; font-weight: 600"><div style="width: 24px; height: 24px; border-radius: 8px; background: #34A889; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg></div>Reminder created</div>
+        <div style="display: flex; align-items: center; gap: 10px; background: #FFF8EE; border: 1px solid #F5DEB9; color: #6B4510; border-radius: 16px; padding: 12px 14px; font-size: 14px; font-weight: 600"><svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M12 20h.01"></path></svg>Sending needs a connection. Saved and queued.</div>
+        <div style="display: flex; gap: 12px; align-items: center; padding: 6px 0" aria-label="Loading">
+          <div class="mira-shimmer" style="width: 40px; height: 40px; border-radius: 13px"></div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 8px"><div class="mira-shimmer" style="height: 12px; width: 70%; border-radius: 6px"></div><div class="mira-shimmer" style="height: 10px; width: 45%; border-radius: 6px"></div></div>
+        </div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 40px; align-items: flex-start">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #444C6C">FLOATING TAB BAR</div>
+        <div style="position: relative; width: 358px; height: 90px">
+          <nav aria-label="Main" style="position: absolute; left: 0; top: 10px; height: 64px; box-sizing: border-box; padding: 6px; display: flex; align-items: center; gap: 4px; border-radius: 999px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); background: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.85); box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 16px 40px rgba(40,52,100,0.18); z-index: 5">
+  <a href="Home.dc.html" aria-current="page" style="height: 52px; padding: 0 18px 0 12px; border-radius: 999px; background: #1C2140; color: #FFFFFF; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 18px rgba(28,33,64,0.3)"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>Home</a>
+  <a href="Inbox.dc.html" aria-label="Inbox" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="m4 7 8 6 8-6"></path></svg></a>
+  <a href="Assistant.dc.html" aria-label="MIRA" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><dc-import name="Mira-lbou" mode="idle" size="32" theme="light" hint-size="32px,32px"></dc-import></a>
+  <a href="Teach.dc.html" aria-label="Teach" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"></path></svg></a>
+  <a href="Tasks.dc.html" aria-label="Planner" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18M9 15l2 2 4-4"></path></svg></a>
+</nav>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; width: 360px">
+        <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #444C6C">EMPTY STATE</div>
+        <div style="background: rgba(255,255,255,0.6); border: 1px dashed #C9D1EC; border-radius: 20px; padding: 24px 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+          <dc-import name="Mira-lbou" mode="idle" size="44" theme="light" hint-size="44px,44px"></dc-import>
+          <div style="font-size: 15px; font-weight: 700">Nothing here right now</div>
+          <div style="font-size: 13px; color: #465071">MIRA will place matching emails here as they arrive.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1580}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      colors: [
+        { name: 'Silk top', hex: '#A7B2CE' }, { name: 'Silk mid', hex: '#C3CBDF' }, { name: 'Silk base', hex: '#E9ECF3' }, { name: 'Glass', hex: 'rgba(255,255,255,0.46)' },
+        { name: 'Ink', hex: '#1C2140' }, { name: 'Ink secondary', hex: '#465071' }, { name: 'Navy action', hex: '#2E3A78' }, { name: 'Periwinkle', hex: '#98A5E4' },
+        { name: 'Mint sheen', hex: '#68CFC1' }, { name: 'Success', hex: '#34A889' }, { name: 'Warning', hex: '#E8AD59' }, { name: 'Error', hex: '#DD6B78' }
+      ]
+    };
+  }
+}
+</script>
+
+
+</body></html>

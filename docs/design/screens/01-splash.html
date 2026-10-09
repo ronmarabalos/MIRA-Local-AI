@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Splash</title>
+<script src="bd0953e1-dce9-4a6b-8e5c-7817dd962719"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+@keyframes mira-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+@keyframes mira-ring{0%{transform:scale(.92);opacity:.7}100%{transform:scale(1.55);opacity:0}}
+@keyframes mira-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes mira-dot{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.mira-breathe{animation:mira-breathe 4s ease-in-out infinite}
+.mira-ring{animation:mira-ring 2.8s ease-out infinite}
+.mira-float{animation:mira-float 5s ease-in-out infinite}
+.mira-dot{animation:mira-dot 1.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.mira-breathe,.mira-ring,.mira-float,.mira-dot{animation:none}}
+.m-breathe{animation:m-breathe 4s ease-in-out infinite}
+@keyframes m-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+.m-blink{animation:m-blink 15s linear infinite}
+@keyframes m-blink{0%,28.6%,30%,62.4%,63.8%,98.6%,100%{transform:scaleY(1)}29.3%,63.1%,99.3%{transform:scaleY(0.08)}}
+.m-swell{animation:m-swell 3.2s ease-in-out infinite}
+@keyframes m-swell{0%{transform:scale(1)}8%{transform:scale(1.025)}16%{transform:scale(1.012)}26%{transform:scale(1.04)}36%{transform:scale(1.018)}46%{transform:scale(1.034)}56%{transform:scale(1.01)}64%{transform:scale(1.028)}74%,100%{transform:scale(1)}}
+.m-lvl{animation:m-lvl 3.2s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes m-lvl{0%{transform:scaleY(.25)}8%{transform:scaleY(.7)}16%{transform:scaleY(.45)}26%{transform:scaleY(1)}36%{transform:scaleY(.5)}46%{transform:scaleY(.85)}56%{transform:scaleY(.35)}64%{transform:scaleY(.75)}74%,100%{transform:scaleY(.18)}}
+.m-scan{animation:m-scan 1.5s ease-in-out infinite alternate}
+@keyframes m-scan{from{transform:translateX(0)}to{transform:translateX(14px)}}
+.m-tilt{animation:m-tilt 1.5s ease-in-out infinite alternate}
+@keyframes m-tilt{from{transform:rotate(0deg)}to{transform:rotate(3deg)}}
+.m-nod{animation:m-nod 6s ease-out infinite}
+@keyframes m-nod{0%,3.3%{transform:translateY(0) rotate(0deg)}5.4%{transform:translateY(1.9%) rotate(1.5deg)}7.5%,100%{transform:translateY(0) rotate(0deg)}}
+@media (prefers-reduced-motion: reduce){.m-breathe,.m-blink,.m-swell,.m-lvl,.m-scan,.m-tilt,.m-nod{animation:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+  <div style="position: absolute; width: 520px; height: 520px; left: -65px; top: 120px; border-radius: 50%; background: radial-gradient(circle, rgba(180,192,240,0.28) 0%, rgba(180,192,240,0) 65%)"></div>
+  <a href="Onboarding.dc.html" aria-label="Continue to onboarding" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; color: #1C2140">
+    <dc-import name="Mira-lbou" mode="idle" size="160" theme="light" hint-size="160px,192px"></dc-import>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+      <div style="font-size: 44px; font-weight: 700; letter-spacing: 0.22em; padding-left: 0.22em; color: #1C2140">MIRA</div>
+      <div style="font-size: 15px; font-weight: 500; color: #465071; text-align: center; max-width: 260px; line-height: 1.5">Your AI. Your Rules.<br>Your Personal Assistant.</div>
+    </div>
+  </a>
+  <div style="position: absolute; left: 0; right: 0; bottom: 64px; display: flex; flex-direction: column; align-items: center; gap: 14px; pointer-events: none">
+    <div style="display: flex; gap: 8px">
+      <div class="mira-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #6A79CF"></div>
+      <div class="mira-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #6A79CF; animation-delay: 0.2s"></div>
+      <div class="mira-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #6A79CF; animation-delay: 0.4s"></div>
+    </div>
+    <div style="font-size: 13px; font-weight: 500; color: #465071">Waking up your on-device assistant</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+
+
+</body></html>

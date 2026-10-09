@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+
+# Superpowers scratch
+.superpowers/
+
+# Playwright & Browser Testing artifacts (webapp-testing)
+test-results/
+playwright-report/
+blob-report/
+
+# Secrets & Environment (varlock)
+.env
+.env.*
+!.env.example
+.varlock/
+
+# Node dependencies (web-artifacts-builder / MCP SDK)
+node_modules/
+dist/
+build/
+
+# Skills Staging
+.agents/skills/_staging/*
+!.agents/skills/_staging/.gitkeep

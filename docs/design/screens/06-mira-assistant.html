@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Assistant</title>
+<script src="400e0274-6c10-4a16-be48-6b2844c69561"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button,input{font-family:inherit}
+button{cursor:pointer}
+input:focus{outline:none}
+@keyframes mira-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes mira-spin{to{transform:rotate(360deg)}}
+@keyframes mira-dot{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@keyframes mira-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.mira-breathe{animation:mira-breathe 3.5s ease-in-out infinite}
+.mira-spin{animation:mira-spin 2.4s linear infinite}
+.mira-dot{animation:mira-dot 1.2s ease-in-out infinite}
+.mira-in{animation:mira-in .35s ease-out both}
+@media (prefers-reduced-motion:reduce){.mira-breathe,.mira-spin,.mira-dot,.mira-in{animation:none}}
+.m-breathe{animation:m-breathe 4s ease-in-out infinite}
+@keyframes m-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+.m-blink{animation:m-blink 15s linear infinite}
+@keyframes m-blink{0%,28.6%,30%,62.4%,63.8%,98.6%,100%{transform:scaleY(1)}29.3%,63.1%,99.3%{transform:scaleY(0.08)}}
+.m-swell{animation:m-swell 3.2s ease-in-out infinite}
+@keyframes m-swell{0%{transform:scale(1)}8%{transform:scale(1.025)}16%{transform:scale(1.012)}26%{transform:scale(1.04)}36%{transform:scale(1.018)}46%{transform:scale(1.034)}56%{transform:scale(1.01)}64%{transform:scale(1.028)}74%,100%{transform:scale(1)}}
+.m-lvl{animation:m-lvl 3.2s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes m-lvl{0%{transform:scaleY(.25)}8%{transform:scaleY(.7)}16%{transform:scaleY(.45)}26%{transform:scaleY(1)}36%{transform:scaleY(.5)}46%{transform:scaleY(.85)}56%{transform:scaleY(.35)}64%{transform:scaleY(.75)}74%,100%{transform:scaleY(.18)}}
+.m-scan{animation:m-scan 1.5s ease-in-out infinite alternate}
+@keyframes m-scan{from{transform:translateX(0)}to{transform:translateX(14px)}}
+.m-tilt{animation:m-tilt 1.5s ease-in-out infinite alternate}
+@keyframes m-tilt{from{transform:rotate(0deg)}to{transform:rotate(3deg)}}
+.m-nod{animation:m-nod 6s ease-out infinite}
+@keyframes m-nod{0%,3.3%{transform:translateY(0) rotate(0deg)}5.4%{transform:translateY(1.9%) rotate(1.5deg)}7.5%,100%{transform:translateY(0) rotate(0deg)}}
+@media (prefers-reduced-motion: reduce){.m-breathe,.m-blink,.m-swell,.m-lvl,.m-scan,.m-tilt,.m-nod{animation:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; display: flex; flex-direction: column; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <header style="padding: 52px 16px 0; height: 120px; box-sizing: border-box; display: flex; align-items: flex-start; justify-content: space-between">
+    <a href="Home.dc.html" aria-label="Back to Home" style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.8); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 30px rgba(40,52,100,0.10); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></a>
+    <div style="height: 36px; margin-top: 4px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.8); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 30px rgba(40,52,100,0.10); display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #1F7A62; box-sizing: border-box"><div style="width: 7px; height: 7px; border-radius: 50%; background: #34A889"></div>{{statusText}}</div>
+    <div style="display: flex; gap: 6px">
+      <a href="Activity.dc.html" aria-label="Conversation history" style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.8); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 30px rgba(40,52,100,0.10); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"></path></svg></a>
+      <button aria-label="More options" style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.8); box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 30px rgba(40,52,100,0.10); color: #1C2140; display: flex; align-items: center; justify-content: center; padding: 0; box-sizing: border-box"><svg width="19" height="19" sc-camel-view-box="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg></button>
+    </div>
+  </header>
+
+  <section aria-label="Conversation with MIRA" style="flex: 1; min-height: 0; margin-top: 8px; border-radius: 34px 34px 0 0; background: linear-gradient(180deg, rgba(240,242,249,0.78) 0%, rgba(232,235,245,0.9) 100%); backdrop-filter: blur(30px) saturate(160%); -webkit-backdrop-filter: blur(30px) saturate(160%); border-top: 1px solid rgba(255,255,255,0.95); box-shadow: 0 -16px 40px rgba(40,52,100,0.12); display: flex; flex-direction: column">
+    <div style="align-self: center; width: 36px; height: 4px; border-radius: 999px; background: rgba(28,33,64,0.18); margin: 10px 0 4px"></div>
+
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 10px 18px 12px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; justify-content: center; margin: -2px 0 -6px"><dc-import name="Mira-lbou" mode="{{miraMode}}" size="80" theme="light" hint-size="80px,96px"></dc-import></div>
+      <h1 style="margin: 0; font-size: 26px; line-height: 1.22; font-weight: 300; letter-spacing: -0.03em">Alex, how can I help you this morning?</h1>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <sc-for list="{{starters}}" as="s" hint-placeholder-count="3">
+          <button sc-camel-on-click="{{s.pick}}" style="height: 48px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.9); background: rgba(255,255,255,0.55); padding: 0 12px 0 6px; display: flex; align-items: center; gap: 10px; text-align: left; color: #1C2140; font-size: 14px; font-weight: 500">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; color: #2E3A78"><svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{s.icon}}"></path></svg></div>
+            <div style="flex: 1">{{s.label}}</div>
+            <svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="#515A7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>
+          </button>
+        </sc-for>
+      </div>
+
+      <sc-for list="{{messages}}" as="m" hint-placeholder-count="4">
+        <sc-if value="{{m.isUser}}" hint-placeholder-val="{{ true }}">
+          <div class="mira-in" style="align-self: flex-end; max-width: 80%; display: flex; flex-direction: column; align-items: flex-end; gap: 4px">
+            <div style="background: rgba(255,255,255,0.92); color: #1C2140; padding: 12px 14px; border-radius: 20px 20px 6px 20px; font-size: 15px; line-height: 1.45; box-shadow: 0 8px 20px rgba(40,52,100,0.10)">{{m.text}}</div>
+            <div style="font-size: 11px; color: #515A7A">{{m.time}}</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{m.isMira}}" hint-placeholder-val="{{ false }}">
+          <div class="mira-in" style="align-self: flex-start; max-width: 92%; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #515A7A"><dc-import name="Mira-lbou" mode="responding" size="24" theme="light" hint-size="24px,24px"></dc-import>MIRA · {{m.time}}</div>
+            <div style="font-size: 15px; line-height: 1.5; color: #1C2140">{{m.text}}</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{m.isError}}" hint-placeholder-val="{{ false }}">
+          <div class="mira-in" style="align-self: flex-start; max-width: 92%; background: rgba(255,248,238,0.85); border: 1px solid #F5DEB9; border-radius: 20px; padding: 12px 14px; display: flex; gap: 10px">
+            <svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="#8A5A12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px"><path d="M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5.2-2.8M19 13a10 10 0 0 0-2-1.5M12 20h.01"></path></svg>
+            <div style="display: flex; flex-direction: column; gap: 6px"><div style="font-size: 14px; line-height: 1.45; color: #6B4510">{{m.text}}</div><div style="align-self: flex-start; font-size: 11px; font-weight: 600; color: #444C6C; background: rgba(255,255,255,0.8); padding: 3px 8px; border-radius: 999px">Queued</div></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{m.isChips}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <sc-for list="{{m.chips}}" as="c" hint-placeholder-count="2">
+              <button sc-camel-on-click="{{c.pick}}" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.9); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 13px; font-weight: 600">{{c.label}}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{m.isCard}}" hint-placeholder-val="{{ false }}">
+          <div class="mira-in" style="background: rgba(255,255,255,0.88); border-radius: 26px; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 14px 34px rgba(40,52,100,0.14)">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="#1C2140" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 0 0 4 0"></path></svg>
+              <div style="flex: 1; font-size: 15px; font-weight: 600">Reminder · Submit Q3 report</div>
+              <div style="font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 999px; color: {{cardChipFg}}; background: {{cardChipBg}}">{{cardStatus}}</div>
+            </div>
+            <div style="font-size: 14px; color: #343B5C">Tomorrow · 8:00 AM</div>
+            <sc-if value="{{cardPending}}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; align-items: center; gap: 8px; padding-top: 2px">
+                <a href="Tasks.dc.html" style="height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid rgba(28,33,64,0.12); color: #1C2140; font-size: 13px; font-weight: 600; display: flex; align-items: center; box-sizing: border-box">Edit</a>
+                <button sc-camel-on-click="{{confirmReminder}}" style="height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: #1C2140; color: #FFFFFF; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px">Confirm<svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"></path></svg></button>
+              </div>
+            </sc-if>
+            <sc-if value="{{cardDone}}" hint-placeholder-val="{{ false }}">
+              <a href="Tasks.dc.html" style="height: 40px; border-radius: 999px; background: #E3F5EF; color: #1F7A62; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg>Created · view in Planner</a>
+            </sc-if>
+          </div>
+        </sc-if>
+      </sc-for>
+
+      <sc-if value="{{thinking}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #515A7A" aria-live="polite">
+          <div class="mira-dot" style="width: 6px; height: 6px; border-radius: 50%; background: #2E3A78"></div>
+          <div class="mira-dot" style="width: 6px; height: 6px; border-radius: 50%; background: #2E3A78; animation-delay: .2s"></div>
+          Thinking on your device…
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="padding: 8px 14px 30px; display: flex; flex-direction: column; gap: 8px">
+      <sc-if value="{{notThinking}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; align-items: center; gap: 8px; height: 60px; border-radius: 999px; background: rgba(255,255,255,0.72); border: 1px solid rgba(255,255,255,0.95); padding: 0 8px; box-shadow: 0 10px 26px rgba(40,52,100,0.10)">
+          <button aria-label="Attach a local file" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(28,33,64,0.06); color: #1C2140; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></button>
+          <label for="mira-input" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Message MIRA</label>
+          <input id="mira-input" value="{{draft}}" sc-camel-on-change="{{setDraft}}" sc-camel-on-key-down="{{onKey}}" placeholder="Enter message…" style="flex: 1; min-width: 0; height: 44px; border: 0; background: transparent; font-size: 15px; color: #1C2140">
+          <sc-if value="{{empty}}" hint-placeholder-val="{{ true }}">
+            <button sc-camel-on-click="{{toggleListen}}" aria-pressed="{{listenStr}}" aria-label="Speak to MIRA" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: {{micBg}}; color: #1C2140; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button>
+          </sc-if>
+          <sc-if value="{{hasText}}" hint-placeholder-val="{{ false }}">
+            <button sc-camel-on-click="{{send}}" aria-label="Send" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: #2E3A78; color: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 6px 14px rgba(28,33,64,0.3)"><svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"></path></svg></button>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{thinking}}" hint-placeholder-val="{{ false }}">
+        <div style="height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 4px">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; color: #9AA3BE"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></div>
+          <dc-import name="Mira-lbou" mode="thinking" size="52" theme="light" hint-size="52px,62px"></dc-import>
+          <button sc-camel-on-click="{{stop}}" aria-label="Stop" style="width: 48px; height: 48px; border-radius: 50%; border: 0; background: #12152A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 0"><div style="width: 14px; height: 14px; border-radius: 3px; background: #FFFFFF"></div></button>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      draft: '', thinking: false, reminder: 'pending',
+      messages: [
+        { kind: 'user', text: 'Remind me to submit my report tomorrow.', time: '8:30 AM' },
+        { kind: 'mira', text: 'Of course! What time would you like me to remind you?', time: '8:30 AM' },
+        { kind: 'user', text: '8 AM, before the deadline.', time: '8:31 AM' },
+        { kind: 'mira', text: 'Confirm to create it.', time: '8:31 AM' },
+        { kind: 'card' }
+      ]
+    };
+  }
+  componentWillUnmount() { if (this.t) clearTimeout(this.t); if (this.t2) clearTimeout(this.t2); }
+  now() {
+    const d = new Date();
+    let h = d.getHours(); const m = String(d.getMinutes()).padStart(2, '0');
+    const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12;
+    return h + ':' + m + ' ' + ap;
+  }
+  reply(userText, miraMsg) {
+    const msgs = this.state.messages.filter((x) => x.kind !== 'chips').concat([{ kind: 'user', text: userText, time: this.now() }]);
+    this.setState({ messages: msgs, thinking: true, listening: false, draft: '' });
+    this.t = setTimeout(() => {
+      this.setState({ thinking: false, responding: true, messages: this.state.messages.concat([Object.assign({ time: this.now() }, miraMsg)]) });
+      this.t2 = setTimeout(() => this.setState({ responding: false }), 2600);
+    }, 1400);
+  }
+  send() {
+    const text = (this.state.draft || '').trim();
+    if (!text) return;
+    this.reply(text, { kind: 'mira', text: '(Demo) Got it.' });
+  }
+  renderVals() {
+    const st = this.state;
+    const followUps = {
+      kind: 'chips',
+      chips: [
+        { label: 'Email Priya the draft', pick: () => this.reply('Email Priya the report draft too.', { kind: 'error', text: 'You’re offline. I saved a draft and will ask before sending.' }) },
+        { label: 'Block focus time', pick: () => this.reply('Block focus time this afternoon.', { kind: 'mira', text: 'You’re free 2–4 PM. Add a focus block?' }) }
+      ]
+    };
+    const msgs = st.messages.slice();
+    const last = msgs[msgs.length - 1];
+    if (st.reminder === 'done' && !st.thinking && last.kind === 'mira' && last.doneNote) msgs.push(followUps);
+    const has = !!(st.draft || '').trim();
+    return {
+      statusText: st.thinking ? 'Thinking on device' : (st.listening ? 'Listening' : 'Running on device'),
+      miraMode: st.thinking ? 'thinking' : (st.listening ? 'listening' : (st.responding ? 'responding' : 'idle')),
+      listenStr: st.listening ? 'true' : 'false', micBg: st.listening ? 'rgba(46,58,120,0.12)' : 'transparent',
+      toggleListen: () => this.setState({ listening: !st.listening }),
+      thinking: st.thinking, notThinking: !st.thinking,
+      draft: st.draft, empty: !has, hasText: has,
+      setDraft: (e) => this.setState({ draft: e.target.value }),
+      onKey: (e) => { if (e.key === 'Enter') this.send(); },
+      send: () => this.send(),
+      stop: () => { if (this.t) clearTimeout(this.t); this.setState({ thinking: false }); },
+      starters: [
+        { label: 'Plan my afternoon', icon: 'M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM8 3v4M16 3v4M3 11h18', pick: () => this.reply('Plan my afternoon.', { kind: 'mira', text: 'Q3 report first, then reply to Sam before 6 PM.' }) },
+        { label: 'Summarize my unread email', icon: 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM4 7l8 6 8-6', pick: () => this.reply('Summarize my unread email.', { kind: 'mira', text: 'Maya wants to move your 1:1. Priya sent the final Q3 numbers.' }) },
+        { label: 'What did I teach you?', icon: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z', pick: () => this.reply('What did I teach you?', { kind: 'mira', text: 'Five preferences, like friendly, concise emails. See Personal Memory.' }) }
+      ],
+      cardPending: st.reminder === 'pending', cardDone: st.reminder === 'done',
+      cardStatus: st.reminder === 'done' ? 'Created' : 'Needs your OK',
+      cardChipFg: st.reminder === 'done' ? '#1F7A62' : '#8A5A12',
+      cardChipBg: st.reminder === 'done' ? '#E3F5EF' : '#FCF1E0',
+      confirmReminder: () => this.setState({ reminder: 'done', messages: st.messages.concat([{ kind: 'mira', doneNote: true, text: 'Done. I’ll remind you tomorrow at 8:00 AM. Anything else for the report?', time: this.now() }]) }),
+      messages: msgs.map((m) => Object.assign({}, m, {
+        isUser: m.kind === 'user', isMira: m.kind === 'mira', isCard: m.kind === 'card', isChips: m.kind === 'chips', isError: m.kind === 'error'
+      }))
+    };
+  }
+}
+</script>
+
+
+</body></html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Calendar</title>
+<script src="e3b91126-3577-4a15-8a79-cff2580ee0f9"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button{font-family:inherit;cursor:pointer}
+.m-breathe{animation:m-breathe 4s ease-in-out infinite}
+@keyframes m-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+.m-blink{animation:m-blink 15s linear infinite}
+@keyframes m-blink{0%,28.6%,30%,62.4%,63.8%,98.6%,100%{transform:scaleY(1)}29.3%,63.1%,99.3%{transform:scaleY(0.08)}}
+.m-swell{animation:m-swell 3.2s ease-in-out infinite}
+@keyframes m-swell{0%{transform:scale(1)}8%{transform:scale(1.025)}16%{transform:scale(1.012)}26%{transform:scale(1.04)}36%{transform:scale(1.018)}46%{transform:scale(1.034)}56%{transform:scale(1.01)}64%{transform:scale(1.028)}74%,100%{transform:scale(1)}}
+.m-lvl{animation:m-lvl 3.2s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes m-lvl{0%{transform:scaleY(.25)}8%{transform:scaleY(.7)}16%{transform:scaleY(.45)}26%{transform:scaleY(1)}36%{transform:scaleY(.5)}46%{transform:scaleY(.85)}56%{transform:scaleY(.35)}64%{transform:scaleY(.75)}74%,100%{transform:scaleY(.18)}}
+.m-scan{animation:m-scan 1.5s ease-in-out infinite alternate}
+@keyframes m-scan{from{transform:translateX(0)}to{transform:translateX(14px)}}
+.m-tilt{animation:m-tilt 1.5s ease-in-out infinite alternate}
+@keyframes m-tilt{from{transform:rotate(0deg)}to{transform:rotate(3deg)}}
+.m-nod{animation:m-nod 6s ease-out infinite}
+@keyframes m-nod{0%,3.3%{transform:translateY(0) rotate(0deg)}5.4%{transform:translateY(1.9%) rotate(1.5deg)}7.5%,100%{transform:translateY(0) rotate(0deg)}}
+@media (prefers-reduced-motion: reduce){.m-breathe,.m-blink,.m-swell,.m-lvl,.m-scan,.m-tilt,.m-nod{animation:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1200px; position: relative; overflow: hidden; box-sizing: border-box; padding: 52px 20px 0; display: flex; flex-direction: column; gap: 16px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <header style="display: flex; align-items: center; justify-content: space-between">
+    <h1 style="margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.03em">Planner</h1>
+    <div style="display: flex; background: rgba(222,228,250,0.85); border-radius: 14px; padding: 4px">
+      <a href="Tasks.dc.html" style="height: 36px; padding: 0 14px; border-radius: 11px; color: #343B5C; font-size: 13px; font-weight: 700; display: flex; align-items: center">Tasks</a>
+      <div aria-current="page" style="height: 36px; padding: 0 14px; border-radius: 11px; background: rgba(255,255,255,0.6); color: #1C2140; font-size: 13px; font-weight: 700; display: flex; align-items: center; box-shadow: 0 2px 6px rgba(28,33,64,0.08)">Calendar</div>
+    </div>
+  </header>
+
+  <section style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 24px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <div style="display: flex; align-items: center; gap: 2px">
+        <button aria-label="Previous month" style="width: 40px; height: 40px; border: 0; border-radius: 12px; background: transparent; color: #1C2140; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></button>
+        <div style="font-size: 17px; font-weight: 700">October 2026</div>
+        <button aria-label="Next month" style="width: 40px; height: 40px; border: 0; border-radius: 12px; background: transparent; color: #1C2140; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></button>
+      </div>
+      <div role="tablist" aria-label="View" style="display: flex; background: rgba(255,255,255,0.55); border-radius: 12px; padding: 3px">
+        <sc-for list="{{views}}" as="v" hint-placeholder-count="2">
+          <button role="tab" aria-selected="{{v.sel}}" sc-camel-on-click="{{v.pick}}" style="height: 34px; padding: 0 12px; border: 0; border-radius: 10px; font-size: 12px; font-weight: 700; background: {{v.bg}}; color: {{v.fg}}">{{v.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; text-align: center; font-size: 11px; font-weight: 700; color: #515A7A">
+      <div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div>S</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px">
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="35">
+        <button sc-camel-on-click="{{d.pick}}" aria-pressed="{{d.sel}}" aria-label="{{d.aria}}" style="height: 46px; border: 0; border-radius: 14px; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: {{d.bg}}; color: {{d.fg}}; font-size: 14px; font-weight: {{d.fw}}; box-shadow: {{d.ring}}">
+          <div>{{d.n}}</div>
+          <div style="display: flex; gap: 3px; height: 5px">
+            <sc-for list="{{d.dots}}" as="c" hint-placeholder-count="1"><div style="width: 5px; height: 5px; border-radius: 50%; background: {{c}}"></div></sc-for>
+          </div>
+        </button>
+      </sc-for>
+    </div>
+    <div style="display: flex; gap: 14px; font-size: 11px; font-weight: 700; color: #444C6C; flex-wrap: wrap; padding: 0 4px">
+      <div style="display: flex; align-items: center; gap: 5px"><div style="width: 8px; height: 8px; border-radius: 50%; background: #6A79CF"></div>Events</div>
+      <div style="display: flex; align-items: center; gap: 5px"><div style="width: 8px; height: 8px; border-radius: 2px; background: #68CFC1"></div>Reminders</div>
+      <div style="display: flex; align-items: center; gap: 5px"><div style="width: 8px; height: 8px; border-radius: 2px; transform: rotate(45deg); background: #E8AD59"></div>Automations</div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 700">{{dayTitle}}</h2>
+      <div style="font-size: 12px; color: #515A7A">{{countText}}</div>
+    </div>
+    <sc-for list="{{agenda}}" as="e" hint-placeholder-count="3">
+      <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 20px; overflow: hidden">
+        <button sc-camel-on-click="{{e.toggle}}" aria-expanded="{{e.openStr}}" style="width: 100%; border: 0; background: transparent; padding: 14px; display: flex; gap: 12px; align-items: center; text-align: left; color: #1C2140">
+          <div style="width: 4px; align-self: stretch; border-radius: 4px; background: {{e.color}}"></div>
+          <div style="width: 64px; flex-shrink: 0; font-size: 13px; font-weight: 700; color: #343B5C">{{e.time}}</div>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 15px; font-weight: 700">{{e.title}}</div>
+            <div style="display: flex; align-items: center; gap: 6px"><div style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; color: {{e.srcFg}}; background: {{e.srcBg}}">{{e.src}}</div></div>
+          </div>
+        </button>
+        <sc-if value="{{e.open}}" hint-placeholder-val="{{ false }}">
+          <div style="border-top: 1px solid rgba(28,33,64,0.08); padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px">
+            <div style="font-size: 13px; line-height: 1.5; color: #343B5C">{{e.note}}</div>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+              <button style="height: 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 13px; font-weight: 700">Edit</button>
+              <a href="Tasks.dc.html" style="height: 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); color: #1C2140; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-sizing: border-box">Remind me</a>
+              <a href="Assistant.dc.html" style="height: 40px; border-radius: 12px; background: rgba(222,228,250,0.85); color: #232C5E; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center">Ask MIRA</a>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+    <sc-if value="{{noEvents}}" hint-placeholder-val="{{ false }}">
+      <div style="border: 1.5px dashed #C9D1EC; border-radius: 20px; padding: 24px; text-align: center; font-size: 14px; color: #465071">Nothing planned. Ask MIRA to suggest focus time.</div>
+    </sc-if>
+  </section>
+
+  <nav aria-label="Main" style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 26px; height: 64px; box-sizing: border-box; padding: 6px; display: flex; align-items: center; gap: 4px; border-radius: 999px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); background: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.85); box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 16px 40px rgba(40,52,100,0.18); z-index: 5">
+  <a href="Home.dc.html" aria-label="Home" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></a>
+  <a href="Inbox.dc.html" aria-label="Inbox" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="m4 7 8 6 8-6"></path></svg></a>
+  <a href="Assistant.dc.html" aria-label="MIRA" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><dc-import name="Mira-lbou" mode="idle" size="32" theme="light" hint-size="32px,32px"></dc-import></a>
+  <a href="Teach.dc.html" aria-label="Teach" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"></path></svg></a>
+  <a href="Tasks.dc.html" aria-current="page" style="height: 52px; padding: 0 18px 0 12px; border-radius: 999px; background: #1C2140; color: #FFFFFF; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 18px rgba(28,33,64,0.3)"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18M9 15l2 2 4-4"></path></svg>Planner</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1200}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 10, view: 'month', open: 'e5' };
+  }
+  renderVals() {
+    const st = this.state;
+    const C = { event: '#6A79CF', reminder: '#68CFC1', auto: '#E8AD59' };
+    const SRC = {
+      synced: ['Synced · demo calendar', '#232C5E', 'rgba(222,228,250,0.85)'],
+      local: ['On this device', '#1E7F73', '#E2F6F3'],
+      auto: ['Automation', '#8A5A12', '#FCF1E0']
+    };
+    const ev = {
+      9: [
+        { id: 'e1', time: '9:30 AM', title: 'Team stand-up', type: 'event', src: 'synced', note: 'Daily 15-minute check-in. Last synced 8:45 AM.' },
+        { id: 'e2', time: '2:00 PM', title: '1:1 with Priya', type: 'event', src: 'synced', note: 'Bring the Q3 revenue table she sent this morning.' },
+        { id: 'e3', time: '8:00 PM', title: 'Call Mom', type: 'reminder', src: 'local', note: 'Reminder you created on this device.' }
+      ],
+      10: [
+        { id: 'e4', time: '9:00 AM', title: 'Submit Q3 report', type: 'reminder', src: 'local', note: 'Reminder at 8:00 AM, created with MIRA this morning.' },
+        { id: 'e5', time: '10:00 AM', title: 'Design review', type: 'event', src: 'synced', note: 'MIRA suggested moving this to 11:00 AM. The change is waiting in your approvals.' },
+        { id: 'e6', time: '7:30 PM', title: 'Dinner with Sam', type: 'event', src: 'local', note: 'Thai place on Elm. Your reply to Sam is queued until you’re online.' }
+      ],
+      11: [{ id: 'e7', time: '7:00 PM', title: 'Plan the week', type: 'auto', src: 'auto', note: 'Weekly reminder. MIRA suggested turning this into an automation.' }],
+      12: [{ id: 'e8', time: '7:30 AM', title: 'Daily morning planning', type: 'auto', src: 'auto', note: 'Runs on device every morning.' }],
+      14: [{ id: 'e9', time: '3:00 PM', title: 'Dentist', type: 'event', src: 'local', note: 'Booked yesterday.' }],
+      20: [{ id: 'e10', time: 'All day', title: 'Electricity bill due', type: 'reminder', src: 'local', note: 'Created from the City Utilities email.' }]
+    };
+    const cells = [];
+    for (let i = 0; i < 35; i++) {
+      const n = i - 3; // Oct 1 2026 is a Thursday (Mon-first grid)
+      const inMonth = n >= 1 && n <= 31;
+      const label = inMonth ? n : (n < 1 ? 30 + n : n - 31);
+      cells.push({ n: label, day: inMonth ? n : null, row: Math.floor(i / 7) });
+    }
+    const selRow = cells.find((c) => c.day === st.sel).row;
+    const shown = st.view === 'week' ? cells.filter((c) => c.row === selRow) : cells;
+    const names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const wd = names[(st.sel + 2) % 7];
+    const list = ev[st.sel] || [];
+    return {
+      views: [['month', 'Month'], ['week', 'Week']].map(([id, label]) => {
+        const sel = st.view === id;
+        return { label, sel: sel ? 'true' : 'false', bg: sel ? '#FFFFFF' : 'transparent', fg: sel ? '#1C2140' : '#444C6C', pick: () => this.setState({ view: id }) };
+      }),
+      days: shown.map((c) => {
+        const sel = c.day === st.sel, today = c.day === 9;
+        const types = c.day && ev[c.day] ? Array.from(new Set(ev[c.day].map((e) => e.type))) : [];
+        return {
+          n: c.n, sel: sel ? 'true' : 'false',
+          aria: c.day ? 'October ' + c.day + (types.length ? ', has items' : '') : 'Outside this month',
+          bg: sel ? '#2E3A78' : 'transparent',
+          fg: sel ? '#FFFFFF' : (c.day ? '#1C2140' : '#B9B6CC'),
+          fw: today || sel ? '800' : '600',
+          ring: today && !sel ? 'inset 0 0 0 1.5px #6A79CF' : 'none',
+          dots: sel ? types.map(() => '#FFFFFF') : types.map((t) => C[t]),
+          pick: () => { if (c.day) this.setState({ sel: c.day }); }
+        };
+      }),
+      dayTitle: (st.sel === 9 ? 'Today · ' : st.sel === 10 ? 'Tomorrow · ' : '') + wd + ' ' + st.sel + ' Oct',
+      countText: list.length ? list.length + (list.length === 1 ? ' item' : ' items') : '',
+      noEvents: list.length === 0,
+      agenda: list.map((e) => {
+        const open = st.open === e.id;
+        return Object.assign({}, e, {
+          color: C[e.type], src: SRC[e.src][0], srcFg: SRC[e.src][1], srcBg: SRC[e.src][2],
+          open, openStr: open ? 'true' : 'false',
+          toggle: () => this.setState({ open: open ? null : e.id })
+        });
+      })
+    };
+  }
+}
+</script>
+
+
+</body></html>

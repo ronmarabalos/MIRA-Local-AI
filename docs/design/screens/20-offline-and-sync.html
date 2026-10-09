@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Offline and sync</title>
+<script src="779591cd-28b6-431a-b1bf-cd0c9fd28a6a"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button{font-family:inherit;cursor:pointer}
+@keyframes mira-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes mira-spin{to{transform:rotate(360deg)}}
+.mira-breathe{animation:mira-breathe 4s ease-in-out infinite}
+.mira-spin{animation:mira-spin 1.2s linear infinite}
+@media (prefers-reduced-motion:reduce){.mira-breathe,.mira-spin{animation:none}}
+.m-breathe{animation:m-breathe 4s ease-in-out infinite}
+@keyframes m-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+.m-blink{animation:m-blink 15s linear infinite}
+@keyframes m-blink{0%,28.6%,30%,62.4%,63.8%,98.6%,100%{transform:scaleY(1)}29.3%,63.1%,99.3%{transform:scaleY(0.08)}}
+.m-swell{animation:m-swell 3.2s ease-in-out infinite}
+@keyframes m-swell{0%{transform:scale(1)}8%{transform:scale(1.025)}16%{transform:scale(1.012)}26%{transform:scale(1.04)}36%{transform:scale(1.018)}46%{transform:scale(1.034)}56%{transform:scale(1.01)}64%{transform:scale(1.028)}74%,100%{transform:scale(1)}}
+.m-lvl{animation:m-lvl 3.2s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes m-lvl{0%{transform:scaleY(.25)}8%{transform:scaleY(.7)}16%{transform:scaleY(.45)}26%{transform:scaleY(1)}36%{transform:scaleY(.5)}46%{transform:scaleY(.85)}56%{transform:scaleY(.35)}64%{transform:scaleY(.75)}74%,100%{transform:scaleY(.18)}}
+.m-scan{animation:m-scan 1.5s ease-in-out infinite alternate}
+@keyframes m-scan{from{transform:translateX(0)}to{transform:translateX(14px)}}
+.m-tilt{animation:m-tilt 1.5s ease-in-out infinite alternate}
+@keyframes m-tilt{from{transform:rotate(0deg)}to{transform:rotate(3deg)}}
+.m-nod{animation:m-nod 6s ease-out infinite}
+@keyframes m-nod{0%,3.3%{transform:translateY(0) rotate(0deg)}5.4%{transform:translateY(1.9%) rotate(1.5deg)}7.5%,100%{transform:translateY(0) rotate(0deg)}}
+@media (prefers-reduced-motion: reduce){.m-breathe,.m-blink,.m-swell,.m-lvl,.m-scan,.m-tilt,.m-nod{animation:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1560px; position: relative; overflow: hidden; box-sizing: border-box; padding: 52px 20px 40px; display: flex; flex-direction: column; gap: 18px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <div style="display: flex; align-items: center">
+    <a href="Home.dc.html" aria-label="Back to Home" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></a>
+  </div>
+  <h1 style="margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.03em">Offline &amp; Sync</h1>
+
+  <button sc-camel-on-click="{{toggle}}" role="switch" aria-checked="{{offStr}}" style="min-height: 56px; border-radius: 18px; border: 1.5px dashed #BCC6EA; background: rgba(255,255,255,0.6); padding: 8px 12px 8px 14px; display: flex; align-items: center; gap: 12px; text-align: left; color: #1C2140">
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: #8A5A12; background: #FCF1E0; padding: 4px 7px; border-radius: 6px">DEMO</div>
+    <div style="flex: 1; font-size: 14px; font-weight: 700">Simulate offline mode</div>
+    <div style="width: 52px; height: 32px; border-radius: 999px; padding: 3px; box-sizing: border-box; display: flex; justify-content: {{align}}; background: {{track}}"><div style="width: 26px; height: 26px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 2px 6px rgba(28,33,64,0.2)"></div></div>
+  </button>
+
+  <section style="position: relative; overflow: hidden; border-radius: 28px; padding: 22px 20px; display: flex; align-items: center; gap: 16px; background: {{heroBg}}; color: {{heroFg}}">
+    <div style="position: absolute; right: -50px; top: -60px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(180,192,240,0.4) 0%, rgba(180,192,240,0) 70%)"></div>
+    <div style="position: relative; width: 64px; height: 64px; flex-shrink: 0">
+      <div style="position: absolute"><dc-import name="Mira-lbou" mode="{{orbMode}}" size="64" theme="{{orbTheme}}" hint-size="64px,77px"></dc-import></div>
+      
+    </div>
+    <div style="position: relative; display: flex; flex-direction: column; gap: 4px">
+      <div style="font-size: 19px; line-height: 1.3; font-weight: 700">{{heroTitle}}</div>
+      <div style="font-size: 13px; line-height: 1.45; opacity: 0.85">{{heroSub}}</div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+    <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #1F7A62"><svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"></rect></svg>Works offline</div>
+      <sc-for list="{{offlineCaps}}" as="c" hint-placeholder-count="6">
+        <div style="display: flex; gap: 6px; font-size: 12px; font-weight: 600; line-height: 1.35"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="#34A889" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px"><path d="m5 12 5 5 9-10"></path></svg>{{c}}</div>
+      </sc-for>
+    </div>
+    <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 22px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #444C6C"><svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9a4.5 4.5 0 0 0 1 9z"></path></svg>Needs internet</div>
+      <sc-for list="{{onlineCaps}}" as="c" hint-placeholder-count="4">
+        <div style="display: flex; gap: 6px; font-size: 12px; font-weight: 600; line-height: 1.35; color: {{capColor}}"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px"><path d="{{capIcon}}"></path></svg>{{c}}</div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 22px; padding: 4px 16px">
+    <div style="display: flex; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid rgba(28,33,64,0.08); font-size: 14px"><div style="color: #465071">Last successful sync</div><div style="font-weight: 700">{{lastSync}}</div></div>
+    <div style="display: flex; justify-content: space-between; padding: 13px 0; font-size: 14px"><div style="color: #465071">Cached on device</div><div style="font-weight: 700">6 emails · 10 events · 7 memories</div></div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; justify-content: space-between"><h2 style="margin: 0; font-size: 18px; font-weight: 700">Pending When Online</h2><div style="font-size: 12px; font-weight: 700; color: #444C6C">{{pendingCount}}</div></div>
+    <sc-for list="{{pending}}" as="p" hint-placeholder-count="3">
+      <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 12px">
+        <div style="width: 36px; height: 36px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: {{p.iconBg}}; color: {{p.iconFg}}">
+          <sc-if value="{{p.running}}" hint-placeholder-val="{{ false }}"><div class="mira-spin" style="width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8); border-top-color: #2E3A78"></div></sc-if>
+          <sc-if value="{{p.idle}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{p.icon}}"></path></svg></sc-if>
+        </div>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><div style="font-size: 14px; font-weight: 700">{{p.title}}</div><div style="font-size: 12px; color: #515A7A">{{p.detail}}</div></div>
+        <div style="font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; flex-shrink: 0; color: {{p.sFg}}; background: {{p.sBg}}">{{p.status}}</div>
+      </div>
+    </sc-for>
+    <sc-if value="{{showReview}}" hint-placeholder-val="{{ false }}">
+      <a href="Approvals.dc.html" style="height: 50px; border-radius: 16px; background: linear-gradient(180deg, #343F78 0%, #1C2245 100%); color: #FFFFFF; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center">Review &amp; approve queued actions</a>
+    </sc-if>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 10px">
+    <h2 style="margin: 0; font-size: 18px; font-weight: 700">Sync history</h2>
+    <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 22px; padding: 4px 16px">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(28,33,64,0.08)">
+        <div style="width: 28px; height: 28px; border-radius: 9px; background: #E3F5EF; color: #1F7A62; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg></div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><div style="font-size: 14px; font-weight: 700">Email &amp; calendar synced</div><div style="font-size: 12px; color: #515A7A">Today 8:45 AM · 2 new emails</div></div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0">
+        <div style="width: 28px; height: 28px; border-radius: 9px; display: flex; align-items: center; justify-content: center; background: {{failBg}}; color: {{failFg}}"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="{{failIcon}}"></path></svg></div>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><div style="font-size: 14px; font-weight: 700">{{failTitle}}</div><div style="font-size: 12px; color: #515A7A">{{failSub}}</div></div>
+        <sc-if value="{{canRetry}}" hint-placeholder-val="{{ true }}"><button sc-camel-on-click="{{retry}}" style="height: 38px; padding: 0 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #2E3A78; font-size: 13px; font-weight: 700">{{retryLabel}}</button></sc-if>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1560}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { offline: true, syncing: false, retried: false };
+  }
+  componentWillUnmount() { if (this.t) clearTimeout(this.t); }
+  renderVals() {
+    const st = this.state;
+    const off = st.offline;
+    const queued = { status: 'Queued', sFg: '#444C6C', sBg: 'rgba(255,255,255,0.6)', iconBg: 'rgba(255,255,255,0.6)', iconFg: '#444C6C', running: false, idle: true };
+    const checking = { status: 'Re-checking', sFg: '#232C5E', sBg: 'rgba(222,228,250,0.85)', iconBg: 'rgba(222,228,250,0.85)', iconFg: '#2E3A78', running: true, idle: false };
+    const awaiting = { status: 'Needs approval', sFg: '#8A5A12', sBg: '#FCF1E0', iconBg: '#FCF1E0', iconFg: '#8A5A12', running: false, idle: true };
+    const done = { status: 'Completed', sFg: '#1F7A62', sBg: '#E3F5EF', iconBg: '#E3F5EF', iconFg: '#1F7A62', running: false, idle: true };
+    const phase = off ? 'off' : (st.syncing ? 'sync' : 'on');
+    const pick = (needsApproval) => phase === 'off' ? queued : phase === 'sync' ? checking : (needsApproval ? awaiting : done);
+    const pending = [
+      Object.assign({ title: 'Send reply to Sam Rivera', detail: 'Draft saved yesterday · Demo mailbox', icon: 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM4 7l8 6 8-6' }, pick(true)),
+      Object.assign({ title: 'Email Priya the report draft', detail: 'Asked in MIRA chat today', icon: 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM4 7l8 6 8-6' }, pick(true)),
+      Object.assign({ title: 'Refresh calendars', detail: 'Read-only · approved earlier', icon: 'M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4' }, pick(false))
+    ];
+    return {
+      orbMode: off ? 'offline' : (st.syncing ? 'thinking' : 'idle'),
+      orbTheme: off ? 'dark' : 'light',
+      offStr: off ? 'true' : 'false', track: off ? '#2E3A78' : '#B9C0D6', align: off ? 'flex-end' : 'flex-start',
+      toggle: () => {
+        if (off) {
+          this.setState({ offline: false, syncing: true });
+          this.t = setTimeout(() => this.setState({ syncing: false }), 1600);
+        } else this.setState({ offline: true, syncing: false });
+      },
+      heroBg: off ? '#1C2140' : '#E3F5EF', heroFg: off ? '#FFFFFF' : '#15544C',
+      heroTitle: off ? 'You’re offline. MIRA is still here.' : (st.syncing ? 'Back online. Syncing…' : 'You’re online. All synced.'),
+      heroSub: off ? 'Your assistant, memory and tasks keep working on this device.' : (st.syncing ? 'Checking queued actions before anything runs.' : 'Queued actions were re-checked and are waiting for you.'),
+      badgeBg: off ? '#E8AD59' : '#34A889', badgeRing: off ? '#1C2140' : '#E3F5EF',
+      badgeIcon: off ? 'M2 2l20 20M12 20h.01' : 'm5 12 5 5 9-10',
+      offlineCaps: ['Local AI assistant', 'Saved preferences & memory', 'Tasks & reminders', 'Previously synced messages', 'Draft creation', 'Supported local automations'],
+      onlineCaps: ['Receiving new emails', 'Sending emails', 'Refreshing calendars', 'External service actions'],
+      capColor: off ? '#515A7A' : '#1C2140', capIcon: off ? 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z' : 'm5 12 5 5 9-10',
+      lastSync: phase === 'on' ? 'Just now' : 'Today 8:45 AM',
+      pendingCount: phase === 'on' ? '2 need you' : '3 queued',
+      pending: pending,
+      showReview: phase === 'on',
+      canRetry: !st.retried,
+      retryLabel: off ? 'Retry when online' : 'Retry',
+      retry: () => { if (!off) this.setState({ retried: true }); },
+      failBg: st.retried ? '#E3F5EF' : '#FBE9EB', failFg: st.retried ? '#1F7A62' : '#B23A4A',
+      failIcon: st.retried ? 'm5 12 5 5 9-10' : 'M6 6l12 12M18 6 6 18',
+      failTitle: st.retried ? 'Calendar refresh succeeded' : 'Calendar refresh failed',
+      failSub: st.retried ? 'Just now' : 'Today 9:12 AM · no connection'
+    };
+  }
+}
+</script>
+
+
+</body></html>

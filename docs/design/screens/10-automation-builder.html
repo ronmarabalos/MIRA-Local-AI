@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Create an automation</title>
+<script src="6a49e1dd-0653-4571-9205-2708796c66d0"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button,input,textarea{font-family:inherit}
+button{cursor:pointer}
+input:focus,textarea:focus{outline:2px solid #6A79CF;outline-offset:1px}
+@keyframes mira-spin{to{transform:rotate(360deg)}}
+@keyframes mira-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.mira-spin{animation:mira-spin 1.6s linear infinite}
+.mira-in{animation:mira-in .35s ease-out both}
+@media (prefers-reduced-motion:reduce){.mira-spin,.mira-in{animation:none}}
+.m-breathe{animation:m-breathe 4s ease-in-out infinite}
+@keyframes m-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+.m-blink{animation:m-blink 15s linear infinite}
+@keyframes m-blink{0%,28.6%,30%,62.4%,63.8%,98.6%,100%{transform:scaleY(1)}29.3%,63.1%,99.3%{transform:scaleY(0.08)}}
+.m-swell{animation:m-swell 3.2s ease-in-out infinite}
+@keyframes m-swell{0%{transform:scale(1)}8%{transform:scale(1.025)}16%{transform:scale(1.012)}26%{transform:scale(1.04)}36%{transform:scale(1.018)}46%{transform:scale(1.034)}56%{transform:scale(1.01)}64%{transform:scale(1.028)}74%,100%{transform:scale(1)}}
+.m-lvl{animation:m-lvl 3.2s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes m-lvl{0%{transform:scaleY(.25)}8%{transform:scaleY(.7)}16%{transform:scaleY(.45)}26%{transform:scaleY(1)}36%{transform:scaleY(.5)}46%{transform:scaleY(.85)}56%{transform:scaleY(.35)}64%{transform:scaleY(.75)}74%,100%{transform:scaleY(.18)}}
+.m-scan{animation:m-scan 1.5s ease-in-out infinite alternate}
+@keyframes m-scan{from{transform:translateX(0)}to{transform:translateX(14px)}}
+.m-tilt{animation:m-tilt 1.5s ease-in-out infinite alternate}
+@keyframes m-tilt{from{transform:rotate(0deg)}to{transform:rotate(3deg)}}
+.m-nod{animation:m-nod 6s ease-out infinite}
+@keyframes m-nod{0%,3.3%{transform:translateY(0) rotate(0deg)}5.4%{transform:translateY(1.9%) rotate(1.5deg)}7.5%,100%{transform:translateY(0) rotate(0deg)}}
+@media (prefers-reduced-motion: reduce){.m-breathe,.m-blink,.m-swell,.m-lvl,.m-scan,.m-tilt,.m-nod{animation:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1500px; position: relative; overflow: hidden; box-sizing: border-box; padding: 52px 20px 40px; display: flex; flex-direction: column; gap: 20px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <a href="Teach.dc.html" aria-label="Back" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></a>
+    <a href="Automations.dc.html" style="font-size: 14px; font-weight: 700; padding: 12px 4px">My automations</a>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <h1 style="margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.03em">Create an Automation</h1>
+  </div>
+
+  <section style="background: linear-gradient(160deg, rgba(255,255,255,0.72) 0%, rgba(222,228,248,0.5) 100%); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.8); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <dc-import name="Mira-lbou" mode="idle" size="32" theme="light" hint-size="32px,32px"></dc-import>
+      <label for="describe" style="font-size: 15px; font-weight: 700">Describe what you want to automate.</label>
+    </div>
+    <textarea id="describe" rows="2" value="{{desc}}" sc-camel-on-change="{{setDesc}}" style="width: 100%; box-sizing: border-box; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); padding: 12px 14px; font-size: 15px; line-height: 1.5; color: #1C2140; resize: none"></textarea>
+    <button sc-camel-on-click="{{propose}}" style="height: 46px; border-radius: 14px; border: 0; background: #1C2140; color: #FFFFFF; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px">
+      <sc-if value="{{working}}" hint-placeholder-val="{{ false }}"><div class="mira-spin" style="width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); border-top-color: #FFFFFF"></div></sc-if>
+      {{proposeLabel}}
+    </button>
+  </section>
+
+  <sc-if value="{{proposed}}" hint-placeholder-val="{{ true }}">
+    <div class="mira-in" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #2E3A78; background: rgba(222,228,250,0.85); border-radius: 14px; padding: 10px 12px"><svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg>Proposed by MIRA. Edit freely.</div>
+  </sc-if>
+
+  <div style="display: flex; flex-direction: column; gap: 6px">
+    <label for="auto-name" style="font-size: 13px; font-weight: 700">Automation name</label>
+    <input id="auto-name" value="Draft routine email replies" style="height: 52px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); padding: 0 14px; font-size: 16px; font-weight: 600; color: #1C2140; box-sizing: border-box; width: 100%">
+  </div>
+
+  <section aria-label="Workflow" style="display: flex; flex-direction: column">
+    <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #FFFFFF; background: #2E3A78; padding: 5px 10px; border-radius: 8px">WHEN</div>
+        <div style="font-size: 15px; font-weight: 700">{{triggerText}}</div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <sc-for list="{{triggers}}" as="t" hint-placeholder-count="3">
+          <button sc-camel-on-click="{{t.pick}}" aria-pressed="{{t.sel}}" style="height: 38px; padding: 0 12px; border-radius: 12px; font-size: 13px; font-weight: 700; border: {{t.border}}; background: {{t.bg}}; color: {{t.fg}}">{{t.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="height: 28px; display: flex; justify-content: center" aria-hidden="true"><div style="width: 2px; background: #BCC6EA"></div></div>
+
+    <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #1C2140; background: #CDD4EB; padding: 5px 10px; border-radius: 8px">IF</div>
+        <div style="font-size: 15px; font-weight: 700">Conditions</div>
+        <div style="font-size: 12px; color: #515A7A">optional</div>
+      </div>
+      <sc-for list="{{conds}}" as="c" hint-placeholder-count="2">
+        <div style="display: flex; align-items: center; gap: 10px; min-height: 48px; border-radius: 14px; background: rgba(255,255,255,0.5); border: 1px solid rgba(28,33,64,0.08); padding: 6px 6px 6px 12px">
+          <div style="flex: 1; font-size: 14px; font-weight: 600">{{c.label}}</div>
+          <button sc-camel-on-click="{{c.toggle}}" aria-pressed="{{c.onStr}}" aria-label="{{c.label}}" style="width: 52px; height: 32px; border-radius: 999px; border: 0; padding: 3px; display: flex; justify-content: {{c.align}}; background: {{c.track}}"><div style="width: 26px; height: 26px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 2px 6px rgba(28,33,64,0.2)"></div></button>
+        </div>
+      </sc-for>
+      <button style="height: 40px; border-radius: 12px; border: 1px dashed #BCC6EA; background: rgba(255,255,255,0.6); color: #2E3A78; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>Add condition</button>
+    </div>
+    <div style="height: 28px; display: flex; justify-content: center" aria-hidden="true"><div style="width: 2px; background: #BCC6EA"></div></div>
+
+    <div style="background: rgba(255,255,255,0.6); border: 1.5px solid #BCC6EA; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 12px 28px rgba(40,52,100,0.08)">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: #FFFFFF; background: #1E7F73; padding: 5px 10px; border-radius: 8px">THEN</div>
+        <div style="font-size: 15px; font-weight: 700">{{actionText}}</div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <sc-for list="{{actions}}" as="a" hint-placeholder-count="3">
+          <button sc-camel-on-click="{{a.pick}}" aria-pressed="{{a.sel}}" style="height: 38px; padding: 0 12px; border-radius: 12px; font-size: 13px; font-weight: 700; border: {{a.border}}; background: {{a.bg}}; color: {{a.fg}}">{{a.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 10px">
+    <div style="font-size: 15px; font-weight: 700">How much can MIRA do?</div>
+    <div role="radiogroup" aria-label="Permission level" style="display: flex; flex-direction: column; gap: 8px">
+      <sc-for list="{{levels}}" as="l" hint-placeholder-count="3">
+        <button role="radio" aria-checked="{{l.sel}}" sc-camel-on-click="{{l.pick}}" disabled="{{l.disabled}}" style="min-height: 60px; border-radius: 16px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; text-align: left; border: {{l.border}}; background: {{l.bg}}; opacity: {{l.opacity}}">
+          <div style="width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; box-sizing: border-box; border: {{l.dot}}"></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><div style="font-size: 14px; font-weight: 700; color: #1C2140">{{l.label}}</div><div style="font-size: 12px; color: #465071">{{l.hint}}</div></div>
+        </button>
+      </sc-for>
+    </div>
+  </section>
+
+  <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 18px; padding: 12px 14px">
+    <svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="#2E3A78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><div style="font-size: 14px; font-weight: 700">Ask me before sending</div><div style="font-size: 12px; color: #515A7A">Always on for email</div></div>
+    <div style="font-size: 11px; font-weight: 700; color: #444C6C; background: rgba(255,255,255,0.6); padding: 4px 8px; border-radius: 999px">Locked</div>
+  </div>
+
+  <a href="AutomationReview.dc.html" style="height: 56px; border-radius: 18px; background: linear-gradient(180deg, #343F78 0%, #1C2245 100%); color: #FFFFFF; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 12px 28px rgba(40,52,100,0.32)">Review</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1500}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { desc: 'When a routine meeting request arrives, prepare a reply draft for me.', working: false, proposed: true, trigger: 0, action: 0, level: 0, conds: [true, false] };
+  }
+  componentWillUnmount() { if (this.t) clearTimeout(this.t); }
+  renderVals() {
+    const st = this.state;
+    const pill = (sel) => ({ sel: sel ? 'true' : 'false', bg: sel ? 'rgba(222,228,250,0.85)' : '#FFFFFF', fg: sel ? '#232C5E' : '#1C2140', border: sel ? '1.5px solid #6A79CF' : '1px solid rgba(255,255,255,0.8)' });
+    const trig = ['An email arrives', 'A time of day', 'A task is due'];
+    const acts = ['Prepare a reply draft', 'Remind me', 'Create a task'];
+    const condLabels = ['It’s a routine meeting request', 'Sender is in my contacts'];
+    const lv = [
+      { label: 'Prepare only', hint: 'MIRA drafts, you decide' },
+      { label: 'Ask before acting', hint: 'Asks every time' },
+      { label: 'Act automatically', hint: 'Not for email', disabled: true }
+    ];
+    return {
+      desc: st.desc, working: st.working, proposed: st.proposed,
+      proposeLabel: st.working ? 'Drafting a rule…' : 'Propose a rule',
+      setDesc: (e) => this.setState({ desc: e.target.value }),
+      propose: () => {
+        this.setState({ working: true, proposed: false });
+        this.t = setTimeout(() => this.setState({ working: false, proposed: true, trigger: 0, action: 0, conds: [true, false] }), 1000);
+      },
+      triggerText: trig[st.trigger], actionText: acts[st.action],
+      triggers: trig.map((l, i) => Object.assign({ label: l, pick: () => this.setState({ trigger: i }) }, pill(i === st.trigger))),
+      actions: acts.map((l, i) => Object.assign({ label: l, pick: () => this.setState({ action: i }) }, pill(i === st.action))),
+      conds: condLabels.map((l, i) => {
+        const on = st.conds[i];
+        return { label: l, onStr: on ? 'true' : 'false', track: on ? '#2E3A78' : '#B9C0D6', align: on ? 'flex-end' : 'flex-start', toggle: () => { const c = st.conds.slice(); c[i] = !c[i]; this.setState({ conds: c }); } };
+      }),
+      levels: lv.map((l, i) => {
+        const sel = i === st.level;
+        return {
+          label: l.label, hint: l.hint, sel: sel ? 'true' : 'false', disabled: !!l.disabled,
+          bg: sel ? 'rgba(255,255,255,0.55)' : '#FFFFFF', border: sel ? '1.5px solid #6A79CF' : '1px solid rgba(255,255,255,0.8)',
+          dot: sel ? '6px solid #2E3A78' : '2px solid #BCC6EA', opacity: l.disabled ? 0.55 : 1,
+          pick: () => { if (!l.disabled) this.setState({ level: i }); }
+        };
+      })
+    };
+  }
+}
+</script>
+
+
+</body></html>

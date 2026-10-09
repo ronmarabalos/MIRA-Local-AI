@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Settings and privacy</title>
+<script src="2c587be3-b023-44a8-9434-4bba3c418d4f"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button{font-family:inherit;cursor:pointer}
+@keyframes mira-in{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+.mira-in{animation:mira-in .25s ease-out both}
+@media (prefers-reduced-motion:reduce){.mira-in{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1900px; position: relative; overflow: hidden; box-sizing: border-box; padding: 52px 20px 40px; display: flex; flex-direction: column; gap: 18px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <div style="display: flex; align-items: center">
+    <a href="Profile.dc.html" aria-label="Back to Profile" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></a>
+  </div>
+  <h1 style="margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.03em">Settings</h1>
+
+  <sc-for list="{{groups}}" as="g" hint-placeholder-count="6">
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0; padding-left: 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #444C6C">{{g.title}}</h2>
+      <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 22px; overflow: hidden">
+        <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="3">
+          <sc-if value="{{r.isLink}}" hint-placeholder-val="{{ true }}">
+            <a href="{{r.href}}" style="display: flex; align-items: center; gap: 12px; padding: 0 14px; min-height: 56px; color: {{r.color}}; font-size: 15px; font-weight: 600; border-top: {{r.sep}}">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 8px 0"><div>{{r.label}}</div><sc-if value="{{r.hasHint}}" hint-placeholder-val="{{ false }}"><div style="font-size: 12px; font-weight: 500; color: #515A7A">{{r.hint}}</div></sc-if></div>
+              <div style="font-size: 13px; color: #515A7A">{{r.value}}</div>
+              <svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="#515A7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>
+            </a>
+          </sc-if>
+          <sc-if value="{{r.isSwitch}}" hint-placeholder-val="{{ false }}">
+            <button sc-camel-on-click="{{r.toggle}}" role="switch" aria-checked="{{r.onStr}}" style="width: 100%; border: 0; border-top: {{r.sep}}; background: rgba(255,255,255,0.6); display: flex; align-items: center; gap: 12px; padding: 0 14px; min-height: 56px; text-align: left; color: #1C2140">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 8px 0"><div style="font-size: 15px; font-weight: 600">{{r.label}}</div><sc-if value="{{r.hasHint}}" hint-placeholder-val="{{ false }}"><div style="font-size: 12px; color: #515A7A">{{r.hint}}</div></sc-if></div>
+              <div style="width: 52px; height: 32px; flex-shrink: 0; border-radius: 999px; padding: 3px; box-sizing: border-box; display: flex; justify-content: {{r.align}}; background: {{r.track}}; transition: all .2s"><div style="width: 26px; height: 26px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 2px 6px rgba(28,33,64,0.2)"></div></div>
+            </button>
+          </sc-if>
+          <sc-if value="{{r.isTheme}}" hint-placeholder-val="{{ false }}">
+            <div role="radiogroup" aria-label="Theme" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 12px; border-top: {{r.sep}}">
+              <sc-for list="{{themes}}" as="t" hint-placeholder-count="3">
+                <button role="radio" aria-checked="{{t.sel}}" sc-camel-on-click="{{t.pick}}" style="border-radius: 16px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 8px; border: {{t.border}}; background: {{t.bg}}; color: #1C2140; font-size: 13px; font-weight: 700">
+                  <div style="width: 54px; height: 38px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.8); background: {{t.swatch}}"></div>{{t.label}}
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{r.isDanger}}" hint-placeholder-val="{{ false }}">
+            <button sc-camel-on-click="{{askWipe}}" style="width: 100%; border: 0; border-top: {{r.sep}}; background: rgba(255,255,255,0.6); display: flex; align-items: center; gap: 12px; padding: 0 14px; min-height: 56px; text-align: left; color: #B23A4A; font-size: 15px; font-weight: 700">
+              <svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>{{r.label}}
+            </button>
+          </sc-if>
+        </sc-for>
+      </div>
+    </section>
+  </sc-for>
+
+  <sc-if value="{{wipe}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; z-index: 10; background: rgba(28,33,64,0.42); display: flex; align-items: flex-start; justify-content: center; padding: 1100px 24px 0">
+      <div class="mira-in" role="alertdialog" aria-label="Delete local data" style="width: 100%; background: rgba(242,244,250,0.9); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.9); border-radius: 28px; padding: 22px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 30px 60px rgba(28,33,64,0.25)">
+        <div style="font-size: 19px; font-weight: 700">Delete all local data?</div>
+        <div style="font-size: 14px; line-height: 1.5; color: #343B5C">This removes memories, preferences, cached emails, drafts and automations from this device. It can’t be undone.</div>
+        <div style="display: flex; gap: 8px">
+          <button sc-camel-on-click="{{cancelWipe}}" style="flex: 1; height: 50px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 15px; font-weight: 700">Cancel</button>
+          <button sc-camel-on-click="{{cancelWipe}}" style="flex: 1; height: 50px; border: 0; border-radius: 16px; background: #B23A4A; color: #FFFFFF; font-size: 15px; font-weight: 700">Delete (demo)</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1900}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      theme: 'light', wipe: false,
+      sw: { localOnly: true, offlineAuto: true, askSend: true, askModify: true, pauseAll: false, remind: true, approvals: true, autoUpd: false, motion: false }
+    };
+  }
+  renderVals() {
+    const st = this.state;
+    let first = true;
+    const sep = () => { const s = first ? '0' : '1px solid rgba(28,33,64,0.08)'; first = false; return s; };
+    const link = (label, href, value, hint, color) => ({ isLink: true, label, href, value: value || '', hint: hint || '', hasHint: !!hint, color: color || '#1C2140', sep: sep() });
+    const sw = (key, label, hint) => {
+      const on = st.sw[key];
+      return { isSwitch: true, label, hint: hint || '', hasHint: !!hint, onStr: on ? 'true' : 'false', track: on ? '#2E3A78' : '#B9C0D6', align: on ? 'flex-end' : 'flex-start', sep: sep(), toggle: () => { const n = Object.assign({}, st.sw); n[key] = !on; this.setState({ sw: n }); } };
+    };
+    const group = (title, build) => { first = true; return { title, rows: build() }; };
+    return {
+      groups: [
+        group('PERSONALIZATION', () => [
+          link('Communication preferences', 'Memory.dc.html', 'Friendly, concise'),
+          link('Default AI behavior', 'Teach.dc.html', 'Suggest, then ask'),
+          link('Assistant name', 'Setup.dc.html', 'MIRA'),
+          link('Saved instructions', 'Memory.dc.html', '1')
+        ]),
+        group('AI & DEVICE', () => [
+          link('Local model', 'ModelSetup.dc.html', 'Demo mode'),
+          sw('offlineAuto', 'Keep working offline'),
+          link('Storage used', 'OfflineSync.dc.html', '214 MB')
+        ]),
+        group('AUTOMATION', () => [
+          sw('askSend', 'Ask before sending anything', 'Can’t be turned off for email'),
+          sw('askModify', 'Ask before changing calendars or files'),
+          sw('pauseAll', 'Pause all automations'),
+          link('Execution limits', 'Automations.dc.html', 'Drafts only')
+        ]),
+        group('PRIVACY', () => [
+          sw('localOnly', 'Keep memory on this device only'),
+          link('Manage memories', 'Memory.dc.html', '7'),
+          link('Review app permissions', 'ConnectedApps.dc.html'),
+          link('Disconnect accounts', 'ConnectedApps.dc.html'),
+          { isDanger: true, label: 'Delete local data', sep: sep() }
+        ]),
+        group('APPEARANCE', () => [
+          { isTheme: true, sep: sep() },
+          sw('motion', 'Reduce motion')
+        ]),
+        group('NOTIFICATIONS', () => [
+          sw('remind', 'Reminder alerts'),
+          sw('approvals', 'Approval requests'),
+          sw('autoUpd', 'Automation updates')
+        ])
+      ],
+      themes: [['light', 'Light', '#DDE2EE'], ['dark', 'Dark', '#1C2140'], ['system', 'System', 'linear-gradient(90deg, #DDE2EE 50%, #1C2140 50%)']].map(([id, label, swatch]) => {
+        const sel = st.theme === id;
+        return { label, swatch, sel: sel ? 'true' : 'false', bg: sel ? 'rgba(255,255,255,0.55)' : '#FFFFFF', border: sel ? '1.5px solid #6A79CF' : '1px solid rgba(255,255,255,0.8)', pick: () => this.setState({ theme: id }) };
+      }),
+      wipe: st.wipe,
+      askWipe: () => this.setState({ wipe: true }),
+      cancelWipe: () => this.setState({ wipe: false })
+    };
+  }
+}
+</script>
+
+
+</body></html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Email and AI reply</title>
+<script src="e92848e9-9ba7-40ea-8c43-6689aa10d5fd"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button,textarea{font-family:inherit}
+button{cursor:pointer}
+textarea:focus{outline:2px solid #6A79CF;outline-offset:1px}
+@keyframes mira-spin{to{transform:rotate(360deg)}}
+@keyframes mira-up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.mira-spin{animation:mira-spin 1.6s linear infinite}
+.mira-up{animation:mira-up .3s ease-out both}
+@media (prefers-reduced-motion:reduce){.mira-spin,.mira-up{animation:none}}
+.m-breathe{animation:m-breathe 4s ease-in-out infinite}
+@keyframes m-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+.m-blink{animation:m-blink 15s linear infinite}
+@keyframes m-blink{0%,28.6%,30%,62.4%,63.8%,98.6%,100%{transform:scaleY(1)}29.3%,63.1%,99.3%{transform:scaleY(0.08)}}
+.m-swell{animation:m-swell 3.2s ease-in-out infinite}
+@keyframes m-swell{0%{transform:scale(1)}8%{transform:scale(1.025)}16%{transform:scale(1.012)}26%{transform:scale(1.04)}36%{transform:scale(1.018)}46%{transform:scale(1.034)}56%{transform:scale(1.01)}64%{transform:scale(1.028)}74%,100%{transform:scale(1)}}
+.m-lvl{animation:m-lvl 3.2s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes m-lvl{0%{transform:scaleY(.25)}8%{transform:scaleY(.7)}16%{transform:scaleY(.45)}26%{transform:scaleY(1)}36%{transform:scaleY(.5)}46%{transform:scaleY(.85)}56%{transform:scaleY(.35)}64%{transform:scaleY(.75)}74%,100%{transform:scaleY(.18)}}
+.m-scan{animation:m-scan 1.5s ease-in-out infinite alternate}
+@keyframes m-scan{from{transform:translateX(0)}to{transform:translateX(14px)}}
+.m-tilt{animation:m-tilt 1.5s ease-in-out infinite alternate}
+@keyframes m-tilt{from{transform:rotate(0deg)}to{transform:rotate(3deg)}}
+.m-nod{animation:m-nod 6s ease-out infinite}
+@keyframes m-nod{0%,3.3%{transform:translateY(0) rotate(0deg)}5.4%{transform:translateY(1.9%) rotate(1.5deg)}7.5%,100%{transform:translateY(0) rotate(0deg)}}
+@media (prefers-reduced-motion: reduce){.m-breathe,.m-blink,.m-swell,.m-lvl,.m-scan,.m-tilt,.m-nod{animation:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1300px; position: relative; overflow: hidden; box-sizing: border-box; padding: 52px 20px 40px; display: flex; flex-direction: column; gap: 18px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <a href="Inbox.dc.html" aria-label="Back to Inbox" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></a>
+    <div style="display: flex; gap: 8px; align-items: center">
+      <button sc-camel-on-click="{{toggleNet}}" aria-pressed="{{offStr}}" style="height: 36px; padding: 0 12px; border-radius: 999px; border: 1px dashed #BCC6EA; background: rgba(255,255,255,0.6); color: #444C6C; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px"><div style="width: 8px; height: 8px; border-radius: 50%; background: {{netDot}}"></div>Demo: {{netLabel}}</button>
+      <a href="Tasks.dc.html" aria-label="Create task from email" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg></a>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <h1 style="margin: 0; font-size: 24px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em">Can we reschedule our meeting?</h1>
+    <div style="display: flex; gap: 6px; flex-wrap: wrap">
+      <div style="font-size: 11px; font-weight: 700; color: #B23A4A; background: #FBE9EB; padding: 4px 8px; border-radius: 999px">Priority</div>
+      <div style="font-size: 11px; font-weight: 700; color: #2E3A78; background: rgba(222,228,250,0.85); padding: 4px 8px; border-radius: 999px">Needs reply</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 12px">
+    <div style="width: 44px; height: 44px; border-radius: 15px; background: #FBE9EB; color: #B23A4A; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700">M</div>
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+      <div style="font-size: 15px; font-weight: 700">Maya Chen</div>
+      <div style="font-size: 12px; color: #515A7A">to you</div>
+    </div>
+    <div style="font-size: 12px; color: #515A7A">8:42 AM</div>
+  </div>
+
+  <div style="background: linear-gradient(160deg, rgba(255,255,255,0.72) 0%, rgba(222,228,248,0.5) 100%); border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #2E3A78"><dc-import name="Mira-lbou" mode="idle" size="24" theme="light" hint-size="24px,24px"></dc-import>MIRA SUMMARY</div>
+    <div style="font-size: 14px; line-height: 1.55; color: #2A3150">Maya can’t make Thursday’s 1:1 and wants to move it to early next week. She’s free Monday or Tuesday morning.</div>
+  </div>
+
+  <div style="font-size: 15px; line-height: 1.65; color: #2A3150; display: flex; flex-direction: column; gap: 12px">
+    <p style="margin: 0">Hi Alex,</p>
+    <p style="margin: 0">Something came up on Thursday and I won’t be able to make our 1:1. Could we move it to early next week? I’m free Monday or Tuesday morning. I’ve attached my availability.</p>
+    <p style="margin: 0">Thanks so much,<br>Maya</p>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 14px; padding: 10px 12px; align-self: flex-start">
+    <svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="#2E3A78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6v18h12V7z"></path><path d="M14 3v4h4"></path></svg>
+    <div style="font-size: 13px; font-weight: 700">availability.ics</div>
+    <div style="font-size: 12px; color: #515A7A">2 KB</div>
+  </div>
+
+  <section aria-label="MIRA reply assistant" style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 14px 34px rgba(40,52,100,0.08)">
+    <sc-if value="{{isIdle}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <dc-import name="Mira-lbou" mode="idle" size="40" theme="light" hint-size="40px,40px"></dc-import>
+          <div style="display: flex; flex-direction: column; gap: 2px"><div style="font-size: 15px; font-weight: 700">Reply to Maya?</div></div>
+        </div>
+        <button sc-camel-on-click="{{generate}}" style="height: 50px; border: 0; border-radius: 16px; background: linear-gradient(180deg, #343F78 0%, #1C2245 100%); color: #FFFFFF; font-size: 15px; font-weight: 700; box-shadow: 0 10px 22px rgba(40,52,100,0.3)">Generate reply</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{isWorking}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; align-items: center; gap: 12px; height: 76px">
+        <dc-import name="Mira-lbou" mode="thinking" size="40" theme="light" hint-size="40px,40px"></dc-import>
+        <div style="font-size: 14px; font-weight: 600; color: #343B5C">Writing…</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{hasDraft}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #2E3A78">DRAFT REPLY</div>
+          <div style="font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; color: {{statusFg}}; background: {{statusBg}}">{{statusLabel}}</div>
+        </div>
+        <label for="reply-body" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Reply text</label>
+        <textarea id="reply-body" value="{{draft}}" sc-camel-on-change="{{editDraft}}" rows="7" style="width: 100%; box-sizing: border-box; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.5); padding: 12px 14px; font-size: 14px; line-height: 1.55; color: #1C2140; resize: none"></textarea>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <button sc-camel-on-click="{{regenerate}}" style="height: 36px; padding: 0 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4"></path></svg>Regenerate</button>
+          <button sc-camel-on-click="{{cycleTone}}" style="height: 36px; padding: 0 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px">Tone: <span style="color: #2E3A78">{{tone}}</span></button>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <button sc-camel-on-click="{{saveDraft}}" style="flex: 1; height: 50px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 15px; font-weight: 700">Save draft</button>
+          <button sc-camel-on-click="{{askSend}}" style="flex: 1; height: 50px; border: 0; border-radius: 16px; background: linear-gradient(180deg, #343F78 0%, #1C2245 100%); color: #FFFFFF; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px">Send…</button>
+        </div>
+      </div>
+    </sc-if>
+  </section>
+
+  <sc-if value="{{sheet}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: rgba(28,33,64,0.42); z-index: 10; display: flex; flex-direction: column; justify-content: flex-end">
+      <div class="mira-up" role="dialog" aria-label="Confirm sending" style="background: rgba(238,241,249,0.86); backdrop-filter: blur(30px) saturate(160%); -webkit-backdrop-filter: blur(30px) saturate(160%); border: 1px solid rgba(255,255,255,0.9); border-radius: 32px 32px 0 0; padding: 12px 20px 36px; display: flex; flex-direction: column; gap: 16px">
+        <div style="align-self: center; width: 40px; height: 5px; border-radius: 999px; background: #B9C0D6"></div>
+        <sc-if value="{{offline}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <div style="width: 48px; height: 48px; border-radius: 16px; background: #FCF1E0; color: #8A5A12; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5.2-2.8M19 13a10 10 0 0 0-2-1.5M12 20h.01"></path></svg></div>
+            <div style="display: flex; flex-direction: column; gap: 6px"><div style="font-size: 20px; font-weight: 700">You’re offline</div><div style="font-size: 14px; line-height: 1.5; color: #465071">MIRA will save it and ask you to send it when you’re back online.</div></div>
+            <button sc-camel-on-click="{{queue}}" style="height: 54px; border: 0; border-radius: 18px; background: linear-gradient(180deg, #343F78 0%, #1C2245 100%); color: #FFFFFF; font-size: 15px; font-weight: 700">Save &amp; queue for when online</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{online}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <div style="width: 48px; height: 48px; border-radius: 16px; background: rgba(222,228,250,0.85); color: #2E3A78; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
+            <div style="display: flex; flex-direction: column; gap: 6px"><div style="font-size: 20px; font-weight: 700">Send this reply to Maya?</div></div>
+            <div style="background: rgba(255,255,255,0.5); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 6px; font-size: 13px">
+              <div style="display: flex; justify-content: space-between"><div style="color: #465071">To</div><div style="font-weight: 700">maya@northwind.example</div></div>
+            </div>
+            <button sc-camel-on-click="{{approveSend}}" style="height: 54px; border: 0; border-radius: 18px; background: linear-gradient(180deg, #343F78 0%, #1C2245 100%); color: #FFFFFF; font-size: 15px; font-weight: 700">Approve &amp; send</button>
+          </div>
+        </sc-if>
+        <button sc-camel-on-click="{{closeSheet}}" style="height: 48px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 15px; font-weight: 700">Keep editing</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1300}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { phase: 'idle', tone: 0, draft: '', status: 'draft', sheet: false, offline: true };
+  }
+  componentWillUnmount() { if (this.t) clearTimeout(this.t); }
+  text(i) {
+    return [
+      'Hi Maya,\n\nNo problem at all! Monday at 10:00 AM works well for me. Does that suit you?\n\nBest,\nAlex',
+      'Dear Maya,\n\nThank you for letting me know. I would be glad to move our meeting to Monday at 10:00 AM. Please let me know if that time is convenient.\n\nKind regards,\nAlex',
+      'Hi Maya, sure. Monday 10 AM? —Alex'
+    ][i];
+  }
+  renderVals() {
+    const st = this.state;
+    const tones = ['Friendly', 'Formal', 'Brief'];
+    const statusMap = {
+      draft: ['Not sent', '#2E3A78', 'rgba(222,228,250,0.85)'],
+      saved: ['Saved on device', '#1F7A62', '#E3F5EF'],
+      queued: ['Queued', '#444C6C', 'rgba(255,255,255,0.6)'],
+      sent: ['Sent (demo)', '#1F7A62', '#E3F5EF']
+    }[st.status];
+    const work = (tone) => {
+      this.setState({ phase: 'working' });
+      this.t = setTimeout(() => this.setState({ phase: 'draft', draft: this.text(tone), tone: tone, status: 'draft' }), 900);
+    };
+    return {
+      isIdle: st.phase === 'idle', isWorking: st.phase === 'working', hasDraft: st.phase === 'draft',
+      draft: st.draft, tone: tones[st.tone],
+      statusLabel: statusMap[0], statusFg: statusMap[1], statusBg: statusMap[2],
+      offline: st.offline, online: !st.offline, offStr: st.offline ? 'true' : 'false',
+      netLabel: st.offline ? 'offline' : 'online', netDot: st.offline ? '#E8AD59' : '#34A889',
+      toggleNet: () => this.setState({ offline: !st.offline }),
+      generate: () => work(0),
+      regenerate: () => work(st.tone),
+      cycleTone: () => work((st.tone + 1) % 3),
+      editDraft: (e) => this.setState({ draft: e.target.value, status: 'draft' }),
+      saveDraft: () => this.setState({ status: 'saved' }),
+      askSend: () => this.setState({ sheet: true }),
+      closeSheet: () => this.setState({ sheet: false }),
+      queue: () => this.setState({ sheet: false, status: 'queued' }),
+      approveSend: () => this.setState({ sheet: false, status: 'sent' }),
+      sheet: st.sheet
+    };
+  }
+}
+</script>
+
+
+</body></html>

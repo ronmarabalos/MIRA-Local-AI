@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Inbox</title>
+<script src="3ff2e639-8510-44be-8667-236d0bec8e26"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button,input{font-family:inherit}
+button{cursor:pointer}
+input:focus{outline:2px solid #6A79CF;outline-offset:1px}
+.m-breathe{animation:m-breathe 4s ease-in-out infinite}
+@keyframes m-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+.m-blink{animation:m-blink 15s linear infinite}
+@keyframes m-blink{0%,28.6%,30%,62.4%,63.8%,98.6%,100%{transform:scaleY(1)}29.3%,63.1%,99.3%{transform:scaleY(0.08)}}
+.m-swell{animation:m-swell 3.2s ease-in-out infinite}
+@keyframes m-swell{0%{transform:scale(1)}8%{transform:scale(1.025)}16%{transform:scale(1.012)}26%{transform:scale(1.04)}36%{transform:scale(1.018)}46%{transform:scale(1.034)}56%{transform:scale(1.01)}64%{transform:scale(1.028)}74%,100%{transform:scale(1)}}
+.m-lvl{animation:m-lvl 3.2s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes m-lvl{0%{transform:scaleY(.25)}8%{transform:scaleY(.7)}16%{transform:scaleY(.45)}26%{transform:scaleY(1)}36%{transform:scaleY(.5)}46%{transform:scaleY(.85)}56%{transform:scaleY(.35)}64%{transform:scaleY(.75)}74%,100%{transform:scaleY(.18)}}
+.m-scan{animation:m-scan 1.5s ease-in-out infinite alternate}
+@keyframes m-scan{from{transform:translateX(0)}to{transform:translateX(14px)}}
+.m-tilt{animation:m-tilt 1.5s ease-in-out infinite alternate}
+@keyframes m-tilt{from{transform:rotate(0deg)}to{transform:rotate(3deg)}}
+.m-nod{animation:m-nod 6s ease-out infinite}
+@keyframes m-nod{0%,3.3%{transform:translateY(0) rotate(0deg)}5.4%{transform:translateY(1.9%) rotate(1.5deg)}7.5%,100%{transform:translateY(0) rotate(0deg)}}
+@media (prefers-reduced-motion: reduce){.m-breathe,.m-blink,.m-swell,.m-lvl,.m-scan,.m-tilt,.m-nod{animation:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1300px; position: relative; overflow: hidden; box-sizing: border-box; padding: 52px 20px 0; display: flex; flex-direction: column; gap: 16px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <header style="display: flex; flex-direction: column; gap: 4px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <h1 style="margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.03em">Inbox</h1>
+      <a href="EmailDetail.dc.html" aria-label="Compose" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #2E3A78; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg></a>
+    </div>
+  </header>
+
+  <a href="ConnectedApps.dc.html" style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 16px; padding: 10px 12px; color: #1C2140">
+    <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.6); color: #444C6C; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="17" height="17" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="m4 7 8 6 8-6"></path></svg></div>
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px"><div style="font-size: 13px; font-weight: 700">Demo mailbox</div><div style="font-size: 12px; color: #515A7A">Synced 8:45 AM</div></div>
+    <div style="font-size: 11px; font-weight: 700; color: #8A5A12; background: #FCF1E0; padding: 4px 8px; border-radius: 999px">Demo</div>
+  </a>
+
+  <div style="position: relative">
+    <label for="inbox-search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search emails</label>
+    <svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="#515A7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 14px; top: 15px"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+    <input id="inbox-search" placeholder="Search mail" style="width: 100%; box-sizing: border-box; height: 48px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); padding: 0 14px 0 42px; font-size: 14px; color: #1C2140">
+  </div>
+
+  <div role="tablist" aria-label="Categories" style="display: flex; gap: 8px; overflow-x: auto; margin: 0 -20px; padding: 0 20px 2px">
+    <sc-for list="{{tabs}}" as="t" hint-placeholder-count="5">
+      <button role="tab" aria-selected="{{t.sel}}" sc-camel-on-click="{{t.pick}}" style="flex-shrink: 0; height: 38px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; border: {{t.border}}; background: {{t.bg}}; color: {{t.fg}}">{{t.label}}<span style="font-size: 11px; opacity: 0.8">{{t.count}}</span></button>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <sc-for list="{{emails}}" as="e" hint-placeholder-count="6">
+      <sc-if value="{{e.showDivider}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #444C6C; padding: 6px 2px 0">
+          <svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{e.dividerIcon}}"></path></svg>{{e.divider}}
+        </div>
+      </sc-if>
+      <div style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid {{e.cardBorder}}; box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+        <a href="EmailDetail.dc.html" style="display: flex; gap: 12px; color: #1C2140">
+          <div style="position: relative; width: 40px; height: 40px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; background: {{e.avBg}}; color: {{e.avFg}}">{{e.initial}}
+            <sc-if value="{{e.unread}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; left: -4px; top: -4px; width: 11px; height: 11px; border-radius: 50%; background: #2E3A78; border: 2px solid #FFFFFF" aria-label="Unread"></div></sc-if>
+          </div>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+            <div style="display: flex; justify-content: space-between; gap: 8px"><div style="font-size: 14px; font-weight: {{e.weight}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{e.from}}</div><div style="font-size: 12px; color: #515A7A; flex-shrink: 0">{{e.time}}</div></div>
+            <div style="font-size: 14px; font-weight: {{e.weight}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{e.subject}}</div>
+            <div style="font-size: 13px; color: #465071; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden">{{e.preview}}</div>
+          </div>
+        </a>
+        <div style="display: flex; align-items: center; gap: 6px; padding-left: 52px; flex-wrap: wrap">
+          <sc-if value="{{e.high}}" hint-placeholder-val="{{ false }}"><div style="font-size: 11px; font-weight: 700; color: #B23A4A; background: #FBE9EB; padding: 4px 8px; border-radius: 999px; display: flex; align-items: center; gap: 4px"><svg width="11" height="11" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"></path></svg>Priority</div></sc-if>
+          <div style="font-size: 11px; font-weight: 700; color: #2E3A78; background: rgba(222,228,250,0.85); padding: 4px 8px; border-radius: 999px; display: flex; align-items: center; gap: 5px"><div style="width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #EEF1FF, #6A79CF)"></div>{{e.label}}</div>
+          <div style="flex: 1"></div>
+          <button sc-camel-on-click="{{e.toggle}}" aria-expanded="{{e.openStr}}" aria-label="MIRA actions for this email" style="height: 32px; padding: 0 10px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #2E3A78; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 4px">Actions<svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="{{e.chev}}"></path></svg></button>
+        </div>
+        <sc-if value="{{e.open}}" hint-placeholder-val="{{ false }}">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-top: 2px">
+            <a href="EmailDetail.dc.html" style="height: 40px; border-radius: 12px; background: rgba(255,255,255,0.55); color: #1C2140; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="#2E3A78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h7"></path></svg>Summarize</a>
+            <a href="EmailDetail.dc.html" style="height: 40px; border-radius: 12px; background: rgba(255,255,255,0.55); color: #1C2140; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="#2E3A78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg>Draft reply</a>
+            <a href="Tasks.dc.html" style="height: 40px; border-radius: 12px; background: rgba(255,255,255,0.55); color: #1C2140; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="#2E3A78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 0 0 4 0"></path></svg>Remind me</a>
+            <a href="Tasks.dc.html" style="height: 40px; border-radius: 12px; background: rgba(255,255,255,0.55); color: #1C2140; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="#2E3A78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg>Create task</a>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+    <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+      <div style="background: rgba(255,255,255,0.6); border: 1px dashed #C9D1EC; border-radius: 20px; padding: 28px 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+        <dc-import name="Mira-lbou" mode="idle" size="44" theme="light" hint-size="44px,44px"></dc-import>
+        <div style="font-size: 15px; font-weight: 700">Nothing here right now</div>
+        <div style="font-size: 13px; color: #465071">MIRA will place matching emails here as they arrive.</div>
+      </div>
+    </sc-if>
+  </div>
+
+  <nav aria-label="Main" style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 26px; height: 64px; box-sizing: border-box; padding: 6px; display: flex; align-items: center; gap: 4px; border-radius: 999px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); background: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.85); box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 16px 40px rgba(40,52,100,0.18); z-index: 5">
+  <a href="Home.dc.html" aria-label="Home" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg></a>
+  <a href="Inbox.dc.html" aria-current="page" style="height: 52px; padding: 0 18px 0 12px; border-radius: 999px; background: #1C2140; color: #FFFFFF; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 18px rgba(28,33,64,0.3)"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"></rect><path d="m4 7 8 6 8-6"></path></svg>Inbox</a>
+  <a href="Assistant.dc.html" aria-label="MIRA" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><dc-import name="Mira-lbou" mode="idle" size="32" theme="light" hint-size="32px,32px"></dc-import></a>
+  <a href="Teach.dc.html" aria-label="Teach" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"></path></svg></a>
+  <a href="Tasks.dc.html" aria-label="Planner" style="width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #343B5C"><svg width="21" height="21" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18M9 15l2 2 4-4"></path></svg></a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1300}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'all', open: 'e1' };
+  }
+  renderVals() {
+    const { tab, open } = this.state;
+    const all = [
+      { id: 'e1', from: 'Maya Chen', subject: 'Can we reschedule our meeting?', preview: 'Hi Alex, something came up on Thursday. Could we move our 1:1 to early next week?', time: '8:42 AM', unread: true, high: true, label: 'Needs reply', cats: ['priority', 'reply'], fresh: true, avBg: '#FBE9EB', avFg: '#B23A4A' },
+      { id: 'e2', from: 'Priya Nair', subject: 'Q3 report: final numbers', preview: 'Attached the final revenue table. Can you fold it into the report before tomorrow?', time: '8:15 AM', unread: true, high: true, label: 'Deadline tomorrow', cats: ['priority'], fresh: true, avBg: '#E2F6F3', avFg: '#1E7F73' },
+      { id: 'e3', from: 'Sam Rivera', subject: 'Dinner Saturday?', preview: 'Are we still on for 7:30? I can book the Thai place on Elm.', time: 'Yesterday', unread: false, high: false, label: 'Draft saved', cats: ['reply', 'drafts'], fresh: false, avBg: '#FCF1E0', avFg: '#8A5A12' },
+      { id: 'e4', from: 'Jordan Lee', subject: 'Weekly sync notes', preview: 'Notes from today’s sync, plus the three action items we agreed on.', time: 'Yesterday', unread: false, high: false, label: 'Summarized', cats: ['handled'], fresh: false, avBg: 'rgba(222,228,250,0.85)', avFg: '#2E3A78' },
+      { id: 'e5', from: 'City Utilities', subject: 'Your October bill is ready', preview: 'Your bill of $64.20 is due on 20 October.', time: 'Yesterday', unread: false, high: false, label: 'Task created', cats: ['handled'], fresh: false, avBg: 'rgba(255,255,255,0.6)', avFg: '#444C6C' },
+      { id: 'e6', from: 'Lumen Design Weekly', subject: '5 patterns for calmer interfaces', preview: 'This week: progressive disclosure, quiet defaults, and more.', time: 'Mon', unread: false, high: false, label: 'Newsletter', cats: [], fresh: false, avBg: 'rgba(255,255,255,0.6)', avFg: '#444C6C' }
+    ];
+    const defs = [
+      { id: 'all', label: 'All' }, { id: 'priority', label: 'Priority' }, { id: 'reply', label: 'Needs Reply' },
+      { id: 'drafts', label: 'Drafts' }, { id: 'handled', label: 'Handled by MIRA' }
+    ];
+    const match = (e, t) => t === 'all' || e.cats.indexOf(t) >= 0;
+    const list = all.filter((e) => match(e, tab));
+    let lastFresh = null;
+    return {
+      tabs: defs.map((d) => {
+        const sel = d.id === tab;
+        return {
+          label: d.label, count: all.filter((e) => match(e, d.id)).length, sel: sel ? 'true' : 'false',
+          bg: sel ? '#1C2140' : '#FFFFFF', fg: sel ? '#FFFFFF' : '#1C2140', border: sel ? '1px solid #1C2140' : '1px solid rgba(255,255,255,0.8)',
+          pick: () => this.setState({ tab: d.id })
+        };
+      }),
+      empty: list.length === 0,
+      emails: list.map((e) => {
+        const showDivider = e.fresh !== lastFresh;
+        lastFresh = e.fresh;
+        const isOpen = open === e.id;
+        return Object.assign({}, e, {
+          initial: e.from[0],
+          weight: e.unread ? '800' : '600',
+          cardBorder: e.unread ? '#C9D1EC' : 'rgba(255,255,255,0.8)',
+          showDivider: showDivider,
+          divider: e.fresh ? 'New' : 'Earlier · saved offline',
+          dividerIcon: e.fresh ? 'M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4' : 'M7 3h10v18H7zM11 18h2',
+          open: isOpen, openStr: isOpen ? 'true' : 'false',
+          chev: isOpen ? 'm6 15 6-6 6 6' : 'm6 9 6 6 6-6',
+          toggle: () => this.setState({ open: isOpen ? null : e.id })
+        });
+      })
+    };
+  }
+}
+</script>
+
+
+</body></html>

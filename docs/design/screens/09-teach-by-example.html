@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>MIRA · Teach by example</title>
+<script src="f29a47c4-bad0-4bf7-8a8f-a2a8f8bb608f"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style></style>
+<style>
+body{margin:0}
+a{color:#2E3A78;text-decoration:none}a:hover{color:#232C5E}
+button,textarea{font-family:inherit}
+button{cursor:pointer}
+textarea:focus{outline:2px solid #6A79CF;outline-offset:1px}
+@keyframes mira-spin{to{transform:rotate(360deg)}}
+@keyframes mira-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.mira-spin{animation:mira-spin 1.6s linear infinite}
+.mira-in{animation:mira-in .35s ease-out both}
+@media (prefers-reduced-motion:reduce){.mira-spin,.mira-in{animation:none}}
+.m-breathe{animation:m-breathe 4s ease-in-out infinite}
+@keyframes m-breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
+.m-blink{animation:m-blink 15s linear infinite}
+@keyframes m-blink{0%,28.6%,30%,62.4%,63.8%,98.6%,100%{transform:scaleY(1)}29.3%,63.1%,99.3%{transform:scaleY(0.08)}}
+.m-swell{animation:m-swell 3.2s ease-in-out infinite}
+@keyframes m-swell{0%{transform:scale(1)}8%{transform:scale(1.025)}16%{transform:scale(1.012)}26%{transform:scale(1.04)}36%{transform:scale(1.018)}46%{transform:scale(1.034)}56%{transform:scale(1.01)}64%{transform:scale(1.028)}74%,100%{transform:scale(1)}}
+.m-lvl{animation:m-lvl 3.2s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes m-lvl{0%{transform:scaleY(.25)}8%{transform:scaleY(.7)}16%{transform:scaleY(.45)}26%{transform:scaleY(1)}36%{transform:scaleY(.5)}46%{transform:scaleY(.85)}56%{transform:scaleY(.35)}64%{transform:scaleY(.75)}74%,100%{transform:scaleY(.18)}}
+.m-scan{animation:m-scan 1.5s ease-in-out infinite alternate}
+@keyframes m-scan{from{transform:translateX(0)}to{transform:translateX(14px)}}
+.m-tilt{animation:m-tilt 1.5s ease-in-out infinite alternate}
+@keyframes m-tilt{from{transform:rotate(0deg)}to{transform:rotate(3deg)}}
+.m-nod{animation:m-nod 6s ease-out infinite}
+@keyframes m-nod{0%,3.3%{transform:translateY(0) rotate(0deg)}5.4%{transform:translateY(1.9%) rotate(1.5deg)}7.5%,100%{transform:translateY(0) rotate(0deg)}}
+@media (prefers-reduced-motion: reduce){.m-breathe,.m-blink,.m-swell,.m-lvl,.m-scan,.m-tilt,.m-nod{animation:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1200px; position: relative; overflow: hidden; box-sizing: border-box; padding: 52px 20px 40px; display: flex; flex-direction: column; gap: 22px; font-family: 'Onest', 'Segoe UI', system-ui, sans-serif; color: #1C2140; background: linear-gradient(180deg, #A7B2CE 0%, #C3CBDF 30%, #DCE0EC 62%, #E9ECF3 100%); isolation: isolate">
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none">
+    <div style="position: absolute; width: 560px; height: 360px; left: -150px; top: -90px; border-radius: 50%; background: radial-gradient(ellipse at 55% 60%, rgba(92,106,150,0.55) 0%, rgba(92,106,150,0) 66%); filter: blur(28px); transform: rotate(-16deg)"></div>
+    <div style="position: absolute; width: 260px; height: 640px; right: -40px; top: -180px; border-radius: 50%; background: linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.9) 47%, rgba(255,255,255,0) 72%); filter: blur(16px); transform: rotate(28deg)"></div>
+    <div style="position: absolute; width: 180px; height: 520px; left: 120px; top: -160px; border-radius: 50%; background: linear-gradient(95deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 78%); filter: blur(22px); transform: rotate(-30deg)"></div>
+    <div style="position: absolute; width: 420px; height: 260px; right: -160px; top: 260px; border-radius: 50%; background: conic-gradient(from 120deg, rgba(255,190,214,0.35), rgba(196,206,255,0.35), rgba(176,236,226,0.32), rgba(255,226,196,0.3), rgba(255,190,214,0.35)); filter: blur(46px)"></div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 12px">
+    <a href="Teach.dc.html" aria-label="Back to Teach MIRA" style="width: 44px; height: 44px; border-radius: 14px; background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); color: #1C2140; display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"></path></svg></a>
+    <div style="font-size: 13px; font-weight: 700; color: #465071">Teach by example</div>
+  </div>
+
+  <h1 style="margin: 0; font-size: 27px; line-height: 1.2; font-weight: 400; letter-spacing: -0.03em">Show MIRA an example.</h1>
+
+  <div style="display: flex; flex-direction: column">
+    <div style="display: flex; gap: 14px">
+      <div style="display: flex; flex-direction: column; align-items: center"><div style="width: 28px; height: 28px; border-radius: 50%; background: #2E3A78; color: #FFFFFF; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">1</div><div style="flex: 1; width: 2px; background: #CDD4EB; margin: 4px 0"></div></div>
+      <div style="flex: 1; min-width: 0; padding-bottom: 22px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 15px; font-weight: 700; padding-top: 4px">Your example</div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="ex-in" style="font-size: 12px; font-weight: 700; color: #465071">EXAMPLE INPUT · incoming email</label>
+          <textarea id="ex-in" rows="2" style="width: 100%; box-sizing: border-box; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); padding: 12px 14px; font-size: 15px; line-height: 1.5; color: #1C2140; resize: none">Can we reschedule our meeting?</textarea>
+        </div>
+        <div style="align-self: center; color: #9DAAE6"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"></path></svg></div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="ex-out" style="font-size: 12px; font-weight: 700; color: #465071">YOUR PREFERRED RESPONSE</label>
+          <textarea id="ex-out" rows="2" style="width: 100%; box-sizing: border-box; border-radius: 16px; border: 1.5px solid #BCC6EA; background: rgba(255,255,255,0.6); padding: 12px 14px; font-size: 15px; line-height: 1.5; color: #1C2140; resize: none">Certainly! Please let me know your preferred time.</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px">
+      <div style="display: flex; flex-direction: column; align-items: center"><div style="width: 28px; height: 28px; border-radius: 50%; background: {{s2bg}}; color: {{s2fg}}; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">2</div><div style="flex: 1; width: 2px; background: #CDD4EB; margin: 4px 0"></div></div>
+      <div style="flex: 1; min-width: 0; padding-bottom: 22px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 15px; font-weight: 700; padding-top: 4px">MIRA analyzes it</div>
+        <sc-if value="{{isIdle}}" hint-placeholder-val="{{ true }}">
+          <button sc-camel-on-click="{{analyze}}" style="height: 50px; border: 0; border-radius: 16px; background: linear-gradient(180deg, #343F78 0%, #1C2245 100%); color: #FFFFFF; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 22px rgba(40,52,100,0.3)">Analyze example</button>
+        </sc-if>
+        <sc-if value="{{isWorking}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 12px; height: 50px">
+            <dc-import name="Mira-lbou" mode="thinking" size="36" theme="light" hint-size="36px,36px"></dc-import>
+            <div style="font-size: 14px; font-weight: 600; color: #343B5C">Analyzing…</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{isDoneAnalyze}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #1F7A62"><svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg>Analyzed on device</div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 14px">
+      <div style="display: flex; flex-direction: column; align-items: center"><div style="width: 28px; height: 28px; border-radius: 50%; background: {{s3bg}}; color: {{s3fg}}; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">3</div></div>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 15px; font-weight: 700; padding-top: 4px">MIRA proposes a reusable preference</div>
+        <sc-if value="{{waiting}}" hint-placeholder-val="{{ true }}">
+          <div style="border: 1.5px dashed #C9D1EC; border-radius: 18px; padding: 18px; font-size: 13px; color: #515A7A; text-align: center">Appears after analysis</div>
+        </sc-if>
+        <sc-if value="{{hasProposal}}" hint-placeholder-val="{{ false }}">
+          <div class="mira-in" style="background: rgba(255,255,255,0.46); backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%); border: 1px solid rgba(255,255,255,0.78); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 10px 30px rgba(40,52,100,0.08); border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 14px 32px rgba(40,52,100,0.08)">
+            <div style="display: flex; align-items: center; justify-content: space-between"><div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #2E3A78">MIRA LEARNS</div><div style="font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; color: {{chipFg}}; background: {{chipBg}}">{{chipLabel}}</div></div>
+            <sc-for list="{{traits}}" as="t" hint-placeholder-count="3">
+              <button sc-camel-on-click="{{t.toggle}}" aria-pressed="{{t.onStr}}" style="min-height: 44px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.5); padding: 8px 12px; display: flex; align-items: center; gap: 10px; text-align: left; color: #1C2140; font-size: 14px; font-weight: 600">
+                <div style="width: 22px; height: 22px; border-radius: 7px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: {{t.boxBg}}; border: {{t.boxBorder}}; color: #FFFFFF"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg></div>{{t.label}}
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{notSaved}}" hint-placeholder-val="{{ true }}">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px">
+              <button sc-camel-on-click="{{save}}" style="height: 50px; border: 0; border-radius: 16px; background: linear-gradient(180deg, #343F78 0%, #1C2245 100%); color: #FFFFFF; font-size: 15px; font-weight: 700">Save</button>
+              <button sc-camel-on-click="{{revise}}" style="height: 50px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.6); color: #1C2140; font-size: 14px; font-weight: 700">Revise</button>
+              <a href="Teach.dc.html" style="height: 50px; border-radius: 16px; color: #B23A4A; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center">Discard</a>
+            </div>
+          </sc-if>
+          <sc-if value="{{saved}}" hint-placeholder-val="{{ false }}">
+            <a href="Memory.dc.html" style="height: 50px; border-radius: 16px; background: #E3F5EF; color: #1F7A62; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px"><svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg>Saved · view in Personal Memory</a>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:1200}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { phase: 'idle', saved: false, on: [true, true, true] };
+  }
+  componentWillUnmount() { if (this.t) clearTimeout(this.t); }
+  renderVals() {
+    const st = this.state;
+    const labels = ['Professional but friendly tone', 'Acknowledge the request first', 'Ask for the details you need'];
+    const done = st.phase === 'done';
+    const active = (n) => (n === 2 ? st.phase !== 'idle' : done);
+    return {
+      isIdle: st.phase === 'idle', isWorking: st.phase === 'working', isDoneAnalyze: done,
+      waiting: !done, hasProposal: done, saved: st.saved, notSaved: !st.saved,
+      s2bg: active(2) ? '#2E3A78' : '#CDD4EB', s2fg: active(2) ? '#FFFFFF' : '#444C6C',
+      s3bg: active(3) ? '#2E3A78' : '#CDD4EB', s3fg: active(3) ? '#FFFFFF' : '#444C6C',
+      chipLabel: st.saved ? 'Saved' : 'Suggested', chipFg: st.saved ? '#1F7A62' : '#2E3A78', chipBg: st.saved ? '#E3F5EF' : 'rgba(222,228,250,0.85)',
+      traits: labels.map((l, i) => {
+        const on = st.on[i];
+        return {
+          label: l, onStr: on ? 'true' : 'false',
+          boxBg: on ? '#2E3A78' : '#FFFFFF', boxBorder: on ? '0' : '1.5px solid #BCC6EA',
+          toggle: () => { const n = st.on.slice(); n[i] = !n[i]; this.setState({ on: n, saved: false }); }
+        };
+      }),
+      analyze: () => {
+        this.setState({ phase: 'working' });
+        this.t = setTimeout(() => this.setState({ phase: 'done' }), 1100);
+      },
+      save: () => this.setState({ saved: true }),
+      revise: () => this.setState({ phase: 'idle', saved: false })
+    };
+  }
+}
+</script>
+
+
+</body></html>

@@ -1,0 +1,22 @@
+#!/bin/sh
+# Git pre-commit hook enforcing Baton verification
+
+if [ "$SKIP_VERIFY" = "1" ]; then
+  exit 0
+fi
+
+echo "[Git Hook] Running Baton pre-commit verification..."
+node scripts/baton.mjs verify
+
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  echo ""
+  echo "[Git Hook Error] Commit blocked: Baton verification failed."
+  echo "Fix the reported issue or run 'npm run verify:agent' to inspect diagnostics."
+  echo "To bypass (not recommended): git commit --no-verify"
+  echo ""
+  exit $EXIT_CODE
+fi
+
+git add .agents/sync/handoff.json 2>/dev/null
+exit 0
