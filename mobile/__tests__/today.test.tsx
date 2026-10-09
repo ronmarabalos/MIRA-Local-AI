@@ -7,7 +7,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { getStore } from '../src/services/db';
 import { createStore } from '../src/services/db/store';
-import { migrate, type Row, type Scalar, type SqlDatabase } from '../src/services/db/schema';
+import {
+  migrate,
+  type Row,
+  type Scalar,
+  type SqlDatabase,
+} from '../src/services/db/schema';
 import { useQuery } from '../src/services/db/hooks';
 import type { Chat, Message, MiraRecord } from '../src/core/types';
 import HomeScreen from '../src/screens/Home';
@@ -62,9 +67,14 @@ function record(id: string): MiraRecord {
   };
 }
 
-async function seed(id: string, status: Message['status'] = 'processed', patch: Partial<MiraRecord> = {}) {
+async function seed(
+  id: string,
+  status: Message['status'] = 'processed',
+  patch: Partial<MiraRecord> = {},
+) {
   await store.addMessage(message(id, status), chat);
-  if (status !== 'new') await store.saveRecord({ ...record(id), ...patch }, status);
+  if (status !== 'new')
+    await store.saveRecord({ ...record(id), ...patch }, status);
 }
 
 beforeEach(async () => {
@@ -134,7 +144,11 @@ async function render(detailId?: string, initial = 'Home') {
 
 const output = () => {
   const text = (
-    node: Renderer.ReactTestRendererJSON | Renderer.ReactTestRendererJSON[] | string | null,
+    node:
+      | Renderer.ReactTestRendererJSON
+      | Renderer.ReactTestRendererJSON[]
+      | string
+      | null,
   ): string => {
     if (node === null) return '';
     if (typeof node === 'string') return node;
@@ -210,7 +224,10 @@ test('pending and failed extraction remain visible without presenting invented s
 });
 
 test('queued action keeps its status and source even for a message from yesterday', async () => {
-  await store.addMessage({ ...message('yesterday'), postedAt: today - 86400000 }, chat);
+  await store.addMessage(
+    { ...message('yesterday'), postedAt: today - 86400000 },
+    chat,
+  );
   await store.saveRecord(record('yesterday'), 'processed');
   await store.addAction({
     id: 'queued',
@@ -238,7 +255,10 @@ test('detail without a selection or with a deleted message never shows a sample 
 test('detail uses the original source, expands long text, and saves a category correction safely', async () => {
   const original = 'Original message '.repeat(50) + 'SOURCE END';
   await store.addMessage({ ...message('correct'), text: original }, chat);
-  await store.saveRecord({ ...record('correct'), sensitive: true, instructionLike: true }, 'processed');
+  await store.saveRecord(
+    { ...record('correct'), sensitive: true, instructionLike: true },
+    'processed',
+  );
   await render('correct', 'EmailDetail');
   expect(output()).toContain('MIRA SUMMARY');
   await press('Show all');
@@ -299,19 +319,22 @@ test('an older async query cannot overwrite newer stored data', async () => {
   expect(output()).not.toContain('stale');
 });
 
-test('Ask answers from a stored record, shows its source, and opens the message', async () => {
+test('Ask finds the stored message, shows the amount asked for, and opens the message', async () => {
   await seed('tuition');
   await render(undefined, 'Assistant');
+  // An example fills the question; Ask sends it.
   await press('How much do I need to pay?');
+  await press('Ask');
   expect(output()).toContain('PHP 450');
   expect(output()).toContain('Fee notice tuition');
   expect(output()).toContain('Original tuition: pay PHP 450 by Friday.');
-  await press('Open message from Ana Santos');
+  await press('Open message from Ana Santos: Fee notice tuition');
   expect(output()).toContain('Original message');
 });
 
 test('Ask says so when nothing matches', async () => {
   await render(undefined, 'Assistant');
   await press('When is the next deadline?');
-  expect(output()).toContain("I couldn't find that in your messages.");
+  await press('Ask');
+  expect(output()).toContain('I couldn’t find that in your messages.');
 });

@@ -51,10 +51,21 @@ export interface MessageContext {
   chatKind: ChatKind;
 }
 
+/** One message given to the model as the basis for an answer. */
+export interface AnswerSource {
+  message: Message;
+  context: MessageContext;
+}
+
 /** The local model (spec 4.5). One request runs at a time. */
 export interface ModelService {
   /** Rejects when the output cannot be parsed; the caller retries once. */
   extract(message: Message, context: MessageContext): Promise<ExtractedRecord>;
   /** Reply text of at most 60 words. */
   draftReply(message: Message, context: MessageContext): Promise<string>;
+  /**
+   * One or two sentences answering the question from these messages only.
+   * Rejects when there is no usable answer; the caller shows the sources alone.
+   */
+  answer(question: string, sources: AnswerSource[]): Promise<string>;
 }

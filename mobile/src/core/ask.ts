@@ -1,151 +1,187 @@
-import type { ReportItem, ReportLine } from './report';
+import type { ReportItem } from './report';
 
-/** Which record field an answer was read from. */
-export type AskField = 'date' | 'amount' | 'request' | 'summary';
+/** Questions look at messages from the last 14 days. */
+export const ASK_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+export const MAX_MATCHES = 5;
+/** A question is a sentence, not a document: anything longer is cut. */
+const MAX_QUESTION_CHARS = 300;
 
-export type AskAnswer =
-  | {
-      kind: 'found';
-      field: AskField;
-      /** The field's value, copied from the record. */
-      value: string;
-      /** The record and its source message. */
-      line: ReportLine;
-      /** Other matching records, best first. */
-      more: ReportLine[];
-    }
-  | { kind: 'none' };
+/** A stored fact the question asks for, taken from the record, not written by the model. */
+export interface AskFact {
+  kind: 'date' | 'amount';
+  text: string;
+}
 
-export const NOT_FOUND = "I couldn't find that in your messages.";
+export interface AskMatch {
+  item: ReportItem;
+  score: number;
+  fact: AskFact | null;
+}
 
-const DAY = 24 * 60 * 60 * 1000;
-
-/** Words that pick the field to answer from, English and Tagalog. */
-const INTENTS: [Exclude<AskField, 'summary'>, RegExp][] = [
-  ['date', /\b(when|deadline|due|date|until|kailan|what time|anong oras)\b/],
-  ['amount', /\b(how much|pay|payment|fee|fees|amount|cost|price|magkano|bayad|babayaran)\b/],
-  ['request', /\b(what do i need|what should i|what must i|asked|request|need to|to do|todo|gagawin)\b/],
-];
-
-/** Words in a question that say nothing about which message is meant. */
-const STOP = new Set(
+/** Words that carry no meaning for a search, in English and Filipino. */
+const FILLER = new Set(
   (
-    'a an and any are as at be by can could did do does for from have how i in ' +
-    'is it me my of on or should tell the there this to was what when where which who will with ' +
-    'you your about need much due deadline date time pay payment fee fees amount cost price ' +
-    'asked request todo until anything something message messages next upcoming all ' +
-    'ang ng sa na mga ba kailan magkano anong oras bayad babayaran gagawin ko ako'
+    'a an the is are was were be been am do does did has have had will would can could should may ' +
+    'i me my mine you your we our us it its this that these those there here of in on at to for from with by about as ' +
+    'and or but if so not no yes what which who whom whose where why how any some all ' +
+    'please tell show give find know need want get got thing ' +
+    // What is left of a contraction once its apostrophe is gone ("what's", "didn't").
+    'don didn doesn isn wasn aren ll ve re ' +
+    'next last say said ' +
+    'ang ng mga sa si ni kay na pa ba po ho yung yun ito iyan iyon ko mo ka ako ikaw siya kami tayo sila ' +
+    'ano anong anu sino saan bakit paano ilan sabi may meron wala at o pero kung din rin lang naman nga daw raw'
   ).split(' '),
 );
 
-/** Date words that narrow the search to a window of days from today. */
-const WINDOWS: [RegExp, number, number][] = [
-  [/\b(today|tonight|ngayon|mamaya)\b/, 0, 1],
-  [/\b(tomorrow|bukas)\b/, 1, 2],
-  [/\bnext week\b|\bsusunod na linggo\b/, 7, 14],
-  [/\bthis week\b/, 0, 7],
+const DATE_WORDS = new Set([
+  'when',
+  'kailan',
+  'kelan',
+  'time',
+  'oras',
+  'due',
+  'deadline',
+]);
+const AMOUNT_WORDS = new Set([
+  'much',
+  'magkano',
+  'amount',
+  'price',
+  'cost',
+  'halaga',
+]);
+/** Question words that only say what is being asked for; they are not searched for. */
+const INTENT_ONLY = new Set([
+  'when',
+  'kailan',
+  'kelan',
+  'time',
+  'oras',
+  'much',
+  'magkano',
+]);
+
+/** Words that mean the same thing for a search, across both languages. */
+const GROUPS = [
+  [
+    'pay',
+    'payment',
+    'paid',
+    'fee',
+    'bayad',
+    'bayaran',
+    'babayaran',
+    'balance',
+    'utang',
+    'owe',
+    'tuition',
+    'bill',
+  ],
+  [
+    'deadline',
+    'due',
+    'submit',
+    'submission',
+    'pasa',
+    'ipasa',
+    'ipapasa',
+    'pass',
+  ],
+  ['class', 'klase', 'lecture', 'subject'],
+  ['meeting', 'meet', 'pulong'],
+  ['professor', 'prof', 'teacher', 'instructor', 'sir', 'maam'],
+  ['announce', 'announcement', 'announced', 'notice', 'paalala', 'anunsyo'],
+  ['exam', 'quiz', 'test', 'midterm', 'final'],
+  ['project', 'proposal', 'report', 'paper', 'thesis'],
 ];
 
+/** Folds a plural onto its singular. Applied to both sides, so it only has to be consistent. */
+const stem = (word: string) =>
+  word.length > 3 && word.endsWith('s') ? word.slice(0, -1) : word;
+
+const GROUP_OF = new Map<string, number>();
+GROUPS.forEach((group, index) =>
+  group.forEach(word => GROUP_OF.set(stem(word), index)),
+);
+
+function rawWords(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+const same = (a: string, b: string) =>
+  a === b || (GROUP_OF.has(a) && GROUP_OF.get(a) === GROUP_OF.get(b));
+
+const hasWord = (words: string[], asked: string) =>
+  words.some(word => same(word, asked));
+
 /**
- * Answers a question from stored records by keyword and date search, with no
- * model call. The answer is always a record field plus the message it came
- * from, so the user can check it. Records that try to give MIRA orders,
- * promotions, chatter, and copies are never used.
+ * The stored messages that best match a question (Ask MIRA spec 3.1), with
+ * no model call. A message needs at least one of the question's content
+ * words; what the question asks for ("when", "how much") only adds weight.
  */
-export function ask(question: string, items: ReportItem[], now: number): AskAnswer {
-  const q = question.toLowerCase().replace(/[’']/g, "'");
-  const intent = INTENTS.find(([, pattern]) => pattern.test(q))?.[0] ?? 'summary';
-  const window = WINDOWS.find(([pattern]) => pattern.test(q));
-  const words = (q.match(/[\p{L}\p{N}]+/gu) ?? []).filter(
-    w => w.length > 2 && !STOP.has(w) && !(window && window[0].test(w)),
-  );
+export function searchMessages(
+  question: string,
+  items: ReportItem[],
+  now: number,
+): AskMatch[] {
+  const raw = rawWords(question.slice(0, MAX_QUESTION_CHARS));
+  const wantsDate = raw.some(word => DATE_WORDS.has(word));
+  const wantsAmount = raw.some(word => AMOUNT_WORDS.has(word));
+  const asked = [
+    ...new Set(
+      raw
+        .filter(
+          word =>
+            word.length > 1 && !FILLER.has(word) && !INTENT_ONLY.has(word),
+        )
+        .map(stem),
+    ),
+  ];
+  if (asked.length === 0) return [];
 
-  const today = new Date(now).setHours(0, 0, 0, 0);
-  const lines = items.filter(
-    (i): i is ReportLine =>
-      i.record !== null &&
-      i.message.status === 'processed' &&
-      i.record.duplicateOf === null &&
-      !i.record.instructionLike &&
-      i.record.type !== 'promotion' &&
-      i.record.type !== 'chatter',
-  );
+  const matches: AskMatch[] = [];
+  for (const item of items) {
+    const { message, chat, record } = item;
+    if (
+      !record ||
+      message.status !== 'processed' ||
+      record.type === 'chatter' ||
+      record.type === 'promotion' ||
+      record.duplicateOf !== null ||
+      record.instructionLike ||
+      now - message.postedAt > ASK_WINDOW_MS
+    ) {
+      continue;
+    }
 
-  const scored = lines
-    .filter(l => {
-      if (!window) return true;
-      const at = l.record.dateAt ?? l.message.postedAt;
-      return at >= today + window[1] * DAY && at < today + window[2] * DAY;
-    })
-    .map(line => ({ line, hits: words.filter(w => haystack(line).includes(w)).length }))
-    // A question with its own words must match one of them; one without
-    // (for example "when is the deadline?") needs the field it asks for.
-    .filter(({ line, hits }) => (words.length > 0 ? hits > 0 : field(line, intent) !== null))
-    .map(({ line, hits }) => ({ line, score: hits * 3 + boost(line, intent) }))
-    .sort((a, b) => b.score - a.score || order(a.line, b.line, intent, today));
+    const text = rawWords(message.text).map(stem);
+    const summary = rawWords(record.summary).map(stem);
+    const names = rawWords(`${message.sender} ${chat.title}`).map(stem);
+    let score = 0;
+    for (const word of asked) {
+      if (hasWord(text, word)) score += 3;
+      else if (hasWord(summary, word) || hasWord(names, word)) score += 2;
+    }
+    if (score === 0) continue;
 
-  if (scored.length === 0) return { kind: 'none' };
-  const [best, ...rest] = scored.map(s => s.line);
-  const value = field(best, intent);
-  return {
-    kind: 'found',
-    field: value === null ? 'summary' : intent,
-    value: value ?? best.record.summary,
-    line: best,
-    more: rest.slice(0, 4),
-  };
-}
+    let fact: AskFact | null = null;
+    if (wantsDate && record.dateText)
+      fact = { kind: 'date', text: record.dateText };
+    else if (wantsAmount && record.amount)
+      fact = { kind: 'amount', text: record.amount };
+    if (fact) score += 2;
 
-function haystack({ record, message, chat }: ReportLine): string {
-  return [
-    record.summary,
-    record.request,
-    record.dateText,
-    record.amount,
-    record.type.replace('_', ' '),
-    message.text,
-    message.sender,
-    chat.title,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-}
-
-function field({ record }: ReportLine, intent: AskField): string | null {
-  switch (intent) {
-    case 'date':
-      return record.dateText;
-    case 'amount':
-      return record.amount;
-    case 'request':
-      return record.request;
-    case 'summary':
-      return record.summary;
+    matches.push({ item, score, fact });
   }
-}
 
-function boost(line: ReportLine, intent: AskField): number {
-  const { record } = line;
-  let score = field(line, intent) !== null ? 2 : 0;
-  if (intent === 'date' && record.type === 'deadline') score += 1;
-  if (intent === 'amount' && record.type === 'payment') score += 1;
-  if (intent === 'request' && record.needsUser) score += 1;
-  return score;
-}
-
-/** Ties: for dates, the next one coming first; otherwise the newest message. */
-function order(a: ReportLine, b: ReportLine, intent: AskField, today: number): number {
-  if (intent === 'date') {
-    // Upcoming dates by time, then past dates, then undated.
-    const rank = (l: ReportLine) =>
-      l.record.dateAt === null
-        ? Number.MAX_VALUE
-        : l.record.dateAt >= today
-        ? l.record.dateAt
-        : Number.MAX_SAFE_INTEGER;
-    const diff = rank(a) - rank(b);
-    if (diff) return diff;
-  }
-  return b.message.postedAt - a.message.postedAt;
+  return matches
+    .sort(
+      (a, b) =>
+        b.score - a.score || b.item.message.postedAt - a.item.message.postedAt,
+    )
+    .slice(0, MAX_MATCHES);
 }
