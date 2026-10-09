@@ -243,11 +243,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Do:** build to boards `05-home` and `14-email-and-ai-reply`. Every line carries its `SourceQuote`. Empty state and placeholder rows while the model works.
   - **Done when:** fixture data renders on Today, and tapping a line opens the original message.
 
-- [ ] **Task B2.4: Channels**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B2.4: Channels**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/screens/ConnectedApps/`
   - **Do:** build to board `19-connected-apps`. A switch per app and two levels (Read and report; Also draft replies). Each change calls `setEnabledPackages`.
   - **Done when:** switching an app off is stored and sent to the bridge.
+  - **State (2026-10-10):** Connected Apps reads installed and stored channels, persists levels, synchronizes the complete enabled-package list, keeps failures visible for retry, and blocks pending intake from disabled apps. Baton tests cover persistence, bridge synchronization, failure/retry, and disabled-source intake.
 
 **Phase 2 exit check:** with Gmail and Messenger on, send the phone an announcement, a payment reminder, a question, a promotion, and a message through a switched-off app. Today builds; the switched-off app's message is absent.
 
@@ -291,30 +292,33 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Done when:** all six hard-limit tests pass, including: sending is never `do`, and an instruction-like message produces no action and a log entry.
   - **State (2026-10-10):** built by Steve (crossing lanes, agreed; logic only). `core/rules.ts` exports `decide(input)`; `core/rules.test.ts` has one test per hard limit in spec 4.8 plus the per-rule daily cap. `core/builtinRules.ts` holds the three rules, all off: `builtin-remind` (deadlines and payments), `builtin-draft` (questions in private chats, prepare only), `builtin-alert` (urgent messages). The runner saves them to storage on first use, so the Rules screen reads them with `useRules()` and switches them with `store.setRuleEnabled(id, on)`.
 
-- [ ] **Task B3.2: Action runner and activity log**
-  - **Priority:** P0 · **Status:** In Progress
+- [x] **Task B3.2: Action runner and activity log**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/actions/index.ts`, `mobile/src/screens/Activity/`
   - **Do:** write every action to the `actions` table before it runs and update it with the result (safety requirement 8). Log screen to board `21-activity-history`, showing the rule and, for blocked actions, the reason.
   - **Done when:** a hostile fixture message shows in the log as blocked, with the reason.
-  - **State (2026-10-10):** the action runner is built by Steve; **the Activity screen is still Ronmar's.** `services/actions/index.ts` logs every action before it runs and updates it with the result (safety requirement 8), with the rule that caused it and, for blocked ones, the reason. A message that tries to give instructions is logged as blocked even when no rule matches. Intake calls it after each message the model reads. For screens: `getActionRunner()` in `services/actions/runner.ts`; the log is `useActions()`. Calendar actions are logged as blocked (not in this build). See the log on a phone with the probe's **Show log** button.
+  - **State (2026-10-10):** the action runner logs before execution and records results, rules, sources, and block reasons. The live Activity screen renders paged stored rows. Baton tests verify that a hostile message appears blocked with its reason and exact original source.
 
-- [ ] **Task B3.3: Rules screen**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B3.3: Rules screen**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/screens/Teach/`, `mobile/src/screens/Automations/`, `mobile/src/screens/AutomationReview/`
   - **Do:** build to board `12-my-automations`. The three built-in rules as switches, each with a plain-words description and a preview count of past messages it would have matched.
   - **Done when:** switching a rule on changes what the engine decides for the next message.
+  - **State (2026-10-10):** the live Rules views show the three built-ins, persisted switches, descriptions, and side-effect-free preview counts. Baton tests verify persistence and subsequent decision behavior.
 
-- [ ] **Task B3.4: Approvals**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B3.4: Approvals**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/screens/Approvals/`, `mobile/src/components/DraftCard.tsx`
   - **Do:** build to board `15-approval-center`. Each draft shows the original message, the draft (editable), and why it was prepared. Send needs a tap and then a confirmation dialog (safety requirement 2).
   - **Done when:** approving a draft calls `sendReply` and the action log records it.
+  - **State (2026-10-10):** Approvals shows the source and reason, persists edits, requires individual confirmation, supports discard, and reports queued or retryable outcomes. Baton tests verify cancel never sends, confirmed send is logged, and duplicate confirmation cannot send twice.
 
-- [ ] **Task B3.5: Privacy proof**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B3.5: Privacy proof**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/screens/Settings/` (privacy section), `mobile/src/components/PrivacyIndicator.tsx`
   - **Do:** build to board `24-settings-and-privacy`. Show the facts from `getProofFacts()`, messages processed today, and average processing time. A debug build says "Development build: internet permission present."
   - **Done when:** the indicator in the top bar opens the screen and the facts are read live.
+  - **State (2026-10-10):** the Home indicator links to Settings, where Privacy proof refreshes bridge facts and SQLite counts on focus and distinguishes debug internet permission. Baton tests verify live facts and processed-message counts.
 
 **Phase 3 exit check:** approve a draft and see it sent; send the hostile message and see nothing happen, with the log saying why; open Privacy proof on the release build.
 
@@ -336,12 +340,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 **Lane B**
 
-- [ ] **Task B4.1: Offline queue**
-  - **Priority:** P0 · **Status:** In Progress
+- [x] **Task B4.1: Offline queue**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/core/queue.ts`, test beside it, `mobile/src/services/actions/index.ts`
   - **Do:** an approved reply while offline is stored as `queued`. On reconnect, recheck: the draft still exists, the notification is still showing, the channel still permits drafts. Send, or mark `needs you` and offer to copy the text and open the chat.
   - **Done when:** tests cover each recheck outcome, and the Approvals screen shows "Queued".
-  - **State (2026-10-10):** the queue logic is built by Steve; **showing "Queued" on the Approvals screen is still Ronmar's.** `core/queue.ts` has `recheckQueued` and `reminderTime`, with tests for each outcome. `(await getActionRunner()).sendDraft(draftId)` sends a confirmed draft and returns `sent`, `queued` (offline), or `needs_you`; the Approvals screen calls it only after the user's tap and confirmation (safety requirement 2). `flushQueue()` runs by itself when the phone comes back online. **Not yet run on a phone.**
+  - **State (2026-10-10):** the queue rechecks draft, notification, and channel permissions, flushes on reconnect, and prevents duplicate sends. Approvals displays "Queued" after offline confirmation. Baton tests cover every recheck outcome and the queued UI. The full airplane-mode phone run remains under A4.1.
 
 - [ ] **Task B4.2: Onboarding, permission step**
   - **Priority:** P0 · **Status:** Backlog
