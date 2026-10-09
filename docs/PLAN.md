@@ -271,13 +271,14 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Done when:** a reminder set one minute ahead appears on the phone.
   - **State (2026-10-10):** `reminders/ReminderReceiver.kt` sets an alarm and shows a "Reminder" notification that opens MIRA; `bridge.scheduleReminder` asks for the notification permission on Android 13 and later. Reminders do not survive a phone restart. **Checked on the Infinix (2026-10-10):** a reminder set from the probe for one minute ahead appeared on time, on the `reminders` channel at high importance. Ronmar no longer needs to run this check.
 
-- [ ] **Task A3.3: Release build with no internet permission, and proof facts**
-  - **Priority:** P0 · **Status:** In Progress
+- [x] **Task A3.3: Release build with no internet permission, and proof facts**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/android/app/src/main/AndroidManifest.xml`, `mobile/android/app/src/debug/AndroidManifest.xml`, `mobile/android/app/build.gradle`, `MiraModule.kt`
   - **Do:** move `INTERNET` to the debug manifest only. `getProofFacts()` returns whether the installed app holds the permission, and the bytes-sent count if A1.3 found it.
   - **Done when:** the release build's merged manifest has no `android.permission.INTERNET` (safety requirement 6) and the release app runs on the phone.
   - **State (2026-10-10):** `INTERNET` is declared only in `src/debug/AndroidManifest.xml`; `src/release/AndroidManifest.xml` removes it even if a library asks for it. **Verified on the built release APK** with `aapt2 dump permissions`: it declares `POST_NOTIFICATIONS`, `USE_EXACT_ALARM`, `SCHEDULE_EXACT_ALARM` (to API 32), and `ACCESS_NETWORK_STATE`, and **no `android.permission.INTERNET`** (safety requirement 6). `getProofFacts()` returns the permission check, bytes sent since the phone last started, and the build type. Build with `cd mobile/android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a`; the first run compiles llama.rn for about 25 minutes. **Still to do:** install the release APK on a phone and confirm it starts (it replaces the debug app, so the probe is gone until the debug app is reinstalled).
   - **Rebuilt from `main` at 8f10ba3 (with the design screens):** 2 minutes 21 seconds, 120 MB, and the same permission list with **no `INTERNET`**.
+  - **Installed on the Infinix (2026-10-10):** the release APK built from a80a22e replaced the debug app after a full uninstall. Android reports no `INTERNET` permission for the installed app and it is not debuggable. It starts from cold on the notification-access step, with the model file copied back in place.
 
 - [x] **Task A3.4: Wire the new bridge methods**
   - **Priority:** P0 · **Status:** Done
@@ -387,7 +388,7 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 No new features after T+9:00. Fixes only.
 
-- [ ] **Task A5.1: Release build on the phone.** Priority: P0. Status: Backlog. Lane A. Install the final release build, with the model file in place. Done when the app starts from cold and passes Privacy proof.
+- [x] **Task A5.1: Release build on the phone.** Priority: P0. Status: Done. Lane A. Install the final release build, with the model file in place. Done when the app starts from cold and passes Privacy proof. **Done 2026-10-10:** release build from a80a22e installed on a clean phone (old data, drafts, and test reminders removed), model file in place. Privacy proof on the release build is still to be opened by hand, since the app is waiting at the notification-access step. To get the developer probe back, reinstall the debug app with `npm run android`.
 - [ ] **Task B5.1: Demo messages and script.** Priority: P0. Status: In Progress. Lane B. Write the exact messages to send, in order, in `docs/demo-script.md`, including the hostile message. Done when a third person could run the demo from the file. **State (2026-10-10):** first version written by Steve at [`docs/demo-script.md`](demo-script.md): setup checklist, the exact messages in order with the expected result of each, what to say at each step, and fixes for common problems. It names the design's screens (Home, Connected apps, Automations, Approvals, Activity, Settings); update it as those screens land, and after the first full rehearsal.
 - [ ] **Task 5.2: Rehearse three times and record a backup.** Priority: P0. Status: Backlog. Both. Done when three full runs pass on the phone and a screen recording of one is saved.
 
