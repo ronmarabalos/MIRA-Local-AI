@@ -142,12 +142,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Result so far (2026-10-10, Infinix):** Messenger, private chat: the full text arrived (39 of 39 characters), the sender's name is in the title, there is no separate chat name (expected for a private chat), the message is listed individually, and a reply box is offered. The notification key carries Messenger's `ADVANCED_CRYPT` tag, so end-to-end encrypted chats are readable this way. Infinix mutes app debug logs, so read the probe screen, not logcat.
   - **Still to check:** a Messenger group chat (chat name, group flag, several messages), a long message (is it cut short?), and Gmail (no Gmail notification has been captured yet).
 
-- [ ] **Task A1.3: Reply through a notification, and the bytes-sent count**
-  - **Priority:** P0 · **Status:** In Progress
+- [x] **Task A1.3: Reply through a notification, and the bytes-sent count**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** the listener, plus a temporary test call
   - **Do:** send one reply through Messenger's notification reply box from a test build. Try reading the app's own bytes-sent count from Android.
   - **Done when:** this task records "reply works" or "use clipboard fallback", and "bytes count available" or "permission check only".
-  - **Result so far (2026-10-10, Infinix):** `sendReply` through Messenger's reply box returned `sent`; confirm in Messenger that the text arrived. Bytes sent **is available** from Android (counted since the phone last started; 215,562 then 442,970 in a debug build talking to the development server), so Privacy proof can show a real number. The internet permission check works (`held` in debug).
+  - **Result (2026-10-10, Infinix):** **Reply works.** `sendReply` through Messenger's reply box returned `sent` and the text arrived in the chat, so the clipboard fallback is not needed for Messenger. Bytes sent **is available** from Android (counted since the phone last started; 215,562 then 442,970 in a debug build talking to the development server), so Privacy proof can show a real number. The internet permission check works (`held` in debug).
 
 **Lane B**
 
