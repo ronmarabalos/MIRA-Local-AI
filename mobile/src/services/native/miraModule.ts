@@ -12,6 +12,8 @@ export interface MiraNativeModule {
   getProofFacts(): Promise<ProofFacts>;
   getModelDir(): Promise<string | null>;
   getModelPath(): Promise<string | null>;
+  /** Opens the file picker and copies the chosen model file into MIRA's folder. */
+  importModel(): Promise<'imported' | 'cancelled'>;
   setEnabledPackages(packageNames: string[]): Promise<void>;
   listNotifyingApps(): Promise<NotifyingApp[]>;
   /** A JSON array of CapturedNotification. */
@@ -25,3 +27,4 @@ export const MiraModule: MiraNativeModule = NativeModules.MiraModule;
 
 export const EVENT_NOTIFICATION = 'MiraNotification';
 export const EVENT_ONLINE = 'MiraOnline';
+export const EVENT_MODEL_IMPORT = 'MiraModelImport';

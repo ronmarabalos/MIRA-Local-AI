@@ -7,6 +7,7 @@ import type {
   ChatKind,
   ExtractedRecord,
   Message,
+  MiraRecord,
 } from '../core/types';
 
 export type Unsubscribe = () => void;
@@ -55,6 +56,8 @@ export interface MessageContext {
 export interface AnswerSource {
   message: Message;
   context: MessageContext;
+  /** What MIRA already read from it (summary, date, amount), so the answer can sum it up. */
+  record?: MiraRecord | null;
 }
 
 /** The local model (spec 4.5). One request runs at a time. */
@@ -64,7 +67,7 @@ export interface ModelService {
   /** Reply text of at most 60 words. */
   draftReply(message: Message, context: MessageContext): Promise<string>;
   /**
-   * One or two sentences answering the question from these messages only.
+   * A short summary answering the question from these messages only.
    * Rejects when there is no usable answer; the caller shows the sources alone.
    */
   answer(question: string, sources: AnswerSource[]): Promise<string>;

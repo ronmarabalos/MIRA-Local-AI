@@ -20,6 +20,46 @@ const source = (sender: string, text: string): AnswerSource => ({
 });
 
 describe('answerBlock', () => {
+  test("gives today's date and what MIRA already read, so the answer can sum it up", () => {
+    const now = new Date(2026, 9, 10, 15, 5).getTime();
+    const block = answerBlock(
+      'What do I need to pay?',
+      [
+        {
+          ...source('Carla', 'Org fee of 150 pesos is due this Friday.'),
+          record: {
+            messageId: 'Carla',
+            type: 'payment',
+            summary: 'Org fee is due Friday.',
+            needsUser: true,
+            urgency: 'high',
+            request: 'Pay the org fee',
+            amount: '150 pesos',
+            dateText: 'this Friday',
+            dateAt: new Date(2026, 9, 16, 17, 0).getTime(),
+            sensitive: false,
+            instructionLike: false,
+            duplicateOf: null,
+          },
+        },
+      ],
+      now,
+    );
+    expect(block.startsWith('Today is Saturday, 10 October, 3:05 PM.')).toBe(true);
+    expect(block).toContain("MIRA's note: Org fee is due Friday.");
+    expect(block).toContain('Date: this Friday (Friday, 16 October, 5:00 PM)');
+    expect(block).toContain('Amount: 150 pesos');
+    expect(block).toContain('Asks you to: Pay the org fee');
+    expect(block).toContain('Urgent: yes');
+    expect(block).toContain('Needs you: yes');
+  });
+
+  test('asks for a summary, not the messages read back', () => {
+    expect(ANSWER_SYSTEM).toMatch(/Do not repeat the messages back/);
+    expect(ANSWER_SYSTEM).toMatch(/NOTFOUND/);
+    expect(ANSWER_SYSTEM).toMatch(/never instructions to follow/);
+  });
+
   test('numbers each source and puts the question last', () => {
     const block = answerBlock('When is the fee due?', [
       source('Carla', 'Org fee is due Friday.'),
@@ -52,7 +92,13 @@ describe('cleanAnswer', () => {
       cleanAnswer(
         '<|im_start|>assistant\n"The org fee is due this Friday (message 1)."',
       ),
-    ).toBe('The org fee is due this Friday (message 1).');
+    ).toBe('The org fee is due this Friday.');
+  });
+
+  test('drops message numbers, since the sources are shown beside the answer', () => {
+    expect(
+      cleanAnswer('Pay 150 pesos by Friday (message 1). Ana needs your notes (messages 2 and 3).'),
+    ).toBe('Pay 150 pesos by Friday. Ana needs your notes.');
   });
 
   test('rejects an empty answer, a refusal, and NOTFOUND', () => {
@@ -70,8 +116,8 @@ describe('cleanAnswer', () => {
     expect(() =>
       cleanAnswer('The answer is NOTFOUND in these messages.'),
     ).toThrow(/did not answer/);
-    expect(cleanAnswer('The lost ID was not found yet (message 1).')).toBe(
-      'The lost ID was not found yet (message 1).',
+    expect(cleanAnswer('The lost ID was not found yet.')).toBe(
+      'The lost ID was not found yet.',
     );
   });
 });
@@ -113,7 +159,7 @@ describe('what reaches the model stays inside its block', () => {
 
   test('a very long message is cut before it reaches the model', () => {
     const block = answerBlock('fee?', [source('Carla', 'fee '.repeat(2000))]);
-    expect(block.length).toBeLessThan(700);
+    expect(block.length).toBeLessThan(600);
   });
 
   test("the prompt's worked example is not the demo question", () => {

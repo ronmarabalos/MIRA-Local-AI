@@ -144,47 +144,61 @@ async function ask(question: string) {
 
 test('starts with example questions, and Ask is disabled until something is typed', async () => {
   await render();
-  expect(shown()).toContain('When is the next deadline?');
+  expect(shown()).toContain('What do I need to do today?');
   expect(askButton().props.disabled).toBe(true);
   await act(() => field().props.onChangeText('org fee'));
   expect(askButton().props.disabled).toBe(false);
   expect(field().props.maxLength).toBe(300);
 });
 
-test("a question shows its source, the stored fact, and then MIRA's answer", async () => {
+test('MIRA replies with a summary, and its sources unfold under it', async () => {
   await render();
   await ask('when is the org fee due?');
   await settle();
-  const text = shown();
+  let text = shown();
   expect(text).toContain('when is the org fee due?');
+  // The reply first: MIRA's summary of what it read, not the message itself.
+  expect(text).toContain('Carla says:');
+  expect(text).toContain('MIRA’s summary · from Messenger · ACM Org');
+  expect(text).not.toContain('com.facebook.orca');
+  expect(text).not.toContain('Org fee of 150 pesos is due this Friday.');
+
+  await act(() =>
+    tree!.root.findAllByProps({ accessibilityLabel: 'Show sources' })[0].props.onPress(),
+  );
+  text = shown();
   expect(text).toContain('Org fee of 150 pesos is due this Friday.');
   expect(text).toContain('Date: this Friday');
-  // The app's name, never its package id, and a number the answer can point at.
-  expect(text).toContain('Messenger · ACM Org');
-  expect(text).not.toContain('com.facebook.orca');
-  expect(text).toContain('Message 1');
-  expect(text).toContain('MIRA’s answer');
-  expect(text).toContain('Carla wrote:');
 });
 
-test('a question with no match says so and does not ask the model', async () => {
+test('a broad question is answered from the messages that most need you', async () => {
   const answer = jest.spyOn(model, 'answer');
+  await render();
+  await ask('what do I need to do today?');
+  await settle();
+  expect(answer).toHaveBeenCalled();
+  expect(shown()).toContain('MIRA’s summary');
+});
+
+test('when MIRA cannot use the messages it picked for a broad question, it says so plainly', async () => {
+  jest.spyOn(model, 'answer').mockRejectedValue(new Error('NOTFOUND'));
   await render();
   await ask('what about the basketball tryouts?');
   await settle();
-  expect(shown()).toContain('I couldn’t find that in your messages.');
-  expect(answer).not.toHaveBeenCalled();
+  const text = shown();
+  expect(text).toContain('I couldn’t find that in your messages.');
+  expect(text).not.toContain('Org fee of 150 pesos');
 });
 
-test('when the model has no answer, the sources stay under "Here\'s what I found"', async () => {
+test('when the model has no answer, keyword matches stay, unfolded', async () => {
   jest.spyOn(model, 'answer').mockRejectedValue(new Error('no answer'));
   await render();
   await ask('org fee');
   await settle();
   const text = shown();
-  expect(text).toContain('Here’s what I found');
+  expect(text).toContain('here’s what I found');
   expect(text).toContain('Org fee of 150 pesos is due this Friday.');
-  expect(text).not.toContain('MIRA’s answer');
+  expect(text).not.toContain('MIRA’s summary');
 });
 
 test('two questions sent quickly each get their own answer', async () => {
@@ -209,8 +223,5 @@ test('two questions sent quickly each get their own answer', async () => {
   expect(proposalAt).toBeGreaterThan(-1);
   expect(feeAt).toBeGreaterThan(-1);
   // Newest question first: "proposal" block, then "org fee" block, each holding its own answer.
-  expect(text.indexOf('The proposal is due on Monday morning.')).toBeLessThan(
-    feeAt,
-  );
   expect(proposalAt).toBeLessThan(feeAt);
 });

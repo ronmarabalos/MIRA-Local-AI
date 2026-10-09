@@ -80,7 +80,7 @@ test("the user's question is answered before messages still waiting to be read",
     release = resolve;
   });
   jest.mocked(complete).mockImplementation(async (system: string) => {
-    const kind = system.startsWith('You answer') ? 'answer' : 'read';
+    const kind = system.includes('NOTFOUND') ? 'answer' : 'read';
     order.push(kind);
     if (order.length === 1) await gate;
     return {
@@ -100,7 +100,8 @@ test("the user's question is answered before messages still waiting to be read",
   await new Promise<void>(resolve => setTimeout(resolve, 0));
   release();
 
-  expect(await question).toBe('Due Friday (message 1).');
+  // Message numbers are dropped; the sources are shown beside the answer.
+  expect(await question).toBe('Due Friday.');
   await Promise.all([first, second]);
   expect(order).toEqual(['read', 'answer', 'read']);
 });

@@ -19,3 +19,18 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// Windows only: llama.rn compiles llama.cpp from source, and its object paths
+// under node_modules pass Windows' 260-character limit, which the NDK's ninja
+// does not lift even with long paths enabled. Its native build folder goes to
+// a short path instead. Other systems are unaffected.
+if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+    subprojects { project ->
+        if (project.name == "llama.rn") {
+            project.plugins.withId("com.android.library") {
+                project.android.externalNativeBuild.cmake.buildStagingDirectory =
+                    file("${System.getenv("SystemDrive") ?: "C:"}/mira-cxx")
+            }
+        }
+    }
+}

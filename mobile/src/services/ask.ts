@@ -1,4 +1,9 @@
-import { ASK_WINDOW_MS, type AskMatch, searchMessages } from '../core/ask';
+import {
+  ASK_WINDOW_MS,
+  type AskMatch,
+  recentHighlights,
+  searchMessages,
+} from '../core/ask';
 import type { ModelService } from './contracts';
 import type { Store } from './db/store';
 
@@ -12,13 +17,20 @@ export interface AskDeps {
 const MAX_ITEMS = 1000;
 
 /**
- * Ask MIRA: find the matching messages first, then have the model explain
- * them. The two are separate so the sources can be shown before the model
+ * Ask MIRA: find the messages first, then have the model sum them up into
+ * an answer. The two are separate so the sources can be shown before the model
  * has finished, and still stand when it fails.
  */
 export function createAsk({ store, model, now = Date.now }: AskDeps) {
   return {
-    async findSources(question: string): Promise<AskMatch[]> {
+    /**
+     * The messages to answer from. `exact` is false when no keyword matched
+     * and these are the messages that most need the user instead, for broad
+     * questions such as "what do I need to do?".
+     */
+    async findSources(
+      question: string,
+    ): Promise<{ matches: AskMatch[]; exact: boolean }> {
       const at = now();
       const items = await store.getItems(
         at - ASK_WINDOW_MS,
@@ -26,7 +38,10 @@ export function createAsk({ store, model, now = Date.now }: AskDeps) {
         at + 24 * 60 * 60 * 1000,
         MAX_ITEMS,
       );
-      return searchMessages(question, items, at);
+      const matches = searchMessages(question, items, at);
+      return matches.length > 0
+        ? { matches, exact: true }
+        : { matches: recentHighlights(items, at), exact: false };
     },
 
     /** The model's answer, or null when it has none: the caller then shows "Here's what I found". */
@@ -41,6 +56,7 @@ export function createAsk({ store, model, now = Date.now }: AskDeps) {
           matches.map(({ item }) => ({
             message: item.message,
             context: { chatTitle: item.chat.title, chatKind: item.chat.kind },
+            record: item.record,
           })),
         );
       } catch {

@@ -325,8 +325,10 @@ test('Ask finds the stored message, shows the amount asked for, and opens the me
   // An example fills the question; Ask sends it.
   await press('How much do I need to pay?');
   await press('Ask');
-  expect(output()).toContain('PHP 450');
   expect(output()).toContain('Fee notice tuition');
+  // The reply comes first; the source and its amount unfold under it.
+  await press('Show sources');
+  expect(output()).toContain('PHP 450');
   expect(output()).toContain('Original tuition: pay PHP 450 by Friday.');
   await press('Open message from Ana Santos: Fee notice tuition');
   expect(output()).toContain('Original message');

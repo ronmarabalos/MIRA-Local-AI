@@ -30,9 +30,9 @@ export function createFakeModel(
     },
     async answer(_question, sources) {
       const first = sources[0];
-      return first
-        ? `${first.message.sender} wrote: ${first.message.text} (message 1)`
-        : 'There is nothing to answer from.';
+      if (!first) return 'There is nothing to answer from.';
+      const more = sources.length > 1 ? ` I found ${sources.length - 1} more message${sources.length > 2 ? 's' : ''} that may help.` : '';
+      return `${first.message.sender} says: ${first.record?.summary ?? first.message.text}${more}`;
     },
   };
 }

@@ -1,5 +1,9 @@
-/** Board 04-ai-model-setup. Shows whether the model file is on this phone; nothing is downloaded. */
-import { useCallback, useEffect, useState } from 'react';
+/**
+ * Board 04-ai-model-setup. Shows whether MIRA's file is on this phone and adds
+ * it from a file the user already has (downloaded in their browser). MIRA
+ * itself never goes online.
+ */
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 
 import { Companion } from '../../components/Companion';
@@ -11,15 +15,27 @@ import { Steps } from '../../components/Steps';
 import { T } from '../../components/T';
 import { BackButton, Glass, PrimaryButton, Rows, SecondaryButton } from '../../components/ui';
 import { isModelOnPhone } from '../../services/firstRun';
+import { type ImportProgress, importModelFile } from '../../services/model/importFile';
 import { fx } from '../../theme/effects';
 import palette from '../../theme/palette';
 
-type Phase = 'idle' | 'ready';
+type Phase = 'idle' | 'copying' | 'ready';
 
 const STATUS: Record<Phase, { label: string; fg: string; bg: string }> = {
   idle: { label: 'Not on this phone yet', fg: palette.ink.label, bg: 'rgba(255,255,255,0.6)' },
+  copying: { label: 'Adding to this phone…', fg: palette.navy.DEFAULT, bg: palette.peri.tonal },
   ready: { label: 'On this phone · ready offline', fg: palette.success.ink, bg: palette.success.bg },
 };
+
+/** What went wrong, in plain words, by the native error code. */
+const IMPORT_ERRORS: Record<string, string> = {
+  not_model: 'That isn’t MIRA’s file. Pick the one ending in .gguf.',
+  no_space: 'Not enough free space. Free up about 1.3 GB and try again.',
+  unreadable: 'That file couldn’t be opened. Try picking it again.',
+  no_picker: 'This phone has no file picker. Copy the file over USB instead.',
+};
+
+const gb = (bytes: number) => (bytes / 1024 ** 3).toFixed(2);
 
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -33,15 +49,45 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
 export default function ModelSetupScreen() {
   const go = useGo();
   const [phase, setPhase] = useState<Phase>('idle');
+  const [progress, setProgress] = useState<ImportProgress | null>(null);
+  const [problem, setProblem] = useState('');
+  const live = useRef(true);
+  useEffect(
+    () => () => {
+      live.current = false;
+    },
+    [],
+  );
 
-  // MIRA cannot download anything: the file is copied to the phone over USB.
+  // MIRA never goes online: the file is downloaded in the browser (or copied
+  // over USB) and picked here.
   const check = useCallback(() => {
     isModelOnPhone().then(
-      present => setPhase(present ? 'ready' : 'idle'),
-      () => setPhase('idle'),
+      present => live.current && setPhase(present ? 'ready' : 'idle'),
+      () => live.current && setPhase('idle'),
     );
   }, []);
   useEffect(check, [check]);
+
+  const choose = async () => {
+    const before = phase;
+    setProblem('');
+    setProgress(null);
+    setPhase('copying');
+    try {
+      const result = await importModelFile(p => live.current && setProgress(p));
+      if (!live.current) return;
+      setPhase(result === 'imported' ? 'ready' : before);
+    } catch (error) {
+      if (!live.current) return;
+      const code = (error as { code?: string }).code ?? '';
+      setProblem(IMPORT_ERRORS[code] ?? 'The file couldn’t be added. Try again.');
+      setPhase(before);
+    }
+  };
+
+  const percent =
+    progress && progress.total > 0 ? Math.min(100, Math.round((progress.copied / progress.total) * 100)) : null;
 
   const status = STATUS[phase];
   const finish = () => go('Home', { reset: true });
@@ -100,24 +146,57 @@ export default function ModelSetupScreen() {
         </Rows>
       </Glass>
 
+      {phase === 'copying' ? (
+        <View accessibilityLiveRegion="polite" className="gap-8">
+          <View className="h-8 overflow-hidden rounded-full bg-peri-tonal">
+            <View className="h-8 rounded-full bg-navy" style={{ width: `${percent ?? 5}%` }} />
+          </View>
+          <T className="text-13 font-semibold text-ink-2">
+            {progress === null
+              ? 'Pick the file in the list that opened…'
+              : percent === null
+              ? `Adding… ${gb(progress.copied)} GB`
+              : `Adding… ${percent}% · ${gb(progress.copied)} of ${gb(progress.total)} GB`}
+          </T>
+        </View>
+      ) : null}
+
+      {problem ? (
+        <View accessibilityRole="alert" className="flex-row items-start gap-10 rounded-16 bg-error-bg px-14 py-12">
+          <Icon name="info" size={18} color={palette.error.ink} />
+          <T className="flex-1 text-13 leading-[18.85px] text-error-ink">{problem}</T>
+        </View>
+      ) : null}
+
       <View className="flex-row items-start gap-10 rounded-16 bg-warning-bg px-14 py-12">
         <View className="mt-1">
           <Icon name="info" size={18} color={palette.warning.text} />
         </View>
         <T className="flex-1 text-13 leading-[18.85px] text-warning-text">
           {phase === 'ready'
-            ? 'Nothing was downloaded. The file was copied to this phone over USB.'
-            : 'MIRA never downloads anything. Copy the file to this phone over USB, then check again.'}
+            ? 'MIRA reads everything on this phone and never goes online.'
+            : 'MIRA never goes online. Download its file (.gguf, about 1.1 GB) in your browser, then tap below and pick it.'}
         </T>
       </View>
 
       <View className="mt-auto gap-10">
-        {phase === 'idle' ? (
-          <PrimaryButton label="Check again" onPress={check} />
+        {phase === 'ready' ? (
+          <>
+            <PrimaryButton label="Finish setup" onPress={finish} />
+            <SecondaryButton label="Replace MIRA’s file" onPress={choose} />
+          </>
         ) : (
-          <PrimaryButton label="Finish setup" onPress={finish} />
+          <>
+            <PrimaryButton
+              label={phase === 'copying' ? 'Adding…' : 'Add MIRA’s file'}
+              disabled={phase === 'copying'}
+              onPress={choose}
+              left={<Icon name="download" size={18} color={palette.white} />}
+              className={phase === 'copying' ? 'opacity-60' : ''}
+            />
+            {phase === 'idle' ? <SecondaryButton label="Continue for now" onPress={finish} /> : null}
+          </>
         )}
-        {phase === 'idle' ? <SecondaryButton label="Continue for now" onPress={finish} /> : null}
       </View>
     </Screen>
   );

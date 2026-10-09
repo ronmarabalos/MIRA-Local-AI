@@ -119,6 +119,54 @@ const hasWord = (words: string[], asked: string) =>
   words.some(word => same(word, asked));
 
 /**
+ * Whether a message may be used to answer at all: read by MIRA, not chatter,
+ * a promotion, a copy, or a message trying to give instructions, and recent.
+ */
+function askable({ message, record }: ReportItem, now: number): boolean {
+  return (
+    !!record &&
+    message.status === 'processed' &&
+    record.type !== 'chatter' &&
+    record.type !== 'promotion' &&
+    record.duplicateOf === null &&
+    !record.instructionLike &&
+    now - message.postedAt <= ASK_WINDOW_MS
+  );
+}
+
+/** How much a message matters with no keyword to go on. */
+function weight({ message, record }: ReportItem, now: number): number {
+  if (!record) return 0;
+  let points = 0;
+  if (record.needsUser) points += 4;
+  if (record.urgency === 'high') points += 3;
+  // A date still ahead, or from today, is something to plan around.
+  if (record.dateAt !== null && record.dateAt >= now - 24 * 60 * 60 * 1000) points += 3;
+  if (record.type === 'deadline' || record.type === 'payment') points += 2;
+  if (now - message.postedAt < 24 * 60 * 60 * 1000) points += 1;
+  return points;
+}
+
+/**
+ * For a question no keyword matches ("what do I need to do?", "anything
+ * urgent?"): the messages that most need the user, so MIRA can sum them up.
+ * The answer is still drawn only from these, and they are shown with it.
+ */
+export function recentHighlights(
+  items: ReportItem[],
+  now: number,
+): AskMatch[] {
+  return items
+    .filter(item => askable(item, now))
+    .map(item => ({ item, score: weight(item, now), fact: null }))
+    .sort(
+      (a, b) =>
+        b.score - a.score || b.item.message.postedAt - a.item.message.postedAt,
+    )
+    .slice(0, MAX_MATCHES);
+}
+
+/**
  * The stored messages that best match a question (Ask MIRA spec 3.1), with
  * no model call. A message needs at least one of the question's content
  * words; what the question asks for ("when", "how much") only adds weight.
@@ -146,15 +194,7 @@ export function searchMessages(
   const matches: AskMatch[] = [];
   for (const item of items) {
     const { message, chat, record } = item;
-    if (
-      !record ||
-      message.status !== 'processed' ||
-      record.type === 'chatter' ||
-      record.type === 'promotion' ||
-      record.duplicateOf !== null ||
-      record.instructionLike ||
-      now - message.postedAt > ASK_WINDOW_MS
-    ) {
+    if (!record || !askable(item, now)) {
       continue;
     }
 

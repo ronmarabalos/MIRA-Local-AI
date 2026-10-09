@@ -83,7 +83,8 @@ export function createDeviceModel(fallback: ModelService): ModelService {
         const { text } = await complete(
           ANSWER_SYSTEM,
           answerBlock(question, sources),
-          { maxTokens: 80 },
+          // Two to four sentences: a summary, not a single quoted fact.
+          { maxTokens: 160 },
         );
         return cleanAnswer(text);
       }, 'user'),

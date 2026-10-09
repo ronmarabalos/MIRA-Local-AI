@@ -5,6 +5,12 @@
 - **Owner:** Steve (search, model, service). The screen is in Ronmar's lane and is changed with his knowledge.
 - **Related:** [main spec](2026-10-09-mira-design.md) section 4.11 · [roadmap](../PLAN.md) tasks B4.4 and 2.3 · visual board [`06-mira-assistant`](../design/screens/06-mira-assistant.html)
 
+> **Revised 2026-10-10 (Ronmar): answers are summaries.** Answers read like MIRA's own reply, not the messages read back.
+> 1. **Broad questions reach the model.** When no keyword matches ("what do I need to do today?", "anything urgent?"), `recentHighlights` in `core/ask.ts` picks up to five messages that most need the user: needs a reply, urgent, a date still ahead, deadlines and payments, then the newest. The same exclusions as search apply. If the model cannot use them, the line reads "I couldn't find that in your messages" and they are not shown.
+> 2. **The model sees what MIRA already read.** `AnswerSource` carries the stored record. Each block gives the sent time, MIRA's note, the date (resolved), the amount, the request, urgency, and whether it needs the user, and the prompt opens with today's date.
+> 3. **A summary of two to four sentences**, addressed to the user, leading with what they need to know or do and combining related messages. The output cap goes from 80 to 160 tokens. There are no message numbers; `cleanAnswer` removes any "(message N)" the model writes. `NOTFOUND`, data-block fencing, and "no fallback to the fake" are unchanged.
+> 4. **Screen:** the reply is a chat bubble from MIRA labelled "MIRA's summary · from <app · chat>", with "Show N sources" unfolding the source cards (with the date or amount found). Keyword matches stay unfolded when the model has no answer. Sources stay one tap away for every answer (safety requirement 7).
+
 ---
 
 ## 1. Goal
