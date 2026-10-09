@@ -349,11 +349,13 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Done when:** tests cover each recheck outcome, and the Approvals screen shows "Queued".
   - **State (2026-10-10):** the queue rechecks draft, notification, and channel permissions, flushes on reconnect, and prevents duplicate sends. Approvals displays "Queued" after offline confirmation. Baton tests cover every recheck outcome and the queued UI. The full airplane-mode phone run remains under A4.1.
 
-- [ ] **Task B4.2: Onboarding, permission step**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B4.2: Onboarding, permission step**
+  - **Priority:** P0 · **Status:** Done
+  - **Implementation:** [bounded spec and checklist](specs/2026-10-10-onboarding-permission.md)
   - **Files:** `mobile/src/screens/Onboarding/`
   - **Do:** build to board `02-onboarding`. One screen explaining notification access, a button to the system setting, then Channels.
   - **Done when:** a fresh install reaches Today through onboarding.
+  - **State (2026-10-10):** onboarding reads the live listener state, explains on-device access, opens Android settings, rechecks on foreground return, exposes retryable errors, and continues through Connected Apps to Today with reset navigation. Focused interaction tests, full Tier 2 Baton verification, and changed-file lint pass. Physical fresh-install inspection remains part of B4.3's phone pass.
 
 - [ ] **Task B4.3: Visual pass**
   - **Priority:** P0 · **Status:** Backlog

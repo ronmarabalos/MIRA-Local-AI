@@ -69,7 +69,7 @@ async function render(component: ComponentType<any>, params?: object) {
 
 const BOARDS: [string, ComponentType<any>, string, object?][] = [
   ['01 splash', SplashScreen, 'Waking up your on-device assistant'],
-  ['02 onboarding', OnboardingScreen, 'Meet your personal AI.'],
+  ['02 onboarding', OnboardingScreen, 'Allow notification access'],
   ['03 initial setup', SetupScreen, 'What should MIRA call you?'],
   ['04 model setup', ModelSetupScreen, 'Your AI runs on this device'],
   ['05 home', HomeScreen, 'Here’s what matters today'],
