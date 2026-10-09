@@ -9,7 +9,7 @@
 - **Sync Protocol:** [`scripts/baton.mjs`](../scripts/baton.mjs) via `npm run verify:agent`
 - **Spec:** [`docs/specs/2026-10-09-mira-design.md`](specs/2026-10-09-mira-design.md) (approved by both developers on 2026-10-10)
 - **Visual design:** [`docs/design/README.md`](design/README.md)
-- **Lane integration (2026-10-10):** [merge checklist](specs/2026-10-10-merge-lanes.md); combine Ronmar's Today/Item Detail with Steve's latest native work on local `main`.
+- **Lane integration (2026-10-10):** [completed merge checklist](specs/2026-10-10-merge-lanes.md); Ronmar's Today/Item Detail and Steve's latest native work are merged on local `main`. Combined typecheck and full regression pass through Baton; remote publication and phone acceptance checks remain pending.
 
 ---
 
