@@ -146,6 +146,7 @@ async function draft() {
 test('Connected Apps reads saved values and persists off and level choices', async () => {
   const sync = jest.spyOn(bridge, 'setEnabledPackages');
   await render(ConnectedApps);
+  expect(output()).toContain('Continue to Today');
   await press('Read Messenger');
   expect((await db.store.getChannels())[0].enabled).toBe(false);
   expect(sync).toHaveBeenLastCalledWith([]);

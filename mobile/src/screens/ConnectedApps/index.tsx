@@ -2,10 +2,12 @@
 import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { CollectionScreen } from '../../components/CollectionScreen';
+import { useGo } from '../../components/nav';
 import { T } from '../../components/T';
 import {
   BackButton,
   Glass,
+  PrimaryButton,
   SecondaryButton,
   Switch,
   Tap,
@@ -17,6 +19,7 @@ import { useQuery } from '../../services/db/hooks';
 import { useForegroundRetry } from '../../services/db/foreground';
 
 export default function ConnectedAppsScreen() {
+  const go = useGo();
   const { data, error, retry } = useQuery(async () => {
     const manager = await getChannelManager();
     const [channels, listener] = await Promise.all([
@@ -106,6 +109,8 @@ export default function ConnectedAppsScreen() {
           ) : null}
         </>
       }
+      // CollectionScreen invokes this item renderer; it is not mounted as a component type.
+      // eslint-disable-next-line react/no-unstable-nested-components
       row={channel => (
         <Glass key={channel.packageName} className="gap-10 rounded-20 p-14">
           <Tap
@@ -155,7 +160,12 @@ export default function ConnectedAppsScreen() {
           </View>
         </Glass>
       )}
-      footer={<SecondaryButton label="Refresh apps" onPress={retry} />}
+      footer={
+        <>
+          <SecondaryButton label="Refresh apps" onPress={retry} />
+          <PrimaryButton label="Continue to Today" onPress={() => go('Home', { reset: true })} />
+        </>
+      }
     />
   );
 }
