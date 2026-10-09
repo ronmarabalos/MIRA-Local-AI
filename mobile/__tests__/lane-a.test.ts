@@ -102,4 +102,15 @@ describe('native bridge', () => {
     expect(listeners.MiraNotification).toHaveLength(0);
     expect(listener).toHaveBeenCalledTimes(2);
   });
+
+  test('passes the phone going offline and online to a listener until it unsubscribes', () => {
+    const bridge = createNativeBridge(native, events);
+    const listener = jest.fn();
+    const unsubscribe = bridge.onOnlineChange(listener);
+    listeners.MiraOnline.forEach(l => l(false as never));
+    listeners.MiraOnline.forEach(l => l(true as never));
+    expect(listener.mock.calls).toEqual([[false], [true]]);
+    unsubscribe();
+    expect(listeners.MiraOnline).toHaveLength(0);
+  });
 });

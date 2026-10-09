@@ -318,10 +318,11 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 **Lane A**
 
 - [ ] **Task A4.1: Online state and airplane-mode run**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `MiraModule.kt`, `bridge.ts`
   - **Do:** `isOnline()` and an online/offline event. Run the app in airplane mode: Today, drafting, and the model must work.
   - **Done when:** the app reports offline within a few seconds of airplane mode, and nothing breaks.
+  - **State (2026-10-10):** the code has been in place since A2.1: `isOnline()` and the `MiraOnline` event in `MiraModule.kt`, passed through by `bridge.ts` and covered by a unit test. Online means a network that Android has validated as reaching the internet. The probe's section 3 shows the live state and counts changes. **Phone check still to do** (either developer): open the probe, turn airplane mode on, and confirm it reads `online: no` within a few seconds; then with airplane mode still on, run **Run sample** and **Show stored** to confirm the model and storage work offline; turn it off and confirm `online: yes`.
 
 - [ ] **Task A4.2: Fix what the phone shows**
   - **Priority:** P0 · **Status:** Backlog
