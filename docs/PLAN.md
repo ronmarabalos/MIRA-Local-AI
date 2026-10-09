@@ -139,8 +139,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Files:** `mobile/android/app/src/main/java/com/mira/app/notifications/MiraNotificationListener.kt`, `mobile/android/app/src/main/AndroidManifest.xml`
   - **Do:** a `NotificationListenerService` that logs the spec 4.1 fields. Send real Messenger and Gmail messages to the phone.
   - **Done when:** this task records, for each app: how much text is exposed, whether the chat name is present, whether individual messages are listed, and whether a reply box is offered. Remove message text from logs before merging.
-  - **Result so far (2026-10-10, Infinix):** Messenger, private chat: the full text arrived (39 of 39 characters), the sender's name is in the title, there is no separate chat name (expected for a private chat), the message is listed individually, and a reply box is offered. The notification key carries Messenger's `ADVANCED_CRYPT` tag, so end-to-end encrypted chats are readable this way. Infinix mutes app debug logs, so read the probe screen, not logcat.
-  - **Still to check:** a Messenger group chat (chat name, group flag, several messages), a long message (is it cut short?), and Gmail (no Gmail notification has been captured yet).
+  - **Result (2026-10-10, Infinix), Messenger:**
+    - Private chat: full text (39 of 39 characters), sender's name in `title`, no chat name, message listed individually, reply box offered.
+    - Group chat: chat name present in `title` and `conversationTitle`, group flag set, reply box offered. A three-sentence message arrived whole. The notification carried **3 individual messages** with sender and text separated. Its `text` field is prefixed with the sender ("Name: message"), so intake must read `messages[]` and use `text` only when that list is empty.
+    - End-to-end encrypted chats are readable (key tagged `ADVANCED_CRYPT`). English mixed with Filipino comes through unchanged.
+    - Infinix mutes app debug logs, so read the probe screen, not logcat.
+  - **Still open, Gmail:** no Gmail notification has been posted on the phone in three attempts, so nothing is known about what Gmail exposes. This does not block Phase 2; Messenger alone carries the core loop. Check Gmail's own notification settings before the demo, or demo with Messenger and SMS.
 
 - [x] **Task A1.3: Reply through a notification, and the bytes-sent count**
   - **Priority:** P0 · **Status:** Done
