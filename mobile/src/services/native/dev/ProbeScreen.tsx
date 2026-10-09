@@ -55,6 +55,8 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
   );
   const [replyLog, setReplyLog] = useState<string[]>([]);
   const [facts, setFacts] = useState<ProofFacts | null>(null);
+  const [online, setOnline] = useState<boolean | null>(null);
+  const [onlineChanges, setOnlineChanges] = useState(0);
 
   const say = (line: string) => setModelLog(lines => [...lines, line]);
   const fail = (error: unknown) =>
@@ -69,6 +71,11 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     MiraModule.getModelDir().then(setModelDir);
     refresh();
+    bridge.isOnline().then(setOnline);
+    return bridge.onOnlineChange(next => {
+      setOnline(next);
+      setOnlineChanges(count => count + 1);
+    });
   }, []);
 
   const load = async () => {
@@ -337,6 +344,8 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
           {'\n'}bytes sent since the phone started:{' '}
           {facts.bytesSent ?? 'not available'}
           {'\n'}build: {facts.isDebugBuild ? 'debug' : 'release'}
+          {'\n'}online: {online === null ? '…' : online ? 'yes' : 'no'} (changed{' '}
+          {onlineChanges} times while open)
         </Text>
       ) : null}
     </ScrollView>
