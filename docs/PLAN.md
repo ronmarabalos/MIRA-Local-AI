@@ -22,7 +22,7 @@ Success at judging: the demo script in spec section 10.3 runs on the Infinix GT 
 
 ## Current Sprint Focus
 
-Active phase: **Phase 0: Setup, together**
+Active phase: **Phase 1: Prove the risky parts**
 
 About 8 to 13 hours remained when this plan was written. Phases are sized for 10 hours, counted from the moment Phase 0 starts (**T+0**), which leaves up to 3 hours of slack. Update "Active phase" above each time a phase's exit check passes.
 
@@ -103,12 +103,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Do:** `git rm --cached` both files, add `.agents/sync/handoff.*` to `.gitignore`, remove the `git add .agents/sync/handoff.json` line from the hook.
   - **Done when:** a commit no longer changes anything under `.agents/sync/`.
 
-- [ ] **Task P0.2: Install every library once**
-  - **Priority:** P0 · **Status:** In Progress · **Lane:** A
+- [x] **Task P0.2: Install every library once**
+  - **Priority:** P0 · **Status:** Done · **Lane:** A
   - **Files:** `mobile/package.json`, `mobile/package-lock.json`, `mobile/android/**` as the libraries require
   - **Do:** install `llama.rn`, `@op-engineering/op-sqlite`, `@react-navigation/native`, `@react-navigation/bottom-tabs`, `@react-navigation/native-stack`, `react-native-screens`, `react-native-linear-gradient`, `chrono-node`. Add the Onest font files under `mobile/android/app/src/main/assets/fonts/`. Do not install `react-native-paper` (the MIRA design replaces it) or `@notifee/react-native` (reminders are posted from Kotlin).
   - **Done when:** the app still builds and launches on the Infinix. If a library fails to build, apply its fallback from spec section 11 now, not later.
-  - **State:** installed and passing type-check and unit tests: `llama.rn` 0.13.0-rc.7 (pinned; its `latest` tag is a release candidate), `op-sqlite` 18, React Navigation 7, `react-native-screens` 4, `react-native-linear-gradient` 2.8, `chrono-node` 2. Onest in five weights, used as `Onest-Light`, `Onest-Regular`, `Onest-Medium`, `Onest-SemiBold`, `Onest-Bold`. `MainActivity` overrides `onCreate` for `react-native-screens`. **Not yet built on the Infinix**: run `npm run android` from `mobile/` to finish this task.
+  - **State:** installed and passing type-check and unit tests: `llama.rn` 0.13.0-rc.7 (pinned; its `latest` tag is a release candidate), `op-sqlite` 18, React Navigation 7, `react-native-screens` 4, `react-native-linear-gradient` 2.8, `chrono-node` 2. Onest in five weights, used as `Onest-Light`, `Onest-Regular`, `Onest-Medium`, `Onest-SemiBold`, `Onest-Bold`. `MainActivity` overrides `onCreate` for `react-native-screens`. Built and installed on the Infinix on 2026-10-10; all native libraries compile. Rebuild faster with `npm run android -- --device <id> --active-arch-only`.
 
 - [x] **Task P0.3: Skeleton, shared types, and contracts**
   - **Priority:** P0 · **Status:** Done · **Lane:** both, written together
