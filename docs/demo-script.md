@@ -2,7 +2,7 @@
 
 The acceptance test from spec section 10.3, adapted to what this build contains. Run it on the **release build** on the Infinix GT 20 Pro. A second phone (the "sender") sends the messages.
 
-What differs from the spec's script: rules are three built-in switches, not typed sentences (step 5), and Ask is shown only if it was built (step 4). See [`PLAN.md`](PLAN.md), "Scope for this window".
+What differs from the spec's script: rules are three built-in switches, not typed sentences (step 5). See [`PLAN.md`](PLAN.md), "Scope for this window".
 
 ---
 
@@ -56,9 +56,12 @@ From the sender phone, in this order. Wait for each notification to appear on th
 
 **"Every line shows the original message it came from. And the SMS isn't here, because I never switched that app on."**
 
-### 4. Ask (only if built)
+### 4. Ask
 
-- Open **Ask MIRA**, type `when is the org fee due?`. The answer shows the date and the source message.
+- Tap the centre button to open **Ask MIRA** and type `when is the org fee due?`
+- The fee message appears at once, marked with its date. A few seconds later MIRA's answer appears above it, saying which message it used.
+
+**"I can ask about my messages, and it always shows me the message the answer came from. It's all happening on this phone."**
 
 ### 5. Rules
 

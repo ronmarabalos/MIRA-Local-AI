@@ -52,6 +52,8 @@ export default function AssistantScreen() {
   const nextId = useRef(1);
   const live = useRef(true);
   const askRef = useRef<Promise<Ask> | null>(null);
+  /** App names by package, so a source reads "Messenger" and never a package id. */
+  const [appLabels, setAppLabels] = useState<Record<string, string>>({});
 
   useEffect(() => {
     live.current = true;
@@ -62,7 +64,15 @@ export default function AssistantScreen() {
 
   const service = () => {
     if (!askRef.current) {
-      askRef.current = getStore().then(store => createAsk({ store, model }));
+      askRef.current = getStore().then(async store => {
+        const channels = await store.getChannels();
+        if (live.current) {
+          setAppLabels(
+            Object.fromEntries(channels.map(c => [c.packageName, c.label])),
+          );
+        }
+        return createAsk({ store, model });
+      });
       // A failed open is tried again on the next question.
       askRef.current.catch(() => {
         askRef.current = null;
@@ -207,19 +217,24 @@ export default function AssistantScreen() {
               </T>
             )}
           </View>
-          {block.matches.map(match => (
-            <ReportItem
-              key={match.item.message.id}
-              item={match.item}
-              label={
-                match.fact
-                  ? `${match.fact.kind === 'date' ? 'Date' : 'Amount'}: ${
-                      match.fact.text
-                    }`
-                  : undefined
-              }
-            />
-          ))}
+          {block.matches.map((match, index) => {
+            const fact = match.fact
+              ? ` · ${match.fact.kind === 'date' ? 'Date' : 'Amount'}: ${
+                  match.fact.text
+                }`
+              : '';
+            return (
+              <ReportItem
+                key={match.item.message.id}
+                item={match.item}
+                appLabel={
+                  appLabels[match.item.message.packageName] ?? 'Another app'
+                }
+                // Numbered because the answer says which message it used.
+                label={`Message ${index + 1}${fact}`}
+              />
+            );
+          })}
         </View>
       ))}
     </Screen>

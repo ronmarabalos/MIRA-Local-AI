@@ -20,6 +20,12 @@ beforeEach(async () => {
   db = await testStore();
   jest.mocked(getStore).mockResolvedValue(db.store);
   const now = Date.now();
+  await db.store.saveChannel({
+    packageName: 'com.facebook.orca',
+    label: 'Messenger',
+    enabled: true,
+    level: 2,
+  });
   const add = async (
     id: string,
     sender: string,
@@ -153,6 +159,10 @@ test("a question shows its source, the stored fact, and then MIRA's answer", asy
   expect(text).toContain('when is the org fee due?');
   expect(text).toContain('Org fee of 150 pesos is due this Friday.');
   expect(text).toContain('Date: this Friday');
+  // The app's name, never its package id, and a number the answer can point at.
+  expect(text).toContain('Messenger · ACM Org');
+  expect(text).not.toContain('com.facebook.orca');
+  expect(text).toContain('Message 1');
   expect(text).toContain('MIRA’s answer');
   expect(text).toContain('Carla wrote:');
 });

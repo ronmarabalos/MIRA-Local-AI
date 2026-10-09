@@ -378,11 +378,14 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Done when:** each screen has been checked on the phone beside its board.
   - **State (2026-10-10):** shared `Tap` controls now add 6 dp hit slop so the smallest 36 dp controls expose a 48 dp Android touch target; the focused regression test passes. Static inspection found an accessible name on every `Tap`, scrolling and safe-area handling in the shared screen/list containers, reduced-motion support, semantic status text, and the existing navigation helpers. Scoped Tier 2 Baton verification and the full Baton regression/typecheck pass; changed-file ESLint reports zero errors and two pre-existing inline-style warnings in `ui.tsx`. On the connected M2102J20SG, Home was visually intact at the original 1.0 font scale. This phone blocks ADB input injection and `WRITE_SETTINGS`, so all-screen board comparison, system Back, and 130% font-size checks still require manual interaction on the device; its font scale remained 1.0.
 
-- [ ] **Task B4.4: Ask, lookup only (cut first if late)**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B4.4: Ask, lookup only (cut first if late)**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/core/ask.ts`, test beside it, `mobile/src/screens/Assistant/`
   - **Do:** keyword and date search over records; answer from a record field with its `SourceQuote`; "I couldn't find that in your messages" when nothing matches. No model call. If cut, Assistant shows the companion without answers.
   - **Done when:** "when is the deadline?" returns the deadline record and its source.
+  - **State (2026-10-10, Steve):** built as "find, then explain", going beyond the lookup-only version planned here. Spec: [`docs/specs/2026-10-10-ask-mira-design.md`](specs/2026-10-10-ask-mira-design.md); plan: [`docs/specs/2026-10-10-ask-mira-plan.md`](specs/2026-10-10-ask-mira-plan.md). `core/ask.ts` scores the last 14 days of stored messages against the question and returns the best five with the date or amount asked for; `ModelService.answer` writes one or two sentences from only those messages; `services/ask.ts` joins them so a model failure becomes "Here's what I found". A question runs ahead of background reading (`services/model/queue.ts`). The Assistant screen shows the sources at once and the answer when it arrives.
+  - **Checked on the Infinix (release build):** "When is the next deadline?" showed two real Messenger messages at once, the first marked "Date: 11:59pm", then within about 18 seconds "MIRA's answer: The next deadline is October 11 (message 2)", which is correct. After that check the source cards were changed to show the app's name instead of its package id and to carry "Message N", so the answer's reference can be followed.
+  - **Contract change:** `ModelService.answer(question, sources)` and `AnswerSource` were added to `contracts.ts`, with the fake.
 
 **Phase 4 exit check:** in airplane mode, Today and drafting work and an approved reply shows as queued; back online, it sends.
 
@@ -414,6 +417,7 @@ Not in this window. Take one only if Phase 5 is finished early and everything ab
   - **Priority:** P1
   - **Status:** Backlog
   - **Description:** `planQuery` and an answer from the best five records, naming the one used.
+  - **2026-10-10:** the model-written answer is built (see Task B4.4). Still not built: `planQuery`, where the model chooses what to search for, and follow-up questions.
 
 - [ ] **Task 2.4: Duplicate merging and calendar clash warnings**
   - **Priority:** P1
