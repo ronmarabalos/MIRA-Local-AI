@@ -81,7 +81,19 @@ describe('fake model', () => {
     const known = await model.extract(message, context);
     expect(known.type).toBe('question');
     expect(known.needs_user).toBe(true);
-    const unknown = await model.extract({ ...message, text: 'hello there friend' }, context);
+    const unknown = await model.extract(
+      { ...message, text: 'hello there friend' },
+      context,
+    );
     expect(unknown.type).toBe('other');
+  });
+
+  test('answers from the first source, naming who sent it', async () => {
+    const model = createFakeModel();
+    const answer = await model.answer('When is it due?', [
+      { message, context },
+    ]);
+    expect(answer).toContain('Maya');
+    expect(answer).toContain('Can we move the meeting?');
   });
 });

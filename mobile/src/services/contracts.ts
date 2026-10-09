@@ -63,4 +63,9 @@ export interface ModelService {
   extract(message: Message, context: MessageContext): Promise<ExtractedRecord>;
   /** Reply text of at most 60 words. */
   draftReply(message: Message, context: MessageContext): Promise<string>;
+  /**
+   * One or two sentences answering the question from these messages only.
+   * Rejects when there is no usable answer; the caller shows the sources alone.
+   */
+  answer(question: string, sources: AnswerSource[]): Promise<string>;
 }

@@ -28,5 +28,11 @@ export function createFakeModel(
     async draftReply(message) {
       return `Thanks ${message.sender}, I'll get back to you on this.`;
     },
+    async answer(_question, sources) {
+      const first = sources[0];
+      return first
+        ? `${first.message.sender} wrote: ${first.message.text} (message 1)`
+        : 'There is nothing to answer from.';
+    },
   };
 }
