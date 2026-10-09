@@ -19,7 +19,10 @@ const THREADS = 4;
 
 /** Loads one model file. The spec runs the model on the CPU, so no GPU layers. */
 export async function loadModel(path: string): Promise<{ ms: number }> {
-  await unloadModel();
+  // Always release: after a development reload this module forgets its
+  // context while the native side still holds the model in memory.
+  context = null;
+  await releaseAllLlama();
   const started = Date.now();
   context = await initLlama({
     model: toModelUri(path),
@@ -56,6 +59,9 @@ export async function complete(
       { role: 'system', content: system },
       { role: 'user', content: user },
     ],
+    // The model's own chat template. Without it the reply starts with a
+    // stray chat marker and the JSON form is not enforced.
+    jinja: true,
     n_predict: options.maxTokens ?? 200,
     temperature: 0,
     response_format: options.schema

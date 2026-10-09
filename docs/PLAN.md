@@ -125,13 +125,14 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 **Lane A**
 
-- [ ] **Task A1.1: A model answers on the phone**
-  - **Priority:** P0 · **Status:** In Progress
+- [x] **Task A1.1: A model answers on the phone**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/model/llama.ts`, a developer-only screen under `mobile/src/services/model/dev/`
   - **Do:** download one instruct model of about 1 to 2B parameters in GGUF, 4-bit (candidates to try: Qwen2.5 1.5B Instruct, Gemma 3 1B). Copy it to the phone with `adb push`. Load it with `llama.rn` and run one prompt.
   - **Done when:** the phone prints an answer and the time taken. Record the model name and seconds per message in this task. Try a 3 to 4B model only if the small one is well under 6 seconds.
   - **If it fails:** stop and rethink together (spec section 12).
-  - **State:** code written, not yet run on the phone. `mobile/src/services/model/llama.ts` loads a model and runs one request; `schema.ts` holds the spec 5.2 JSON form. To check: open the dev menu (shake, or `adb shell input keyevent 82`) → **MIRA probe**, note the folder it shows, `adb push <file>.gguf <that folder>/model.gguf`, then Load and Run sample. Record here: model name, load time, seconds per message, and whether the output parses.
+  - **Result (2026-10-10, Infinix, debug build):** Qwen2.5 1.5B Instruct, GGUF Q4_K_M (1.1 GB), CPU, 4 threads. Loads in about 4 s. One extraction takes **7.7 to 9.0 s**: about 2 s to read a 140-token prompt, then 80 to 120 output tokens at 13.5 to 14 tokens per second. Every run returned valid JSON with all nine fields. The raw output starts with a chat marker (`<|im_start|>assistant`), so replies are read with `parseJsonObject`. Field quality varied between runs (`needs_user`, `sensitive`, `amount`).
+  - **Against the 6 s target:** missed. Output length is the cost, so task A2.2 must cut it: a grammar that forbids whitespace, short keys mapped back in code, and a shorter summary should bring it to roughly 60 tokens, about 5 to 6 s. If that is not enough, try Qwen2.5 0.5B or widen the quick filter. The model file is at `~/Downloads/mira-model/` on Steve's machine and on the phone as `Android/data/com.mira.app/files/model.gguf`.
 
 - [ ] **Task A1.2: Log real notifications**
   - **Priority:** P0 · **Status:** In Progress
