@@ -9,6 +9,7 @@
 - **Sync Protocol:** [`scripts/baton.mjs`](../scripts/baton.mjs) via `npm run verify:agent`
 - **Spec:** [`docs/specs/2026-10-09-mira-design.md`](specs/2026-10-09-mira-design.md) (approved by both developers on 2026-10-10)
 - **Visual design:** [`docs/design/README.md`](design/README.md)
+- **Current Lane B execution:** [Phase 2/3 integration spec and checklist](specs/2026-10-10-phase-2-3-ui.md), authorized by Ronmar: phone checks, Connected Apps, Phase 2 matrix, and the remaining Phase 3 screens using the merged engine/runner.
 - **Lane integration (2026-10-10):** [completed merge checklist](specs/2026-10-10-merge-lanes.md); Ronmar's Today/Item Detail and Steve's latest native work are merged on local `main`. Combined typecheck and full regression pass through Baton; remote publication and phone acceptance checks remain pending.
 
 ---

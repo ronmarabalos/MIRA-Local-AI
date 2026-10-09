@@ -91,6 +91,13 @@ export const MIGRATIONS: string[][] = [
     )`,
     'CREATE INDEX actions_status_created ON actions (status, created_at)',
   ],
+  // 2: durable processing durations for Privacy proof; older items have no sample.
+  [
+    `CREATE TABLE processing_times (
+      message_id TEXT PRIMARY KEY REFERENCES messages (id) ON DELETE CASCADE,
+      duration_ms REAL NOT NULL CHECK(duration_ms >= 0)
+    )`,
+  ],
 ];
 
 /** Applies every migration newer than the database, each in one transaction. */

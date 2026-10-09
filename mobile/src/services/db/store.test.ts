@@ -69,7 +69,7 @@ describe('migrate', () => {
     const { db } = await setup();
     await migrate(db);
     const { rows } = await db.execute('PRAGMA user_version');
-    expect(Number(rows[0].user_version)).toBe(1);
+    expect(Number(rows[0].user_version)).toBe(2);
   });
 });
 

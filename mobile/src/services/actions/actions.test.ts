@@ -120,6 +120,29 @@ function setup(options: { level?: 1 | 2; rules?: Rule[] } = {}) {
 }
 
 describe('rules to actions', () => {
+  test('confirmation rechecks revoked channel permissions and logs the block', async () => {
+    const { runner, channels, bridge, actions, drafts } = setup();
+    await runner.onRecord(item());
+    channels[0].enabled = false;
+    expect(await runner.sendDraft(drafts[0].id)).toBe('needs_you');
+    expect(bridge.sentReplies).toEqual([]);
+    expect(actions.at(-1)?.status).toBe('blocked');
+  });
+
+  test('two concurrent confirmations send a draft only once', async () => {
+    const { runner, bridge, drafts } = setup();
+    await runner.onRecord(item());
+    await Promise.all([runner.sendDraft(drafts[0].id), runner.sendDraft(drafts[0].id)]);
+    expect(bridge.sentReplies).toHaveLength(1);
+  });
+
+  test('disabled channels cannot trigger automatic rules on old records', async () => {
+    const { runner, channels, bridge, drafts } = setup();
+    channels[0].enabled = false;
+    await runner.onRecord(item());
+    expect(drafts).toEqual([]);
+    expect(bridge.reminders).toEqual([]);
+  });
   test('a private question gets a draft waiting for approval, and nothing is sent', async () => {
     const { runner, bridge, actions, drafts } = setup();
     await runner.onRecord(item());
@@ -191,6 +214,23 @@ describe('sending a draft', () => {
     await context.runner.onRecord(item());
     return { ...context, draftId: context.drafts[0].id };
   }
+
+  test('concurrent reconnect events deliver a queued reply only once', async () => {
+    const { runner, bridge, draftId } = await withDraft();
+    bridge.setOnline(false);
+    await runner.sendDraft(draftId);
+    bridge.setOnline(true);
+    await Promise.all([runner.flushQueue(), runner.flushQueue()]);
+    expect(bridge.sentReplies).toHaveLength(1);
+  });
+
+  test('an attempted queue flush while offline does not send', async () => {
+    const { runner, bridge, draftId } = await withDraft();
+    bridge.setOnline(false);
+    await runner.sendDraft(draftId);
+    await runner.flushQueue();
+    expect(bridge.sentReplies).toEqual([]);
+  });
 
   test('online, the confirmed draft is sent and logged', async () => {
     const { runner, bridge, actions, drafts, draftId } = await withDraft();

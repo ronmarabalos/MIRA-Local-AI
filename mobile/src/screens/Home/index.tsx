@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Companion } from '../../components/Companion';
 import { useGo } from '../../components/nav';
 import { ReportItem } from '../../components/ReportItem';
+import { PrivacyIndicator } from '../../components/PrivacyIndicator';
 import { useStatusBar } from '../../components/Screen';
 import { SilkBackground } from '../../components/SilkBackground';
 import { TabBar } from '../../components/TabBar';
@@ -121,6 +122,7 @@ export default function HomeScreen() {
               </Tap>
             </View>
             <T className={`text-24 font-light ${sub}`}>Here’s what matters today</T>
+            <View className="flex-row flex-wrap gap-8"><PrivacyIndicator dark={dark} /><Tap label="Review drafts" onPress={() => go('Approvals')} className="min-h-48 justify-center rounded-16 bg-white/60 px-12 py-8"><T className="text-13 font-semibold text-ink-body">Review drafts</T></Tap><Tap label="Connected Apps" onPress={() => go('ConnectedApps')} className="min-h-48 justify-center rounded-16 bg-white/60 px-12 py-8"><T className="text-13 font-semibold text-ink-body">Connected Apps</T></Tap></View>
             <Glass kind={dark ? 'dark' : 'glass'} className="flex-row items-center gap-14 rounded-30 p-18">
               <Companion
                 size={48}
