@@ -36,6 +36,20 @@ export interface ActionDeps {
 
 export type SendOutcome = 'sent' | 'queued' | 'needs_you';
 
+/** What came of the user asking for a draft. */
+export type DraftRequest =
+  | { outcome: 'drafted'; draftId: string }
+  /** A draft for this message was already waiting; no second one was written. */
+  | { outcome: 'exists'; draftId: string }
+  | { outcome: 'blocked'; reason: string }
+  | { outcome: 'failed' };
+
+export const REPLIES_OFF_REASON =
+  'Replies are off for this app. Turn on “Also draft replies” in Connected Apps.';
+export const CANNOT_ANSWER_REASON = 'This message can’t be answered from MIRA.';
+export const HOSTILE_REASON =
+  'MIRA doesn’t write replies to messages like this one.';
+
 const INSTRUCTION_REASON =
   'The message tries to give instructions, so nothing was done.';
 
@@ -60,6 +74,7 @@ export function createActionRunner({
 }: ActionDeps) {
   let counter = 0;
   const sending = new Map<string, Promise<SendOutcome>>();
+  const drafting = new Map<string, Promise<DraftRequest>>();
   let flushing: Promise<void> | null = null;
   const newId = (prefix: string) =>
     `${prefix}-${now().toString(36)}-${(counter++).toString(36)}`;
@@ -302,6 +317,76 @@ export function createActionRunner({
       for (const decision of decisions) {
         await runDecision(decision, item);
       }
+    },
+
+    /**
+     * Writes a draft because the user asked for one on this message. Being
+     * asked lifts the limits on group chats and sensitive messages, which
+     * only stop automatic drafts; the app's permission level and the block on
+     * messages that give instructions still apply. The draft waits in
+     * Approvals like any other: nothing is sent here.
+     */
+    draftFor(messageId: string): Promise<DraftRequest> {
+      const active = drafting.get(messageId);
+      if (active) return active;
+      const work = (async (): Promise<DraftRequest> => {
+        const item = await store.getItem(messageId);
+        if (!item || !item.record) return { outcome: 'failed' };
+        const { message, record } = item;
+
+        const waiting = (await store.getDrafts('waiting')).find(
+          draft => draft.messageId === messageId,
+        );
+        if (waiting) return { outcome: 'exists', draftId: waiting.id };
+
+        const channel = (await store.getChannels()).find(
+          c => c.packageName === message.packageName,
+        );
+        const refusal = record.instructionLike
+          ? HOSTILE_REASON
+          : !channel?.enabled || channel.level < 2
+          ? REPLIES_OFF_REASON
+          : !message.canReply
+          ? CANNOT_ANSWER_REASON
+          : null;
+        if (refusal) {
+          await log('draft', message.id, null, 'blocked', refusal);
+          return { outcome: 'blocked', reason: refusal };
+        }
+
+        const action = await log('draft', message.id, null, 'queued', null);
+        const draftId = newId('d');
+        try {
+          const text = await model.draftReply(message, {
+            chatTitle: item.chat.title,
+            chatKind: item.chat.kind,
+          });
+          await store.addDraft({
+            id: draftId,
+            messageId: message.id,
+            text,
+            firstText: text,
+            status: 'waiting',
+          });
+          await store.updateAction(action.id, {
+            status: 'done',
+            doneAt: now(),
+          });
+          return { outcome: 'drafted', draftId };
+        } catch (error) {
+          await store.updateAction(action.id, {
+            status: 'failed',
+            reason: error instanceof Error ? error.message : String(error),
+          });
+          return { outcome: 'failed' };
+        }
+      })();
+      drafting.set(messageId, work);
+      const clear = () => {
+        if (drafting.get(messageId) === work) drafting.delete(messageId);
+      };
+      work.then(clear, clear);
+      return work;
     },
 
     /**

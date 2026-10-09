@@ -11,8 +11,10 @@ import { SourceQuote } from '../../components/SourceQuote';
 import { T } from '../../components/T';
 import { BackButton, Glass, Tap } from '../../components/ui';
 import type { RecordType } from '../../core/types';
+import { CANNOT_ANSWER_REASON } from '../../services/actions';
+import { getActionRunner } from '../../services/actions/runner';
 import { getStore } from '../../services/db';
-import { useChannels, useItem } from '../../services/db/hooks';
+import { useChannels, useDrafts, useItem } from '../../services/db/hooks';
 import { fx } from '../../theme/effects';
 
 const CATEGORIES: Record<RecordType, string> = {
@@ -49,7 +51,11 @@ function MissingMessage() {
       <T className="text-14 leading-[22px] text-ink-2">
         Choose a saved message from Today. This message may have been deleted.
       </T>
-      <Tap label="Open Today" onPress={() => go('Home')} className="min-h-48 justify-center">
+      <Tap
+        label="Open Today"
+        onPress={() => go('Home')}
+        className="min-h-48 justify-center"
+      >
         <T className="text-15 font-semibold text-navy">Open Today</T>
       </Tap>
     </Glass>
@@ -62,6 +68,31 @@ function StoredDetail({ messageId }: { messageId: string }) {
   const [choosing, setChoosing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState('');
+  const go = useGo();
+  const { data: waitingDrafts } = useDrafts('waiting');
+  const [drafting, setDrafting] = useState(false);
+  const [draftNote, setDraftNote] = useState('');
+
+  /** Asks MIRA for a reply to this message. The draft waits in Approvals; nothing is sent. */
+  async function draft() {
+    if (drafting) return;
+    setDrafting(true);
+    setDraftNote('');
+    try {
+      const result = await (await getActionRunner()).draftFor(messageId);
+      setDraftNote(
+        result.outcome === 'blocked'
+          ? result.reason
+          : result.outcome === 'failed'
+          ? 'Couldn’t write a reply. Try again.'
+          : 'Draft ready. Review it before anything is sent.',
+      );
+    } catch {
+      setDraftNote('Couldn’t write a reply. Try again.');
+    } finally {
+      setDrafting(false);
+    }
+  }
 
   async function correct(type: RecordType) {
     if (saving) return;
@@ -71,11 +102,20 @@ function StoredDetail({ messageId }: { messageId: string }) {
       const store = await getStore();
       // Read again so a correction cannot overwrite a newer extraction or recreate deleted data.
       const latest = await store.getItem(messageId);
-      if (!latest?.record || latest.message.status === 'new' || latest.message.status === 'failed') {
-        setFeedback('The message changed. Open it again before changing its category.');
+      if (
+        !latest?.record ||
+        latest.message.status === 'new' ||
+        latest.message.status === 'failed'
+      ) {
+        setFeedback(
+          'The message changed. Open it again before changing its category.',
+        );
         retry();
       } else {
-        await store.saveRecord({ ...latest.record, type }, latest.message.status);
+        await store.saveRecord(
+          { ...latest.record, type },
+          latest.message.status,
+        );
         setFeedback('Category saved');
       }
     } catch {
@@ -90,7 +130,9 @@ function StoredDetail({ messageId }: { messageId: string }) {
     return (
       <Glass className="gap-8 rounded-22 p-18" accessibilityRole="alert">
         <T className="text-18 font-semibold">Could not load this message</T>
-        <T className="text-14 text-ink-2">Try reading the saved message again.</T>
+        <T className="text-14 text-ink-2">
+          Try reading the saved message again.
+        </T>
         <Tap label="Retry" onPress={retry} className="min-h-48 justify-center">
           <T className="text-15 font-semibold text-navy">Retry</T>
         </Tap>
@@ -98,7 +140,10 @@ function StoredDetail({ messageId }: { messageId: string }) {
     );
   if (item === undefined)
     return (
-      <Glass accessibilityState={{ busy: true }} className="gap-12 rounded-22 p-18">
+      <Glass
+        accessibilityState={{ busy: true }}
+        className="gap-12 rounded-22 p-18"
+      >
         <T className="text-14 text-ink-2">Loading saved message</T>
         <View className="h-14 w-3/4 rounded-full bg-white/60" />
         <View className="h-48 rounded-14 bg-white/60" />
@@ -107,23 +152,34 @@ function StoredDetail({ messageId }: { messageId: string }) {
   if (item === null) return <MissingMessage />;
 
   const { message, record } = item;
-  const readable = record && message.status !== 'new' && message.status !== 'failed';
+  const readable =
+    record && message.status !== 'new' && message.status !== 'failed';
+  const hasDraft = (waitingDrafts ?? []).some(d => d.messageId === messageId);
   return (
     <>
       <View className="gap-6">
         <T accessibilityRole="header" className="text-24 font-semibold">
           Message from {message.sender}
         </T>
-        <T className="text-13 text-ink-2">{new Date(message.postedAt).toLocaleString()}</T>
-        <T className="text-12 text-ink-2">Saved messages are available offline.</T>
+        <T className="text-13 text-ink-2">
+          {new Date(message.postedAt).toLocaleString()}
+        </T>
+        <T className="text-12 text-ink-2">
+          Saved messages are available offline.
+        </T>
       </View>
       {readable ? (
-        <View className="gap-10 rounded-20 border border-white/80 p-16" style={fx.summary}>
+        <View
+          className="gap-10 rounded-20 border border-white/80 p-16"
+          style={fx.summary}
+        >
           <View className="flex-row items-center gap-8">
             <Companion size={24} />
             <T className="text-12 font-semibold text-navy">MIRA SUMMARY</T>
           </View>
-          <T className="text-16 leading-[24px] text-ink-deep">{record.summary}</T>
+          <T className="text-16 leading-[24px] text-ink-deep">
+            {record.summary}
+          </T>
           <T className="text-14 text-ink-2">{CATEGORIES[record.type]}</T>
           {record.dateText ? (
             <T className="text-14 text-ink-2">{`Date mentioned: ${record.dateText}`}</T>
@@ -133,16 +189,21 @@ function StoredDetail({ messageId }: { messageId: string }) {
           ) : null}
           {record.instructionLike ? (
             <T className="text-14 text-ink-2">
-              This message contains instructions aimed at an assistant. Check the original below.
+              This message contains instructions aimed at an assistant. Check
+              the original below.
             </T>
           ) : null}
         </View>
       ) : (
         <Glass className="gap-8 rounded-20 p-16">
           <T className="text-16 font-semibold">
-            {message.status === 'failed' ? "Couldn't read this message" : 'Reading this message…'}
+            {message.status === 'failed'
+              ? "Couldn't read this message"
+              : 'Reading this message…'}
           </T>
-          <T className="text-14 text-ink-2">You can still read the original below.</T>
+          <T className="text-14 text-ink-2">
+            You can still read the original below.
+          </T>
         </Glass>
       )}
       <T accessibilityRole="header" className="text-20 font-semibold">
@@ -150,9 +211,43 @@ function StoredDetail({ messageId }: { messageId: string }) {
       </T>
       <SourceQuote
         item={item}
-        appLabel={channels?.find(channel => channel.packageName === message.packageName)?.label}
+        appLabel={
+          channels?.find(channel => channel.packageName === message.packageName)
+            ?.label
+        }
         expandable
       />
+      {!readable ? null : !message.canReply ? (
+        <T className="text-14 text-ink-2">{CANNOT_ANSWER_REASON}</T>
+      ) : hasDraft ? (
+        <Tap
+          label="Review draft"
+          onPress={() => go('Approvals')}
+          className="h-52 items-center justify-center rounded-16 bg-navy"
+        >
+          <T className="text-15 font-bold text-white">Review draft</T>
+        </Tap>
+      ) : (
+        <Tap
+          label="Draft a reply"
+          disabled={drafting}
+          accessibilityState={{ disabled: drafting, busy: drafting }}
+          onPress={draft}
+          className={`h-52 flex-row items-center justify-center gap-8 rounded-16 bg-navy ${
+            drafting ? 'opacity-70' : ''
+          }`}
+        >
+          {drafting ? <Companion size={24} mode="thinking" /> : null}
+          <T className="text-15 font-bold text-white">
+            {drafting ? 'Writing a reply…' : 'Draft a reply'}
+          </T>
+        </Tap>
+      )}
+      {draftNote ? (
+        <T accessibilityLiveRegion="polite" className="text-14 text-ink-2">
+          {draftNote}
+        </T>
+      ) : null}
       {readable ? (
         <Tap
           label="Change category"
@@ -161,7 +256,9 @@ function StoredDetail({ messageId }: { messageId: string }) {
           onPress={() => setChoosing(true)}
           className="min-h-48 justify-center"
         >
-          <T className="text-15 font-semibold text-navy">{saving ? 'Saving category…' : 'Change category'}</T>
+          <T className="text-15 font-semibold text-navy">
+            {saving ? 'Saving category…' : 'Change category'}
+          </T>
         </Tap>
       ) : null}
       {feedback ? (
@@ -169,9 +266,16 @@ function StoredDetail({ messageId }: { messageId: string }) {
           {feedback}
         </T>
       ) : null}
-      <Sheet visible={choosing} onClose={() => !saving && setChoosing(false)} label="Change category">
+      <Sheet
+        visible={choosing}
+        onClose={() => !saving && setChoosing(false)}
+        label="Change category"
+      >
         <T className="text-20 font-semibold">Change category</T>
-        <ScrollView className="max-h-360" contentContainerStyle={styles.categories}>
+        <ScrollView
+          className="max-h-360"
+          contentContainerStyle={styles.categories}
+        >
           {(Object.keys(CATEGORIES) as RecordType[]).map(type => (
             <Tap
               key={type}

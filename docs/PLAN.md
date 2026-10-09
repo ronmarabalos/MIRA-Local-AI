@@ -316,6 +316,7 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Do:** build to board `15-approval-center`. Each draft shows the original message, the draft (editable), and why it was prepared. Send needs a tap and then a confirmation dialog (safety requirement 2).
   - **Done when:** approving a draft calls `sendReply` and the action log records it.
   - **State (2026-10-10):** Approvals shows the source and reason, persists edits, requires individual confirmation, supports discard, and reports queued or retryable outcomes. Baton tests verify cancel never sends, confirmed send is logged, and duplicate confirmation cannot send twice.
+  - **Draft on request (2026-10-10, Steve):** the message detail screen has a **Draft a reply** button. `runner.draftFor(messageId)` writes a draft that waits in Approvals and logs it with no rule. Asking lifts the group-chat and sensitive-message limits, which only stop automatic drafts; it is still refused when the app is set to read and report only, when the message cannot be answered from its notification, or when the message tries to give instructions. A message with a waiting draft shows **Review draft** and gets no second one. Nothing is sent from here.
 
 - [x] **Task B3.5: Privacy proof**
   - **Priority:** P0 · **Status:** Done

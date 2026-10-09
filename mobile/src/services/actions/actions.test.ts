@@ -54,7 +54,14 @@ const item = (change: Partial<MiraRecord> = {}): StoredItem => ({
   record: { ...record, ...change },
 });
 
-function setup(options: { level?: 1 | 2; rules?: Rule[] } = {}) {
+function setup(
+  options: {
+    level?: 1 | 2;
+    rules?: Rule[];
+    item?: StoredItem | null;
+    draftReply?: () => Promise<string>;
+  } = {},
+) {
   const actions: Action[] = [];
   const drafts: Draft[] = [];
   const channels: Channel[] = [
@@ -92,7 +99,7 @@ function setup(options: { level?: 1 | 2; rules?: Rule[] } = {}) {
       if (draft) Object.assign(draft, change);
     },
     getDrafts: async status => drafts.filter(d => d.status === status),
-    getItem: async () => item(),
+    getItem: async () => (options.item === undefined ? item() : options.item),
   };
   const bridge = createFakeBridge([
     {
@@ -112,7 +119,9 @@ function setup(options: { level?: 1 | 2; rules?: Rule[] } = {}) {
   ]);
   const runner = createActionRunner({
     bridge,
-    model: createFakeModel(),
+    model: options.draftReply
+      ? { draftReply: options.draftReply }
+      : createFakeModel(),
     store,
     now: () => NOW,
   });
@@ -320,5 +329,109 @@ describe('taking back what a repeated message caused', () => {
     await runner.retract('m1', 'the-original');
     expect(drafts[0].status).toBe('sent');
     expect(actions.find(a => a.kind === 'send')?.status).toBe('done');
+  });
+});
+
+describe('drafting a reply because the user asked', () => {
+  // No rule is switched on: these drafts come from the request alone.
+  const asked = (options: Parameters<typeof setup>[0] = {}) =>
+    setup({ rules: BUILTIN_RULES, ...options });
+
+  test('writes a draft that waits for approval, logs it with no rule, and sends nothing', async () => {
+    const { runner, bridge, actions, drafts } = asked();
+    const result = await runner.draftFor('m1');
+    expect(result).toEqual({ outcome: 'drafted', draftId: drafts[0].id });
+    expect(drafts[0]).toMatchObject({ messageId: 'm1', status: 'waiting' });
+    expect(actions).toMatchObject([
+      { kind: 'draft', ruleId: null, status: 'done' },
+    ]);
+    expect(bridge.sentReplies).toEqual([]);
+  });
+
+  test('a group chat and a sensitive message get a draft when asked', async () => {
+    const group = {
+      ...item({ sensitive: true }),
+      chat: { ...chat, kind: 'group' as const },
+    };
+    const { runner, drafts } = asked({ item: group });
+    expect((await runner.draftFor('m1')).outcome).toBe('drafted');
+    expect(drafts).toHaveLength(1);
+  });
+
+  test('asking again while a draft is waiting returns that draft and writes no second one', async () => {
+    const { runner, drafts, actions } = asked();
+    const first = await runner.draftFor('m1');
+    const again = await runner.draftFor('m1');
+    expect(again).toEqual({ outcome: 'exists', draftId: drafts[0].id });
+    expect(first.outcome).toBe('drafted');
+    expect(drafts).toHaveLength(1);
+    expect(actions).toHaveLength(1);
+  });
+
+  test('two taps at once still write one draft', async () => {
+    const { runner, drafts } = asked();
+    const [a, b] = await Promise.all([
+      runner.draftFor('m1'),
+      runner.draftFor('m1'),
+    ]);
+    expect(drafts).toHaveLength(1);
+    expect([a.outcome, b.outcome].sort()).toEqual(['drafted', 'drafted']);
+  });
+
+  test('an app set to read and report only is refused, with the way to change it', async () => {
+    const { runner, drafts, actions } = asked({ level: 1 });
+    const result = await runner.draftFor('m1');
+    expect(result.outcome).toBe('blocked');
+    expect(result.outcome === 'blocked' && result.reason).toMatch(
+      /Connected Apps/,
+    );
+    expect(drafts).toEqual([]);
+    expect(actions[0]).toMatchObject({
+      kind: 'draft',
+      status: 'blocked',
+      ruleId: null,
+    });
+  });
+
+  test('a message that cannot be answered from its notification is refused', async () => {
+    const email = { ...item(), message: { ...message, canReply: false } };
+    const { runner, drafts } = asked({ item: email });
+    const result = await runner.draftFor('m1');
+    expect(result.outcome === 'blocked' && result.reason).toMatch(
+      /can.t be answered/,
+    );
+    expect(drafts).toEqual([]);
+  });
+
+  test('a message that tries to give MIRA orders is refused, even on request', async () => {
+    const draftReply = jest.fn(async () => 'x');
+    const { runner, drafts } = asked({
+      item: item({ instructionLike: true }),
+      draftReply,
+    });
+    const result = await runner.draftFor('m1');
+    expect(result.outcome === 'blocked' && result.reason).toMatch(
+      /messages like this/,
+    );
+    expect(draftReply).not.toHaveBeenCalled();
+    expect(drafts).toEqual([]);
+  });
+
+  test('a message that is gone or not read yet cannot be drafted for', async () => {
+    const missing = asked({ item: null });
+    expect((await missing.runner.draftFor('m1')).outcome).toBe('failed');
+    const unread = asked({ item: { message, chat, record: null } });
+    expect((await unread.runner.draftFor('m1')).outcome).toBe('failed');
+  });
+
+  test('when the reply cannot be written, the request fails and the log says so', async () => {
+    const { runner, drafts, actions } = asked({
+      draftReply: async () => {
+        throw new Error('The model did not write a usable reply.');
+      },
+    });
+    expect(await runner.draftFor('m1')).toEqual({ outcome: 'failed' });
+    expect(drafts).toEqual([]);
+    expect(actions[0]).toMatchObject({ kind: 'draft', status: 'failed' });
   });
 });
