@@ -364,4 +364,58 @@ describe('intake', () => {
     expect(records.get('old-2')?.duplicateOf).toBe('old-1');
     expect(messages.size).toBe(2);
   });
+
+  test('a copy linked earlier is reported again, so its old draft or reminder can be taken back', async () => {
+    const { store } = memoryStore();
+    const now = Date.now();
+    const [first] = splitNotification(fixture('proposal-due'));
+    const base = {
+      type: 'deadline' as const,
+      summary: 'Proposal due.',
+      needsUser: true,
+      urgency: 'normal' as const,
+      request: null,
+      amount: null,
+      dateText: null,
+      dateAt: null,
+      sensitive: false,
+      instructionLike: false,
+    };
+    const original = {
+      ...first.message,
+      id: 'o',
+      postedAt: now - 120_000,
+      status: 'processed' as const,
+    };
+    const copy = {
+      ...first.message,
+      id: 'c',
+      postedAt: now - 60_000,
+      status: 'processed' as const,
+    };
+    await store.addMessage(original, first.chat);
+    await store.saveRecord(
+      { ...base, messageId: 'o', duplicateOf: null },
+      'processed',
+    );
+    await store.addMessage(copy, first.chat);
+    await store.saveRecord(
+      { ...base, messageId: 'c', duplicateOf: 'o' },
+      'processed',
+    );
+
+    const onDuplicateLinked = jest.fn(
+      async (_copy: string, _original: string) => {},
+    );
+    const intake = createIntake({
+      bridge: createFakeBridge(),
+      model: createFakeModel(),
+      store,
+      onDuplicateLinked,
+    });
+    await intake.drain();
+    await intake.drain();
+    expect(onDuplicateLinked).toHaveBeenCalledTimes(1);
+    expect(onDuplicateLinked).toHaveBeenCalledWith('c', 'o');
+  });
 });
