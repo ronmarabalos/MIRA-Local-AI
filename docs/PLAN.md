@@ -350,6 +350,8 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
       4. Connected Apps lists every installed app alphabetically, so Messenger is far down; switched-on and message apps should come first.
       5. Privacy proof shows "Average processing time: no timed messages yet" with 48 messages processed; either record the time or drop the line.
     - **Not yet walked:** Automations, Activity, sending a reply from Approvals, and the airplane-mode step. Screens with a moving companion cannot be read by the automation helper, so these need a person or screenshots.
+  - **Second pass (2026-10-10, `main` at a80a22e):** the five items above are fixed by Steve: the app opens on Today once notification access is granted and an app is switched on (`services/firstRun.ts`); the setup step shows whether the model file is on the phone and no longer mentions a download or Wi-Fi; draft buttons read "Send reply" and "Discard draft"; Connected Apps lists switched-on and message apps first; the empty timing line is hidden. Ronmar's new onboarding replaced the "personal AI" wording. Confirmed on the phone: the app opens on Today.
+  - **New finding for Lane B:** the Inbox tab still shows the design's sample mailbox (Maya Chen, Priya Nair, "Demo mailbox · Synced 8:45 AM"). It is labelled Demo, but it is not the user's messages; avoid the tab in the demo or connect it.
 
 **Lane B**
 
