@@ -25,5 +25,8 @@
     "hackathon"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "expo": "^57.0.27"
+  }
 }

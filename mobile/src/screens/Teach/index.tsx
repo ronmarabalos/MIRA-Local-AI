@@ -1,18 +1,20 @@
+/** Board 07-teach-mira: the helpers MIRA can switch on. */
+import { View } from 'react-native';
+
+import { RulesPanel } from '../../components/RulesPanel';
 import { Screen } from '../../components/Screen';
 import { T } from '../../components/T';
-import { SecondaryButton } from '../../components/ui';
-import { RulesPanel } from '../../components/RulesPanel';
-import { useGo } from '../../components/nav';
-export default function RulesScreen() {
-  const go = useGo();
+
+export default function TeachScreen() {
   return (
     <Screen tab="Teach">
-      <T accessibilityRole="header" className="text-30 font-medium">
-        Teach MIRA
-      </T>
-      <RulesPanel />
-      <SecondaryButton label="View activity" onPress={() => go('Activity')} />
-      <SecondaryButton label="Review drafts" onPress={() => go('Approvals')} />
+      <View className="gap-4">
+        <T accessibilityRole="header" className="text-30 font-medium tracking-[-0.9px]">
+          Teach MIRA
+        </T>
+        <T className="text-15 text-ink-2">Choose what MIRA does for you.</T>
+      </View>
+      <RulesPanel summary />
     </Screen>
   );
 }

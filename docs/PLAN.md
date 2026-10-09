@@ -309,6 +309,7 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Do:** build to board `12-my-automations`. The three built-in rules as switches, each with a plain-words description and a preview count of past messages it would have matched.
   - **Done when:** switching a rule on changes what the engine decides for the next message.
   - **State (2026-10-10):** the live Rules views show the three built-ins, persisted switches, descriptions, and side-effect-free preview counts. Baton tests verify persistence and subsequent decision behavior.
+  - **Simpler Teach page (2026-10-10, Ronmar):** less text, laid out like board 07. A summary card with the companion and "N of 3 helpers on"; each rule is one row with an icon, a short title ("Due date reminders", "Reply drafts", "Urgent alerts"), one line of description, its match count, and a switch; the safety promise in one line; Drafts and Activity as two tiles. "Daily limit" and the preview disclaimer are gone. Automations and Review rules share the panel. Not yet checked on the phone.
 
 - [x] **Task B3.4: Approvals**
   - **Priority:** P0 · **Status:** Done

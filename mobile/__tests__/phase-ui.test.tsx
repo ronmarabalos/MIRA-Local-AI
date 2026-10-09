@@ -167,7 +167,7 @@ test('Connected Apps exposes a failed save and retry without a false success', a
 });
 test('rules show real preview counts and switching on persists', async () => {
   await render(Automations);
-  expect(output()).toContain('1 stored message');
+  expect(output()).toContain('Matches 1 recent message');
   await press(
     'Enable Draft replies to questions in private chats, for me to approve.',
   );
