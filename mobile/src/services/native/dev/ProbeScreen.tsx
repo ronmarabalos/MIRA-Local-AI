@@ -13,8 +13,10 @@ import {
   View,
 } from 'react-native';
 
-import type { CapturedNotification } from '../../../core/types';
+import { FIXTURES, fixtureText } from '../../../core/__fixtures__/messages';
+import type { CapturedNotification, Message } from '../../../core/types';
 import type { ProofFacts } from '../../contracts';
+import { bridge, model } from '../../index';
 import { complete, loadModel } from '../../model/llama';
 import { parseJsonObject, RECORD_SCHEMA } from '../../model/schema';
 import { MiraModule } from '../miraModule';
@@ -99,6 +101,97 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
     }
   };
 
+  /** Spec 10.2: every fixture that should reach the model, with accuracy and time. */
+  const runFixtures = async (limit?: number) => {
+    const cases = FIXTURES.filter(f => f.route === 'model' && f.expected).slice(
+      0,
+      limit,
+    );
+    let rightType = 0;
+    let failed = 0;
+    let totalMs = 0;
+    let slowest = 0;
+    const wrong: string[] = [];
+    say(`Running ${cases.length} fixtures…`);
+    for (const [index, fixture] of cases.entries()) {
+      const n = fixture.notification;
+      const message: Message = {
+        id: fixture.id,
+        notificationKey: n.key,
+        packageName: n.packageName,
+        chatId: fixture.id,
+        sender: n.messages[0]?.sender ?? n.title ?? '',
+        text: fixtureText(fixture),
+        postedAt: n.postedAt,
+        truncated: false,
+        canReply: n.canReply,
+        status: 'new',
+      };
+      const started = Date.now();
+      try {
+        const record = await model.extract(message, {
+          chatTitle: n.conversationTitle ?? n.title ?? '',
+          chatKind: n.isGroup ? 'group' : 'private',
+        });
+        if (record.type === fixture.expected?.type) {
+          rightType += 1;
+        } else {
+          wrong.push(
+            `${fixture.id}: ${record.type}, expected ${
+              fixture.expected?.type
+            } | ${record.summary.slice(0, 60)}`,
+          );
+        }
+      } catch {
+        failed += 1;
+        wrong.push(`${fixture.id}: could not be read`);
+      }
+      const ms = Date.now() - started;
+      totalMs += ms;
+      slowest = Math.max(slowest, ms);
+      if ((index + 1) % 5 === 0) {
+        say(`${index + 1} of ${cases.length}…`);
+      }
+    }
+    say(
+      `FIXTURES DONE: type right ${rightType} of ${cases.length} ` +
+        `(${Math.round(
+          (100 * rightType) / cases.length,
+        )}%), unreadable ${failed}, ` +
+        `average ${(totalMs / cases.length / 1000).toFixed(1)} s, slowest ${(
+          slowest / 1000
+        ).toFixed(1)} s\n` +
+        wrong.join('\n'),
+    );
+  };
+
+  const switchOnProbeApps = async () => {
+    await MiraModule.setEnabledPackages([
+      'com.facebook.orca',
+      'com.google.android.gm',
+    ]);
+    say('Messenger and Gmail are switched on for capture.');
+  };
+
+  const drainInbox = async () => {
+    const drained = await bridge.drainInbox();
+    say(
+      `Inbox handed over ${drained.length}: ` +
+        drained
+          .map(n => `${n.packageName} (${n.messages.length} messages)`)
+          .join(', '),
+    );
+  };
+
+  const injectFixtures = () => {
+    if ('inject' in bridge) {
+      (bridge as { inject(n: CapturedNotification[]): void }).inject(
+        FIXTURES.map(f => f.notification),
+      );
+      say(`Injected ${FIXTURES.length} fixture notifications.`);
+    }
+  };
+
   const reply = async (key: string) => {
     const result = await MiraModule.sendReply(key, 'Test reply from MIRA');
     setReplyLog(lines => [...lines, `${key.slice(0, 40)}: ${result}`]);
@@ -127,6 +220,11 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
         <Button label="Load" onPress={load} />
         <Button label="Run sample" onPress={run} />
       </View>
+      <View style={styles.row}>
+        <Button label="Run fixtures" onPress={() => runFixtures()} />
+        <Button label="Run 6" onPress={() => runFixtures(6)} />
+        <Button label="Inject fixtures" onPress={injectFixtures} />
+      </View>
       {modelLog.map((line, index) => (
         <Text key={index} style={styles.mono}>
           {line}
@@ -145,6 +243,13 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
           onPress={() => MiraModule.openListenerSettings()}
         />
         <Button label="Refresh" onPress={refresh} />
+      </View>
+      <View style={styles.row}>
+        <Button
+          label="Switch on Messenger + Gmail"
+          onPress={switchOnProbeApps}
+        />
+        <Button label="Drain inbox" onPress={drainInbox} />
       </View>
       {notifications.map(n => (
         <View key={n.key} style={styles.card}>

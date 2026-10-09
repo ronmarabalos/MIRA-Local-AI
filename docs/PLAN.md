@@ -186,22 +186,28 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 **Lane A**
 
 - [ ] **Task A2.1: Listener to app**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `notifications/MiraNotificationListener.kt`, `notifications/NativeInbox.kt`, `MiraModule.kt`, `MiraPackage.kt`, `mobile/src/services/native/bridge.ts`
   - **Do:** drop notifications from switched-off apps before anything is stored (safety requirement 1). Store the rest in the native inbox and emit an event. Bridge methods: `isListenerEnabled`, `openListenerSettings`, `setEnabledPackages`, `listNotifyingApps`, `drainInbox`, `isOnline`.
   - **Done when:** `bridge.ts` implements `NativeBridge`, and a Messenger message arrives in JavaScript as a `CapturedNotification`.
+  - **State (2026-10-10):** built and installed on the Infinix. `NativeInbox.kt` keeps captured notifications on disk until JavaScript drains them; `EnabledPackages.kt` holds the switched-on apps (none by default, so nothing is captured until Channels or the probe switches some on); the module emits `MiraNotification` and `MiraOnline`; `bridge.ts` implements `NativeBridge` (`scheduleReminder` rejects until A3.2). It also has `inject()` for feeding fixtures on an emulator. **Still to confirm on the phone:** a real message arriving through the inbox (probe: Switch on Messenger + Gmail, send a message, Drain inbox).
 
 - [ ] **Task A2.2: Extraction**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `mobile/src/services/model/prompts.ts`, `mobile/src/services/model/index.ts`
   - **Do:** `extract(message)` returning a `MiraRecord`, output constrained to the spec 5.2 JSON form, the message inside a marked data block. One request at a time.
   - **Done when:** the fixture set runs on the phone from the developer screen; record accuracy, parse failures, and seconds per message here. Target: correct type on 85% or more, 6 seconds or less.
+  - **State (2026-10-10, Infinix, Qwen2.5 1.5B, 24 fixtures):** the model answers with one-letter keys under a grammar with no whitespace (`prompts.ts`), expanded back to the spec form and checked by `parseExtraction`. **Unreadable answers: 0 of 24** in every run, so the output constraint holds. **Speed: 6.1 to 7.1 s average** (the first message is 13 to 25 s because it also loads the model and reads the instructions). **Type right: 12 of 24 (50%)**, against a target of 85%. Summaries were accurate in every case read.
+  - **Where the type goes wrong:** neighbouring labels (question read as request, a cancelled class read as announcement, a greeting read as announcement) and the three hostile messages, which get an ordinary type. A first prompt with the type before the summary labelled everything `schedule_change`; putting the summary first and adding definitions and examples took it from 17% to 50%.
+  - **Open decision:** accept this with code backstops (the verifier already flags instruction-like and sensitive messages from their own words, and the quick filter catches promotions and short chatter), tune the prompt further, or try a larger model at roughly twice the time per message.
+  - **Build note:** `babel.config.js` needs `@babel/plugin-transform-export-namespace-from` for `chrono-node`; without it the app bundle fails and the phone silently keeps running its last good copy.
 
-- [ ] **Task A2.3: Switch to the real services**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task A2.3: Switch to the real services**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/index.ts`
   - **Do:** export the real bridge and model on a device; keep the fakes for tests.
   - **Done when:** the Phase 2 exit check passes.
+  - **State (2026-10-10):** `services/index.ts` uses the real bridge and the on-phone model whenever the native module exists, and the fakes under Jest. With no model file on the device the model falls back to the fake.
 
 **Lane B**
 

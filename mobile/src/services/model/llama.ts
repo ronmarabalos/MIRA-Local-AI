@@ -44,11 +44,11 @@ export function isModelLoaded(): boolean {
   return context !== null;
 }
 
-/** One request. With a schema, the output is constrained to that JSON form. */
+/** One request. A grammar or a schema constrains the output to that form. */
 export async function complete(
   system: string,
   user: string,
-  options: { schema?: object; maxTokens?: number } = {},
+  options: { schema?: object; grammar?: string; maxTokens?: number } = {},
 ): Promise<Completion> {
   if (!context) {
     throw new Error('No model is loaded.');
@@ -64,12 +64,16 @@ export async function complete(
     jinja: true,
     n_predict: options.maxTokens ?? 200,
     temperature: 0,
-    response_format: options.schema
+    ...(options.grammar
+      ? { grammar: options.grammar }
+      : options.schema
       ? {
-          type: 'json_schema',
-          json_schema: { strict: true, schema: options.schema },
+          response_format: {
+            type: 'json_schema' as const,
+            json_schema: { strict: true, schema: options.schema },
+          },
         }
-      : { type: 'text' },
+      : {}),
   });
   return {
     // `text` is the raw output and can carry the chat template's opening

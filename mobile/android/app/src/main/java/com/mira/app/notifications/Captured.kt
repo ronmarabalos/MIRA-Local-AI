@@ -5,6 +5,8 @@ import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
+import org.json.JSONArray
+import org.json.JSONObject
 
 /** One message inside a notification that uses Android's messaging style. */
 data class CapturedMessage(val sender: String, val text: String, val time: Long)
@@ -24,6 +26,32 @@ data class Captured(
     val isOngoing: Boolean,
     val canReply: Boolean,
 ) {
+  /** The same fields as [toMap], as JSON text for the inbox. */
+  fun toJson(): String {
+    val list = JSONArray()
+    for (message in messages) {
+      list.put(
+          JSONObject()
+              .put("sender", message.sender)
+              .put("text", message.text)
+              .put("time", message.time))
+    }
+    return JSONObject()
+        .put("key", key)
+        .put("packageName", packageName)
+        .put("postedAt", postedAt)
+        .put("title", title ?: JSONObject.NULL)
+        .put("text", text ?: JSONObject.NULL)
+        .put("bigText", bigText ?: JSONObject.NULL)
+        .put("conversationTitle", conversationTitle ?: JSONObject.NULL)
+        .put("isGroup", isGroup)
+        .put("messages", list)
+        .put("category", category ?: JSONObject.NULL)
+        .put("isOngoing", isOngoing)
+        .put("canReply", canReply)
+        .toString()
+  }
+
   fun toMap(): WritableMap {
     val map = Arguments.createMap()
     map.putString("key", key)
