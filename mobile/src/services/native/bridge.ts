@@ -1,4 +1,4 @@
-import { DeviceEventEmitter } from 'react-native';
+import { DeviceEventEmitter, PermissionsAndroid, Platform } from 'react-native';
 
 import type { CapturedNotification } from '../../core/types';
 import type { NativeBridge } from '../contracts';
@@ -51,7 +51,18 @@ export function createNativeBridge(
       };
     },
     sendReply: (key, text) => native.sendReply(key, text),
-    scheduleReminder: (title, at) => native.scheduleReminder(title, at),
+    async scheduleReminder(title, at) {
+      // Android 13 and later ask the user before an app may post notifications.
+      if (Platform.OS === 'android' && Number(Platform.Version) >= 33) {
+        const answer = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+        );
+        if (answer !== PermissionsAndroid.RESULTS.GRANTED) {
+          throw new Error('Reminders need permission to show notifications.');
+        }
+      }
+      await native.scheduleReminder(title, at);
+    },
     isOnline: () => native.isOnline(),
     onOnlineChange(listener) {
       const subscription = events.addListener(EVENT_ONLINE, listener);

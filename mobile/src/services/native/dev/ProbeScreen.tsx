@@ -195,6 +195,49 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
     );
   };
 
+  const remindInOneMinute = async () => {
+    try {
+      await bridge.scheduleReminder(
+        'Test reminder from MIRA',
+        Date.now() + 60_000,
+      );
+      say('Reminder set for one minute from now.');
+    } catch (error) {
+      fail(error);
+    }
+  };
+
+  const draftFor = async (n: CapturedNotification) => {
+    const last = n.messages[n.messages.length - 1];
+    const started = Date.now();
+    try {
+      const text = await model.draftReply(
+        {
+          id: n.key,
+          notificationKey: n.key,
+          packageName: n.packageName,
+          chatId: n.key,
+          sender: last?.sender ?? n.title ?? '',
+          text: last?.text ?? n.bigText ?? n.text ?? '',
+          postedAt: n.postedAt,
+          truncated: false,
+          canReply: n.canReply,
+          status: 'new',
+        },
+        {
+          chatTitle: n.conversationTitle ?? n.title ?? '',
+          chatKind: n.isGroup ? 'group' : 'private',
+        },
+      );
+      setReplyLog(lines => [
+        ...lines,
+        `Draft in ${((Date.now() - started) / 1000).toFixed(1)} s: ${text}`,
+      ]);
+    } catch (error) {
+      setReplyLog(lines => [...lines, `Draft failed: ${String(error)}`]);
+    }
+  };
+
   const injectFixtures = () => {
     if ('inject' in bridge) {
       (bridge as { inject(n: CapturedNotification[]): void }).inject(
@@ -262,6 +305,7 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
           onPress={switchOnProbeApps}
         />
         <Button label="Show stored" onPress={showStored} />
+        <Button label="Remind in 1 min" onPress={remindInOneMinute} />
       </View>
       {notifications.map(n => (
         <View key={n.key} style={styles.card}>
@@ -276,6 +320,7 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
           {n.canReply ? (
             <Button label="Send test reply" onPress={() => reply(n.key)} />
           ) : null}
+          <Button label="Draft a reply" onPress={() => draftFor(n)} />
         </View>
       ))}
       {replyLog.map((line, index) => (
