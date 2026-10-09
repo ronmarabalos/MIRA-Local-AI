@@ -366,7 +366,7 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 No new features after T+9:00. Fixes only.
 
 - [ ] **Task A5.1: Release build on the phone.** Priority: P0. Status: Backlog. Lane A. Install the final release build, with the model file in place. Done when the app starts from cold and passes Privacy proof.
-- [ ] **Task B5.1: Demo messages and script.** Priority: P0. Status: Backlog. Lane B. Write the exact messages to send, in order, in `docs/demo-script.md`, including the hostile message. Done when a third person could run the demo from the file.
+- [ ] **Task B5.1: Demo messages and script.** Priority: P0. Status: In Progress. Lane B. Write the exact messages to send, in order, in `docs/demo-script.md`, including the hostile message. Done when a third person could run the demo from the file. **State (2026-10-10):** first version written by Steve at [`docs/demo-script.md`](demo-script.md): setup checklist, the exact messages in order with the expected result of each, what to say at each step, and fixes for common problems. It names the design's screens (Home, Connected apps, Automations, Approvals, Activity, Settings); update it as those screens land, and after the first full rehearsal.
 - [ ] **Task 5.2: Rehearse three times and record a backup.** Priority: P0. Status: Backlog. Both. Done when three full runs pass on the phone and a screen recording of one is saved.
 
 ---
