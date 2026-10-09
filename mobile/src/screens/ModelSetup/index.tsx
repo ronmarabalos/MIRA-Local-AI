@@ -1,7 +1,7 @@
 /**
- * Board 04-ai-model-setup. Shows whether MIRA's file is on this phone and adds
- * it from a file the user already has (downloaded in their browser). MIRA
- * itself never goes online.
+ * Board 04-ai-model-setup. Shows whether MIRA's file is on this phone, and
+ * downloads it with one tap (the only use of the internet), or adds a copy
+ * the user already has. After that MIRA works with no connection.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
@@ -13,16 +13,24 @@ import { useGo } from '../../components/nav';
 import { Screen } from '../../components/Screen';
 import { Steps } from '../../components/Steps';
 import { T } from '../../components/T';
-import { BackButton, Glass, PrimaryButton, Rows, SecondaryButton } from '../../components/ui';
+import { BackButton, Glass, PrimaryButton, Rows, SecondaryButton, Tap } from '../../components/ui';
 import { isModelOnPhone } from '../../services/firstRun';
-import { type ImportProgress, importModelFile } from '../../services/model/importFile';
+import {
+  cancelModelDownload,
+  downloadModelFile,
+  type ImportProgress,
+  importModelFile,
+  MODEL_BYTES,
+  partialDownloadBytes,
+} from '../../services/model/importFile';
 import { fx } from '../../theme/effects';
 import palette from '../../theme/palette';
 
-type Phase = 'idle' | 'copying' | 'ready';
+type Phase = 'idle' | 'downloading' | 'copying' | 'ready';
 
 const STATUS: Record<Phase, { label: string; fg: string; bg: string }> = {
   idle: { label: 'Not on this phone yet', fg: palette.ink.label, bg: 'rgba(255,255,255,0.6)' },
+  downloading: { label: 'Downloading to this phone…', fg: palette.navy.DEFAULT, bg: palette.peri.tonal },
   copying: { label: 'Adding to this phone…', fg: palette.navy.DEFAULT, bg: palette.peri.tonal },
   ready: { label: 'On this phone · ready offline', fg: palette.success.ink, bg: palette.success.bg },
 };
@@ -33,6 +41,9 @@ const IMPORT_ERRORS: Record<string, string> = {
   no_space: 'Not enough free space. Free up about 1.3 GB and try again.',
   unreadable: 'That file couldn’t be opened. Try picking it again.',
   no_picker: 'This phone has no file picker. Copy the file over USB instead.',
+  no_connection: 'The download stopped. Check your connection, then tap Resume.',
+  corrupt: 'The download was damaged, so it was deleted. Try again.',
+  no_storage: 'Phone storage isn’t available right now. Try again.',
 };
 
 const gb = (bytes: number) => (bytes / 1024 ** 3).toFixed(2);
@@ -59,32 +70,47 @@ export default function ModelSetupScreen() {
     [],
   );
 
-  // MIRA never goes online: the file is downloaded in the browser (or copied
-  // over USB) and picked here.
+  // Bytes an unfinished download left, so it can resume instead of starting over.
+  const [partial, setPartial] = useState(0);
   const check = useCallback(() => {
     isModelOnPhone().then(
       present => live.current && setPhase(present ? 'ready' : 'idle'),
       () => live.current && setPhase('idle'),
     );
+    partialDownloadBytes().then(bytes => live.current && setPartial(bytes));
   }, []);
   useEffect(check, [check]);
 
-  const choose = async () => {
+  /** Runs a download or an import, sharing progress, errors, and the way back. */
+  const run = async (
+    kind: 'downloading' | 'copying',
+    work: (onProgress: (p: ImportProgress) => void) => Promise<string>,
+  ) => {
     const before = phase;
     setProblem('');
     setProgress(null);
-    setPhase('copying');
+    setPhase(kind);
     try {
-      const result = await importModelFile(p => live.current && setProgress(p));
+      const result = await work(p => live.current && setProgress(p));
       if (!live.current) return;
-      setPhase(result === 'imported' ? 'ready' : before);
+      if (result === 'imported' || result === 'downloaded') {
+        setPartial(0);
+        setPhase('ready');
+      } else {
+        setPhase(before);
+      }
     } catch (error) {
       if (!live.current) return;
       const code = (error as { code?: string }).code ?? '';
-      setProblem(IMPORT_ERRORS[code] ?? 'The file couldn’t be added. Try again.');
+      setProblem(IMPORT_ERRORS[code] ?? 'That didn’t work. Try again.');
       setPhase(before);
     }
+    if (kind === 'downloading') {
+      partialDownloadBytes().then(bytes => live.current && setPartial(bytes));
+    }
   };
+  const download = () => run('downloading', downloadModelFile);
+  const choose = () => run('copying', importModelFile);
 
   const percent =
     progress && progress.total > 0 ? Math.min(100, Math.round((progress.copied / progress.total) * 100)) : null;
@@ -140,23 +166,25 @@ export default function ModelSetupScreen() {
           <Fact label="Internet needed">
             <View className="flex-row items-center gap-6">
               <Icon name="check" size={16} strokeWidth={2.4} color={palette.success.ink} />
-              <T className="text-14 font-bold text-success-ink">Never</T>
+              <T className="text-14 font-bold text-success-ink">Only to download it</T>
             </View>
           </Fact>
         </Rows>
       </Glass>
 
-      {phase === 'copying' ? (
+      {phase === 'copying' || phase === 'downloading' ? (
         <View accessibilityLiveRegion="polite" className="gap-8">
           <View className="h-8 overflow-hidden rounded-full bg-peri-tonal">
             <View className="h-8 rounded-full bg-navy" style={{ width: `${percent ?? 5}%` }} />
           </View>
           <T className="text-13 font-semibold text-ink-2">
             {progress === null
-              ? 'Pick the file in the list that opened…'
-              : percent === null
-              ? `Adding… ${gb(progress.copied)} GB`
-              : `Adding… ${percent}% · ${gb(progress.copied)} of ${gb(progress.total)} GB`}
+              ? phase === 'downloading'
+                ? 'Connecting…'
+                : 'Pick the file in the list that opened…'
+              : `${phase === 'downloading' ? 'Downloading' : 'Adding'}… ${
+                  percent === null ? '' : `${percent}% · `
+                }${gb(progress.copied)}${percent === null ? '' : ` of ${gb(progress.total)}`} GB`}
           </T>
         </View>
       ) : null}
@@ -174,8 +202,10 @@ export default function ModelSetupScreen() {
         </View>
         <T className="flex-1 text-13 leading-[18.85px] text-warning-text">
           {phase === 'ready'
-            ? 'MIRA reads everything on this phone and never goes online.'
-            : 'MIRA never goes online. Download its file (.gguf, about 1.1 GB) in your browser, then tap below and pick it.'}
+            ? 'MIRA reads everything on this phone. Your messages never leave it, and it works with no connection.'
+            : phase === 'downloading'
+            ? 'Keep MIRA open while it downloads. If it stops, tap Resume to carry on.'
+            : `Downloading uses about ${gb(MODEL_BYTES)} GB, so Wi-Fi is best. It’s the only time MIRA goes online; your messages never leave this phone.`}
         </T>
       </View>
 
@@ -185,18 +215,29 @@ export default function ModelSetupScreen() {
             <PrimaryButton label="Finish setup" onPress={finish} />
             <SecondaryButton label="Replace MIRA’s file" onPress={choose} />
           </>
+        ) : phase === 'downloading' ? (
+          <SecondaryButton label="Pause download" onPress={() => cancelModelDownload().catch(() => {})} />
+        ) : phase === 'copying' ? (
+          <PrimaryButton label="Adding…" disabled className="opacity-60" />
         ) : (
           <>
             <PrimaryButton
-              label={phase === 'copying' ? 'Adding…' : 'Add MIRA’s file'}
-              disabled={phase === 'copying'}
-              onPress={choose}
+              label={
+                partial > 0
+                  ? `Resume download (${gb(partial)} of ${gb(MODEL_BYTES)} GB done)`
+                  : 'Download MIRA’s file'
+              }
+              onPress={download}
               left={<Icon name="download" size={18} color={palette.white} />}
-              className={phase === 'copying' ? 'opacity-60' : ''}
             />
-            {phase === 'idle' ? <SecondaryButton label="Continue for now" onPress={finish} /> : null}
+            <SecondaryButton label="I have it: Add MIRA’s file" onPress={choose} />
           </>
         )}
+        {phase === 'idle' ? (
+          <Tap label="Continue for now" onPress={finish} className="min-h-44 items-center justify-center">
+            <T className="text-14 font-semibold text-ink-2">Continue for now</T>
+          </Tap>
+        ) : null}
       </View>
     </Screen>
   );

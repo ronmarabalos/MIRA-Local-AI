@@ -15,7 +15,7 @@ Deadlines, schedule changes, payment notices, and requests reach people through 
 
 ### 1.2 Product
 
-MIRA is an Android app that reads incoming notifications from the apps the user has switched on, extracts what matters, and produces a daily report, reminders, and reply drafts. The user teaches it rules in plain words. All processing happens on the phone, and the release build has no internet permission.
+MIRA is an Android app that reads incoming notifications from the apps the user has switched on, extracts what matters, and produces a daily report, reminders, and reply drafts. The user teaches it rules in plain words. All processing happens on the phone. The internet is used for one thing only: downloading MIRA's model file during setup (changed 2026-10-10, see decision 4).
 
 ### 1.3 Demo user
 
@@ -42,7 +42,7 @@ Automatic replies are out of the first build. Rules can reach the **Act** level 
 1. Android only, demonstrated on the Infinix GT 20 Pro (Dimensity 8200, Mali GPU, 8 or 12 GB RAM). The model runs on the CPU. iPhone was considered and ruled out for this build: iOS does not let an app read other apps' notifications, which is how MIRA receives messages (see 2.1).
 2. React Native 0.87.1 with TypeScript, in [`mobile/`](../../mobile). No backend, no accounts.
 3. Messages arrive through Android's notification listener. Replies leave through each notification's own reply box.
-4. The release build declares no `INTERNET` permission. The debug build keeps it, because the development server needs it.
+4. ~~The release build declares no `INTERNET` permission.~~ **Changed 2026-10-10 (Ronmar):** every build declares `INTERNET`, used only by `MiraModule.downloadModel` to download the model file once during setup. Messages, records, drafts, and logs never leave the phone, and everything after setup works with no connection. Privacy proof says so and still shows the bytes-sent counter.
 5. The model produces structured data only. Whether anything happens is decided by ordinary code following rules the user approved.
 6. Text from messages is treated as untrusted data. It can never create, change, or trigger a rule.
 7. Every item shown to the user links to the original message.
@@ -392,7 +392,7 @@ Each is a testable statement.
 3. No action exceeds its channel's permission level.
 4. A record marked sensitive never produces an automatic draft.
 5. No rule is created or changed except from the Rules screen or by the user approving a suggestion.
-6. The release build's merged manifest does not contain `android.permission.INTERNET`.
+6. ~~The release build's merged manifest does not contain `android.permission.INTERNET`.~~ **Changed 2026-10-10:** the only code that opens a network connection is `MiraModule.downloadModel` (the model file); no message content is ever sent.
 7. Every report line, answer, and draft can be traced to a stored message.
 8. Every action appears in the activity log with the rule that caused it.
 

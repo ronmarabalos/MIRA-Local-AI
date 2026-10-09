@@ -72,7 +72,7 @@ const BOARDS: [string, ComponentType<any>, string, object?][] = [
   ['02 onboarding', OnboardingScreen, 'Allow notification access'],
   ['03 initial setup', SetupScreen, 'What should MIRA call you?'],
   ['04 model setup', ModelSetupScreen, 'MIRA runs on this phone'],
-  ['05 home', HomeScreen, 'Here’s what matters today'],
+  ['05 home', HomeScreen, 'What can I help you with today?'],
   ['06 assistant', AssistantScreen, 'Ask MIRA'],
   ['07 teach', TeachScreen, 'Teach MIRA'],
   ['08 teach by instruction', TeachInstructionScreen, 'What would you like MIRA to learn?'],

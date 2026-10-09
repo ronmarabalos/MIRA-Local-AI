@@ -34,7 +34,7 @@ export function PrivacyProof() {
             {data.facts.hasInternetPermission
               ? data.facts.isDebugBuild
                 ? 'Development build: internet permission present.'
-                : 'Internet permission is present in this build.'
+                : 'Internet is used only to download MIRA’s file. Your messages never leave this phone.'
               : 'This build has no internet permission.'}
           </T>
           <T className="text-14 text-ink-body">

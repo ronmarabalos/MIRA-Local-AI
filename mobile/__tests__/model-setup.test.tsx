@@ -5,11 +5,23 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import ModelSetupScreen from '../src/screens/ModelSetup';
-import { importModelFile, type ImportProgress } from '../src/services/model/importFile';
+import {
+  cancelModelDownload,
+  downloadModelFile,
+  importModelFile,
+  type ImportProgress,
+  partialDownloadBytes,
+} from '../src/services/model/importFile';
 import { PrefsProvider } from '../src/theme/prefs';
 
 jest.mock('../src/services/firstRun', () => ({ isModelOnPhone: jest.fn(async () => false) }));
-jest.mock('../src/services/model/importFile', () => ({ importModelFile: jest.fn() }));
+jest.mock('../src/services/model/importFile', () => ({
+  importModelFile: jest.fn(),
+  downloadModelFile: jest.fn(),
+  cancelModelDownload: jest.fn(async () => {}),
+  partialDownloadBytes: jest.fn(async () => 0),
+  MODEL_BYTES: 1024 ** 3,
+}));
 
 const Stack = createNativeStackNavigator();
 let tree: Renderer.ReactTestRenderer | undefined;
@@ -17,6 +29,7 @@ let tree: Renderer.ReactTestRenderer | undefined;
 afterEach(async () => {
   if (tree) await act(async () => tree!.unmount());
   tree = undefined;
+  jest.mocked(partialDownloadBytes).mockResolvedValue(0);
 });
 
 async function render() {
@@ -57,8 +70,8 @@ test('adds the file the user picks, showing progress, then offers to finish', as
       }),
   );
   await render();
-  expect(shown()).toContain('MIRA never goes online.');
-  await press('Add MIRA’s file');
+  expect(shown()).toContain('It’s the only time MIRA goes online');
+  await press('I have it: Add MIRA’s file');
   expect(shown()).toContain('Pick the file in the list that opened');
 
   await act(async () => report({ copied: 512 * 1024 ** 2, total: 1024 ** 3 }));
@@ -74,7 +87,7 @@ test('a file that is not MIRA’s says so plainly, and the button works again', 
     .mocked(importModelFile)
     .mockRejectedValue(Object.assign(new Error('x'), { code: 'not_model' }));
   await render();
-  await press('Add MIRA’s file');
+  await press('I have it: Add MIRA’s file');
   expect(shown()).toContain('That isn’t MIRA’s file. Pick the one ending in .gguf.');
   expect(shown()).toContain('Not on this phone yet');
 });
@@ -82,7 +95,49 @@ test('a file that is not MIRA’s says so plainly, and the button works again', 
 test('cancelling the picker leaves the screen as it was', async () => {
   jest.mocked(importModelFile).mockResolvedValue('cancelled');
   await render();
-  await press('Add MIRA’s file');
+  await press('I have it: Add MIRA’s file');
   expect(shown()).toContain('Not on this phone yet');
   expect(shown()).toContain('Continue for now');
+});
+
+test('Download fetches MIRA’s file by itself, with progress, and can be paused', async () => {
+  let report!: (p: ImportProgress) => void;
+  let done!: (r: 'downloaded' | 'cancelled') => void;
+  jest.mocked(downloadModelFile).mockImplementation(
+    onProgress =>
+      new Promise(resolve => {
+        report = onProgress;
+        done = resolve;
+      }),
+  );
+  await render();
+  await press('Download MIRA’s file');
+  expect(shown()).toContain('Connecting…');
+  expect(shown()).toContain('Downloading to this phone…');
+
+  await act(async () => report({ copied: 256 * 1024 ** 2, total: 1024 ** 3 }));
+  expect(shown()).toContain('Downloading… 25% · 0.25 of 1.00 GB');
+
+  await press('Pause download');
+  expect(cancelModelDownload).toHaveBeenCalled();
+  jest.mocked(partialDownloadBytes).mockResolvedValue(256 * 1024 ** 2);
+  await act(async () => done('cancelled'));
+  expect(shown()).toContain('Resume download (0.25 of 1.00 GB done)');
+});
+
+test('a finished download makes MIRA ready', async () => {
+  jest.mocked(downloadModelFile).mockResolvedValue('downloaded');
+  await render();
+  await press('Download MIRA’s file');
+  expect(shown()).toContain('On this phone · ready offline');
+  expect(shown()).toContain('Finish setup');
+});
+
+test('a dropped connection says how to carry on', async () => {
+  jest
+    .mocked(downloadModelFile)
+    .mockRejectedValue(Object.assign(new Error('x'), { code: 'no_connection' }));
+  await render();
+  await press('Download MIRA’s file');
+  expect(shown()).toContain('The download stopped. Check your connection, then tap Resume.');
 });

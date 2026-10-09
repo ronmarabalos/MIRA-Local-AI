@@ -2,10 +2,8 @@
 import { useEffect, useState } from 'react';
 import { AppState, SectionList, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Companion } from '../../components/Companion';
 import { useGo } from '../../components/nav';
 import { ReportItem } from '../../components/ReportItem';
-import { PrivacyIndicator } from '../../components/PrivacyIndicator';
 import { useStatusBar } from '../../components/Screen';
 import { SilkBackground } from '../../components/SilkBackground';
 import { TabBar } from '../../components/TabBar';
@@ -15,6 +13,7 @@ import type { ReportItem as StoredItem } from '../../core/report';
 import type { ActionKind } from '../../core/types';
 import { useDayReport } from '../../services/db/hooks';
 import { useDisplayName, usePrefs } from '../../theme/prefs';
+import { GetToKnow, Greeting } from './Greeting';
 
 const ACTION_LABELS: Record<ActionKind, string> = {
   remind: 'Reminder',
@@ -121,19 +120,8 @@ export default function HomeScreen() {
                 <T className={`text-15 font-semibold ${ink}`}>{name}</T>
               </Tap>
             </View>
-            <T className={`text-24 font-light ${sub}`}>Here’s what matters today</T>
-            <View className="flex-row flex-wrap gap-8"><PrivacyIndicator dark={dark} /><Tap label="Review drafts" onPress={() => go('Approvals')} className="min-h-48 justify-center rounded-16 bg-white/60 px-12 py-8"><T className="text-13 font-semibold text-ink-body">Review drafts</T></Tap><Tap label="Connected Apps" onPress={() => go('ConnectedApps')} className="min-h-48 justify-center rounded-16 bg-white/60 px-12 py-8"><T className="text-13 font-semibold text-ink-body">Connected Apps</T></Tap></View>
-            <Glass kind={dark ? 'dark' : 'glass'} className="flex-row items-center gap-14 rounded-30 p-18">
-              <Companion
-                size={48}
-                theme={dark ? 'dark' : 'light'}
-                mode={report?.waiting ? 'thinking' : 'idle'}
-              />
-              <View className="flex-1 gap-4">
-                <T className={`text-16 font-semibold ${ink}`}>Your day, from your messages.</T>
-                <T className={`text-13 ${sub}`}>Saved messages are available offline.</T>
-              </View>
-            </Glass>
+            <Greeting dark={dark} thinking={!!report?.waiting} />
+            {data && !error ? <GetToKnow channels={data.channels} dark={dark} /> : null}
             {error ? (
               <Glass
                 kind={dark ? 'dark' : 'glass'}

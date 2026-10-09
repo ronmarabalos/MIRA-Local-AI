@@ -30,6 +30,11 @@ import com.mira.app.notifications.NativeInbox
 import com.mira.app.reminders.ReminderReceiver
 import java.io.BufferedInputStream
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
+import java.security.MessageDigest
 
 /** Bridge methods. Kotlin holds no product logic: it only reports and acts for JavaScript. */
 class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(context) {
@@ -327,9 +332,7 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
           emitImportProgress(copied, if (total > 0) total else copied)
         }
       }
-      val target = File(dir, MODEL_FILE)
-      if (target.exists() && !target.delete()) throw IllegalStateException("old model in use")
-      if (!part.renameTo(target)) throw IllegalStateException("rename failed")
+      installModel(part, dir)
       promise.resolve("imported")
     } catch (e: Exception) {
       part.delete()
@@ -345,6 +348,151 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
     reactApplicationContext.emitDeviceEvent(EVENT_MODEL_IMPORT, progress)
   }
 
+  @Volatile private var downloadCancelled = false
+  @Volatile private var downloading = false
+
+  /**
+   * Downloads MIRA's file from `url` into MIRA's own folder, resuming a part
+   * left by an earlier try. This is the only thing the internet permission is
+   * used for. When `sha256` is given the file must match it. Resolves
+   * "downloaded" or "cancelled"; progress arrives as MiraModelImport events.
+   */
+  @ReactMethod
+  fun downloadModel(url: String, sha256: String?, promise: Promise) {
+    if (downloading) {
+      promise.reject("busy", "MIRA's file is already downloading.")
+      return
+    }
+    downloading = true
+    downloadCancelled = false
+    Thread {
+      try {
+        fetchModel(url, sha256?.lowercase(), promise)
+      } finally {
+        downloading = false
+      }
+    }.start()
+  }
+
+  @ReactMethod
+  fun cancelModelDownload(promise: Promise) {
+    downloadCancelled = true
+    promise.resolve(null)
+  }
+
+  /** Bytes already downloaded by an unfinished try, so the screen can offer to resume. */
+  @ReactMethod
+  fun getPartialDownloadBytes(promise: Promise) {
+    val part = File(reactApplicationContext.getExternalFilesDir(null), DOWNLOAD_PART)
+    promise.resolve(if (part.isFile) part.length().toDouble() else 0.0)
+  }
+
+  private fun fetchModel(url: String, sha256: String?, promise: Promise) {
+    val dir = reactApplicationContext.getExternalFilesDir(null)
+    if (dir == null) {
+      promise.reject("no_storage", "Phone storage is not available.")
+      return
+    }
+    val part = File(dir, DOWNLOAD_PART)
+    var have = if (part.isFile) part.length() else 0L
+    var connection: HttpURLConnection? = null
+    try {
+      connection = (URL(url).openConnection() as HttpURLConnection).apply {
+        connectTimeout = 15_000
+        readTimeout = 30_000
+        instanceFollowRedirects = true
+        if (have > 0) setRequestProperty("Range", "bytes=$have-")
+      }
+      val code = connection.responseCode
+      val append = code == HttpURLConnection.HTTP_PARTIAL && have > 0
+      if (code == 416 && have > 0) {
+        // The part is already whole; check and install it below.
+      } else if (code != HttpURLConnection.HTTP_OK && !append) {
+        promise.reject("http_$code", "The download server answered $code.")
+        return
+      }
+      if (!append && code != 416) have = 0L
+      val total = if (code == 416) have else have + connection.contentLengthLong.coerceAtLeast(0L)
+      if (total > have && dir.usableSpace < (total - have) + SPACE_MARGIN) {
+        promise.reject("no_space", "Not enough free space on this phone.")
+        return
+      }
+
+      val digest = MessageDigest.getInstance("SHA-256")
+      if (have > 0) {
+        part.inputStream().use { input ->
+          val buffer = ByteArray(1 shl 20)
+          while (true) {
+            val n = input.read(buffer)
+            if (n < 0) break
+            digest.update(buffer, 0, n)
+          }
+        }
+      }
+      if (code != 416) {
+        connection.inputStream.use { input ->
+          FileOutputStream(part, append).use { out ->
+            val buffer = ByteArray(1 shl 16)
+            var copied = have
+            var reported = have
+            while (true) {
+              if (downloadCancelled) {
+                promise.resolve("cancelled")
+                return
+              }
+              val n = input.read(buffer)
+              if (n < 0) break
+              out.write(buffer, 0, n)
+              digest.update(buffer, 0, n)
+              copied += n
+              if (copied - reported >= PROGRESS_STEP) {
+                reported = copied
+                emitImportProgress(copied, total)
+              }
+            }
+            emitImportProgress(copied, if (total > 0) total else copied)
+          }
+        }
+      }
+
+      if (sha256 != null) {
+        val got = digest.digest().joinToString("") { "%02x".format(it) }
+        if (got != sha256) {
+          part.delete()
+          promise.reject("corrupt", "The downloaded file was damaged.")
+          return
+        }
+      }
+      if (!startsWithGguf(part)) {
+        part.delete()
+        promise.reject("not_model", "The download is not a model file.")
+        return
+      }
+      installModel(part, dir)
+      promise.resolve("downloaded")
+    } catch (e: IOException) {
+      // The part stays, so the next try resumes where this one stopped.
+      promise.reject("no_connection", "The download stopped. Check the connection and try again.")
+    } catch (e: Exception) {
+      promise.reject("download_failed", "The download failed. Try again.")
+    } finally {
+      connection?.disconnect()
+    }
+  }
+
+  private fun startsWithGguf(file: File): Boolean {
+    val head = ByteArray(GGUF_MAGIC.size)
+    val got = file.inputStream().use { it.read(head) }
+    return got == head.size && head.contentEquals(GGUF_MAGIC)
+  }
+
+  /** Puts a finished file in place of the model, replacing any old one. */
+  private fun installModel(part: File, dir: File) {
+    val target = File(dir, MODEL_FILE)
+    if (target.exists() && !target.delete()) throw IllegalStateException("old model in use")
+    if (!part.renameTo(target)) throw IllegalStateException("rename failed")
+  }
+
   /** Where the model file is copied to over USB. Readable by the app with no permission. */
   @ReactMethod
   fun getModelDir(promise: Promise) {
@@ -356,6 +504,8 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
     const val EVENT_ONLINE = "MiraOnline"
     const val EVENT_MODEL_IMPORT = "MiraModelImport"
     const val MODEL_FILE = "model.gguf"
+    /** Kept apart from the import's part file, so one cannot delete the other's. */
+    private const val DOWNLOAD_PART = "model.gguf.download"
     private const val REQUEST_MODEL_FILE = 4711
     private val GGUF_MAGIC = byteArrayOf(0x47, 0x47, 0x55, 0x46) // "GGUF"
     /** Room left over after the copy, so the phone is not filled to the last byte. */

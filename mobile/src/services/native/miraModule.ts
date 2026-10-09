@@ -14,6 +14,11 @@ export interface MiraNativeModule {
   getModelPath(): Promise<string | null>;
   /** Opens the file picker and copies the chosen model file into MIRA's folder. */
   importModel(): Promise<'imported' | 'cancelled'>;
+  /** Downloads MIRA's file into its folder, resuming an earlier part; checks the SHA-256 when given. */
+  downloadModel(url: string, sha256: string | null): Promise<'downloaded' | 'cancelled'>;
+  cancelModelDownload(): Promise<void>;
+  /** Bytes left by an unfinished download, 0 when there is none. */
+  getPartialDownloadBytes(): Promise<number>;
   setEnabledPackages(packageNames: string[]): Promise<void>;
   listNotifyingApps(): Promise<NotifyingApp[]>;
   /** A JSON array of CapturedNotification. */

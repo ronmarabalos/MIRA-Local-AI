@@ -18,6 +18,7 @@ import type { Chat, Message, MiraRecord } from '../src/core/types';
 import HomeScreen from '../src/screens/Home';
 import EmailDetailScreen from '../src/screens/EmailDetail';
 import AssistantScreen from '../src/screens/Assistant';
+import { BUILTIN_RULES } from '../src/core/builtinRules';
 import { PrefsProvider } from '../src/theme/prefs';
 
 jest.mock('../src/services/db', () => ({ getStore: jest.fn() }));
@@ -192,7 +193,7 @@ test('empty report offers app selection and makes stored offline availability cl
   await render();
   expect(output()).toContain('No messages today');
   expect(output()).toContain('Choose apps');
-  expect(output()).toContain('Saved messages are available offline');
+  expect(output()).toContain('Everything stays on this phone and works offline.');
   expect(output()).not.toContain('Reply to Sam');
 });
 
@@ -339,4 +340,20 @@ test('Ask says so when nothing matches', async () => {
   await press('When is the next deadline?');
   await press('Ask');
   expect(output()).toContain('I couldn’t find that in your messages.');
+});
+
+test('Today asks how MIRA can help and shows what it knows about the user so far', async () => {
+  await store.saveChannel({ packageName: 'com.facebook.orca', label: 'Messenger', enabled: true, level: 2 });
+  await store.saveRule({ ...BUILTIN_RULES.find(r => r.id === 'builtin-remind')!, enabled: true });
+  await render();
+  const text = output();
+  expect(text).toContain('What can I help you with today?');
+  expect(text).toContain('From Messenger');
+  expect(text).toContain('Due dates and payments');
+  expect(text).toContain('Not yet. Tap to choose.');
+  // Privacy, drafts, and apps live on Settings, Teach, and Profile now.
+  expect(text).not.toContain('Privacy proof');
+  expect(text).not.toContain('Connected Apps');
+  await press('Ask MIRA');
+  expect(output()).toContain('Ask about your messages. I’ll sum up what matters.');
 });
