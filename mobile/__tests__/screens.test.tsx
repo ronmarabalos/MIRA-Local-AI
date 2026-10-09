@@ -83,7 +83,7 @@ const BOARDS: [string, ComponentType<any>, string, object?][] = [
   ['13 inbox', InboxScreen, 'Every message MIRA has read, newest first.'],
   ['14 email and reply', EmailDetailScreen, 'Message not found'],
   ['15 approval center', ApprovalsScreen, 'Needs Your Approval'],
-  ['16 tasks', PlannerScreen, 'No tasks yet'],
+  ['16 tasks', PlannerScreen, 'Planner'],
   ['17 calendar', PlannerScreen, 'No events', { view: 'calendar' }],
   ['18 personal memory', MemoryScreen, 'What MIRA Remembers'],
   ['19 connected apps', ConnectedAppsScreen, 'Choose what MIRA can access.'],
