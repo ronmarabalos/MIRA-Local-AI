@@ -28,6 +28,10 @@ You own application architecture, feature planning, and source code in `mobile/s
 4. **Build Screens to the MIRA Design:**
    - Before any screen, component, or styling work, read [`docs/design/README.md`](docs/design/README.md) and the matching board in [`docs/design/screens/`](docs/design/screens/). The original file is [`docs/design/mira-mobile-app.html`](docs/design/mira-mobile-app.html).
    - The design decides visuals only. Screens, navigation, and wording stay with the spec.
+5. **No Claude Attribution in Commits:**
+   - Never add `Co-Authored-By: Claude ...` or a "Generated with Claude Code" line to a commit message or pull request description.
+6. **Android Only:**
+   - `mobile/` has no iOS project. Do not add `mobile/ios/`, a Podfile or Gemfile, or iOS packages and scripts.
 
 ---
 
