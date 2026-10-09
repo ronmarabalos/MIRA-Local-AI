@@ -211,11 +211,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 **Lane B**
 
-- [ ] **Task B2.1: Intake pipeline**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B2.1: Intake pipeline**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/services/intake/index.ts`
   - **Do:** drain the inbox on launch, on return to the foreground, and on each event; split into messages; skip ones already stored; run filter → `extract` → verify → store. A record that fails twice is stored as `other` with status `failed`.
   - **Done when:** replaying the fixtures through the fake bridge fills the database, with tests for skipping a stored message and for the failed path.
+  - **State (2026-10-10):** built by Steve (crossing lanes, agreed) because it was the one missing link. `intake/split.ts` turns a notification into messages, reading the individual-message list first; `intake/index.ts` runs filter → model → verifier → storage with one retry; `intake/start.ts` runs it on launch, on return to the foreground, and on each capture, and is started from `mobile/index.js`. **Checked on the Infinix:** five real Messenger group messages were stored, three settled by the quick filter as chatter with no model call and two read by the model, each with its chat and sender. See them with the probe's **Show stored** button. Today (B2.3) can read these through `useDayItems`.
 
 - [x] **Task B2.2: Report builder**
   - **Priority:** P0 · **Status:** Done. `buildReport(items, actions, filter)`. Also lists undated schedule changes under Announcements, keeps instruction-like messages out of Needs you and Dates found, and counts messages still waiting for placeholder rows.
