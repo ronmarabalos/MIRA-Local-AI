@@ -30,8 +30,8 @@ You own application architecture, feature planning, and source code in `mobile/s
    - The design decides visuals only. Screens, navigation, and wording stay with the spec.
 5. **No Claude Attribution in Commits:**
    - Never add `Co-Authored-By: Claude ...` or a "Generated with Claude Code" line to a commit message or pull request description.
-6. **Android Only:**
-   - `mobile/` has no iOS project. Do not add `mobile/ios/`, a Podfile or Gemfile, or iOS packages and scripts.
+6. **Android First:**
+   - Android is the demo target. `mobile/ios/` exists so the shared TypeScript can run on iPhone later; iOS cannot read other apps' notifications (spec section 2.1). Do not add iOS-only native code or features during the hackathon, and never let iOS work block an Android task.
 
 ---
 

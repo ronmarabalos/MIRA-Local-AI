@@ -55,8 +55,8 @@ To prevent token waste and latency, all tasks are classified into three operatio
    - Never print raw `.env` contents, API keys, credentials, or tokens. Use [`varlock`](.agents/skills/varlock/SKILL.md) and review against [`owasp-security`](.agents/skills/owasp-security/SKILL.md).
 6. **No AI attribution in commits:**
    - Commit messages and pull request descriptions carry no `Co-Authored-By` trailer and no "Generated with" line naming Claude, Gemini, Antigravity, or any other AI tool. The human developer is the only author.
-7. **Android only:**
-   - MIRA targets Android. Do not add an `ios/` folder, CocoaPods or Ruby files, or iOS packages and scripts to [`mobile/`](mobile/).
+7. **Android first:**
+   - MIRA's demo targets Android. [`mobile/ios/`](mobile/ios/) is kept for a later iPhone version (share-in intake, spec section 2.1). Do not add iOS-only native code or features during the hackathon.
 
 ---
 

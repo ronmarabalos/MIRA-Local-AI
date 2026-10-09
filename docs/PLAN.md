@@ -372,3 +372,8 @@ Not in this window. Take one only if Phase 5 is finished early and everything ab
   - **Priority:** P2
   - **Status:** Backlog
   - **Description:** One automatic reply type under approved rules; rule sets shared as a file; spoken morning brief; scheduled reports and PDF export.
+
+- [ ] **Task 3.2: iPhone version**
+  - **Priority:** P2
+  - **Status:** In Progress (scaffold restored on `main`, not yet agreed with Steve)
+  - **Description:** The iOS project, Gemfile, and `cli-platform-ios` are back in `mobile/`. Remaining, on a Mac: `pod install` and a first build; register the Onest fonts in `Info.plist`; share-in intake (message, email, or screenshot shared into MIRA) in place of the notification listener; replies copied to the clipboard; Privacy proof reduced to what iOS can show. Everything after intake is the shared TypeScript.
