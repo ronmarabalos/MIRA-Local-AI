@@ -378,11 +378,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Done when:** each screen has been checked on the phone beside its board.
   - **State (2026-10-10):** shared `Tap` controls now add 6 dp hit slop so the smallest 36 dp controls expose a 48 dp Android touch target; the focused regression test passes. Static inspection found an accessible name on every `Tap`, scrolling and safe-area handling in the shared screen/list containers, reduced-motion support, semantic status text, and the existing navigation helpers. Scoped Tier 2 Baton verification and the full Baton regression/typecheck pass; changed-file ESLint reports zero errors and two pre-existing inline-style warnings in `ui.tsx`. On the connected M2102J20SG, Home was visually intact at the original 1.0 font scale. This phone blocks ADB input injection and `WRITE_SETTINGS`, so all-screen board comparison, system Back, and 130% font-size checks still require manual interaction on the device; its font scale remained 1.0.
 
-- [ ] **Task B4.4: Ask, lookup only (cut first if late)**
-  - **Priority:** P0 · **Status:** Backlog
+- [x] **Task B4.4: Ask, lookup only (cut first if late)**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `mobile/src/core/ask.ts`, test beside it, `mobile/src/screens/Assistant/`
   - **Do:** keyword and date search over records; answer from a record field with its `SourceQuote`; "I couldn't find that in your messages" when nothing matches. No model call. If cut, Assistant shows the companion without answers.
   - **Done when:** "when is the deadline?" returns the deadline record and its source.
+  - **State (2026-10-10):** `ask(question, items, now)` in `core/ask.ts` picks the field from question words (date, amount, request; English and Tagalog), narrows by today, tomorrow, this week, or next week, matches the remaining words against the record, message, sender, and chat, and answers with the field's value and the source message. Instruction-like messages, promotions, chatter, copies, and failed reads are never answers; no match reads "I couldn't find that in your messages." The Assistant screen (opened from the MIRA tab button) searches the last 30 days, shows the source quote, opens the original message, and lists other matches. Nine unit tests and two screen tests pass in the Baton. Not yet checked on the phone.
 
 **Phase 4 exit check:** in airplane mode, Today and drafting work and an approved reply shows as queued; back online, it sends.
 

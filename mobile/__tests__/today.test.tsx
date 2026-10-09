@@ -12,6 +12,7 @@ import { useQuery } from '../src/services/db/hooks';
 import type { Chat, Message, MiraRecord } from '../src/core/types';
 import HomeScreen from '../src/screens/Home';
 import EmailDetailScreen from '../src/screens/EmailDetail';
+import AssistantScreen from '../src/screens/Assistant';
 import { PrefsProvider } from '../src/theme/prefs';
 
 jest.mock('../src/services/db', () => ({ getStore: jest.fn() }));
@@ -117,6 +118,7 @@ async function render(detailId?: string, initial = 'Home') {
               screenOptions={{ headerShown: false, animation: 'none' }}
             >
               <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="Assistant" component={AssistantScreen} />
               <Stack.Screen
                 name="EmailDetail"
                 component={EmailDetailScreen}
@@ -295,4 +297,21 @@ test('an older async query cannot overwrite newer stored data', async () => {
   await act(async () => finishOld('stale'));
   expect(output()).toContain('newest');
   expect(output()).not.toContain('stale');
+});
+
+test('Ask answers from a stored record, shows its source, and opens the message', async () => {
+  await seed('tuition');
+  await render(undefined, 'Assistant');
+  await press('How much do I need to pay?');
+  expect(output()).toContain('PHP 450');
+  expect(output()).toContain('Fee notice tuition');
+  expect(output()).toContain('Original tuition: pay PHP 450 by Friday.');
+  await press('Open message from Ana Santos');
+  expect(output()).toContain('Original message');
+});
+
+test('Ask says so when nothing matches', async () => {
+  await render(undefined, 'Assistant');
+  await press('When is the next deadline?');
+  expect(output()).toContain("I couldn't find that in your messages.");
 });
