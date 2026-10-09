@@ -16,6 +16,7 @@ import {
 import { FIXTURES, fixtureText } from '../../../core/__fixtures__/messages';
 import type { CapturedNotification, Message } from '../../../core/types';
 import type { ProofFacts } from '../../contracts';
+import { getStore } from '../../db';
 import { bridge, model } from '../../index';
 import { complete, loadModel } from '../../model/llama';
 import { parseJsonObject, RECORD_SCHEMA } from '../../model/schema';
@@ -173,13 +174,24 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
     say('Messenger and Gmail are switched on for capture.');
   };
 
-  const drainInbox = async () => {
-    const drained = await bridge.drainInbox();
+  /** What intake has stored in the last day: the source, the type, and the summary. */
+  const showStored = async () => {
+    const store = await getStore();
+    const items = await store.getItems(
+      Date.now() - 24 * 60 * 60 * 1000,
+      Date.now() + 60_000,
+    );
     say(
-      `Inbox handed over ${drained.length}: ` +
-        drained
-          .map(n => `${n.packageName} (${n.messages.length} messages)`)
-          .join(', '),
+      `Stored in the last day: ${items.length}\n` +
+        items
+          .map(
+            item =>
+              `[${item.message.status}] ${item.chat.title} · ${item.message.sender}: ` +
+              `${item.record?.type ?? 'waiting'} | ${
+                item.record?.summary ?? item.message.text.slice(0, 60)
+              }`,
+          )
+          .join('\n'),
     );
   };
 
@@ -249,7 +261,7 @@ export default function ProbeScreen({ onClose }: { onClose: () => void }) {
           label="Switch on Messenger + Gmail"
           onPress={switchOnProbeApps}
         />
-        <Button label="Drain inbox" onPress={drainInbox} />
+        <Button label="Show stored" onPress={showStored} />
       </View>
       {notifications.map(n => (
         <View key={n.key} style={styles.card}>
