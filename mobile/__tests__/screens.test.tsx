@@ -80,7 +80,7 @@ const BOARDS: [string, ComponentType<any>, string, object?][] = [
   ['10 automation builder', AutomationBuilderScreen, 'Create an Automation'],
   ['11 review and approve', AutomationReviewScreen, 'Review rules'],
   ['12 my automations', AutomationsScreen, 'My automations'],
-  ['13 inbox', InboxScreen, 'Nothing here right now'],
+  ['13 inbox', InboxScreen, 'Every message MIRA has read, newest first.'],
   ['14 email and reply', EmailDetailScreen, 'Message not found'],
   ['15 approval center', ApprovalsScreen, 'Needs Your Approval'],
   ['16 tasks', PlannerScreen, 'No tasks yet'],
