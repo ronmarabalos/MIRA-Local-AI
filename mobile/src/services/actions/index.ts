@@ -56,6 +56,8 @@ export function createActionRunner({
   now = Date.now,
 }: ActionDeps) {
   let counter = 0;
+  const sending = new Map<string, Promise<SendOutcome>>();
+  let flushing: Promise<void> | null = null;
   const newId = (prefix: string) =>
     `${prefix}-${now().toString(36)}-${(counter++).toString(36)}`;
 
@@ -222,6 +224,7 @@ export function createActionRunner({
         store.getActionsBetween(startOfDay(now()), now() + 1),
       ]);
       const channel = channels.find(c => c.packageName === message.packageName);
+      if (!channel?.enabled) return;
       const actionsTodayByRule: Record<string, number> = {};
       let autoActionsToday = 0;
       for (const action of today) {
@@ -256,60 +259,114 @@ export function createActionRunner({
      * Sends a draft the user has just confirmed. Offline, it is kept as
      * queued and sent by `flushQueue` when the connection returns.
      */
-    async sendDraft(draftId: string): Promise<SendOutcome> {
-      const draft = await findDraft(draftId);
-      const item = draft ? await store.getItem(draft.messageId) : null;
-      if (!draft || !item) return 'needs_you';
+    sendDraft(draftId: string): Promise<SendOutcome> {
+      const active = sending.get(draftId);
+      if (active) return active;
+      const work = (async (): Promise<SendOutcome> => {
+        const draft = (await store.getDrafts('waiting')).find(
+          d => d.id === draftId,
+        );
+        const item = draft ? await store.getItem(draft.messageId) : null;
+        if (!draft || !item) return 'needs_you';
 
-      await store.updateDraft(draft.id, { status: 'approved' });
-      const approved: Draft = { ...draft, status: 'approved' };
-      const payload = { draftId: draft.id };
+        const channel = (await store.getChannels()).find(
+          c => c.packageName === item.message.packageName,
+        );
+        if (!channel?.enabled || channel.level < 2 || !item.message.canReply) {
+          await log(
+            'send',
+            item.message.id,
+            null,
+            'blocked',
+            'This app no longer permits replies, or the message cannot be answered.',
+            { draftId },
+          );
+          return 'needs_you';
+        }
 
-      if (!(await bridge.isOnline())) {
-        await log(
+        await store.updateDraft(draft.id, { status: 'approved' });
+        const approved: Draft = { ...draft, status: 'approved' };
+        const payload = { draftId: draft.id };
+
+        if (!(await bridge.isOnline())) {
+          await log(
+            'send',
+            item.message.id,
+            null,
+            'queued',
+            'Waiting for a connection.',
+            payload,
+          );
+          return 'queued';
+        }
+        const action = await log(
           'send',
           item.message.id,
           null,
           'queued',
-          'Waiting for a connection.',
+          null,
           payload,
         );
-        return 'queued';
-      }
-      const action = await log(
-        'send',
-        item.message.id,
-        null,
-        'queued',
-        null,
-        payload,
-      );
-      return deliver(action, approved, item);
+        try {
+          return await deliver(action, approved, item);
+        } catch {
+          await store.updateAction(action.id, {
+            status: 'needs_you',
+            reason:
+              'The reply could not be confirmed as sent. Review it before trying again.',
+          });
+          return 'needs_you';
+        }
+      })();
+      sending.set(draftId, work);
+      work.finally(() => sending.delete(draftId)).catch(() => undefined);
+      return work;
     },
 
     /** Rechecks and sends every reply that was approved while offline. */
-    async flushQueue(): Promise<void> {
-      const queued = (await store.getActions()).filter(
-        action => action.kind === 'send' && action.status === 'queued',
-      );
-      if (queued.length === 0) return;
-      const channels = await store.getChannels();
-      for (const action of queued.reverse()) {
-        const draft = await findDraft(action.payload.draftId);
-        const item = draft ? await store.getItem(draft.messageId) : null;
-        const channel =
-          channels.find(c => c.packageName === item?.message.packageName) ??
-          null;
-        const check = recheckQueued(draft, channel);
-        if (check.outcome === 'needs_you' || !draft || !item) {
-          await store.updateAction(action.id, {
-            status: 'needs_you',
-            reason: check.outcome === 'needs_you' ? check.reason : GONE_REASON,
-          });
-          continue;
+    flushQueue(): Promise<void> {
+      if (flushing) return flushing;
+      const work = (async () => {
+        if (!(await bridge.isOnline())) return;
+        const queued = (await store.getActions()).filter(
+          action => action.kind === 'send' && action.status === 'queued',
+        );
+        if (queued.length === 0) return;
+        for (const action of queued.reverse()) {
+          if (!(await bridge.isOnline())) break;
+          const channels = await store.getChannels();
+          const draft = await findDraft(action.payload.draftId);
+          const item = draft ? await store.getItem(draft.messageId) : null;
+          const channel =
+            channels.find(c => c.packageName === item?.message.packageName) ??
+            null;
+          const check = recheckQueued(draft, channel);
+          if (check.outcome === 'needs_you' || !draft || !item) {
+            await store.updateAction(action.id, {
+              status: 'needs_you',
+              reason:
+                check.outcome === 'needs_you' ? check.reason : GONE_REASON,
+            });
+            continue;
+          }
+          try {
+            await deliver(action, draft, item);
+          } catch {
+            await store.updateAction(action.id, {
+              status: 'needs_you',
+              reason:
+                'The reply could not be confirmed as sent. Review it before trying again.',
+            });
+          }
         }
-        await deliver(action, draft, item);
-      }
+      })();
+      flushing = work;
+      work
+        .finally(() => {
+          flushing = null;
+        })
+        .catch(() => undefined);
+      return work;
     },
   };
 }

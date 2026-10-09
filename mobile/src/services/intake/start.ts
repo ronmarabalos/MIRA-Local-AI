@@ -1,6 +1,7 @@
 import { AppState } from 'react-native';
 
 import { getActionRunner } from '../actions/runner';
+import { getChannelManager } from '../channels/manager';
 import { getStore } from '../db';
 import { bridge, model } from '../index';
 import { createIntake } from './index';
@@ -17,7 +18,9 @@ export function startIntake(): () => void {
   let flush = () => {};
 
   Promise.all([getStore(), getActionRunner()])
-    .then(([store, runner]) => {
+    .then(async ([store, runner]) => {
+      await (await getChannelManager()).sync();
+      if (stopped) return;
       const intake = createIntake({
         bridge,
         model,

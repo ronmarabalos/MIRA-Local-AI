@@ -1,150 +1,161 @@
-/** Board 19-connected-apps: sources MIRA can read, with per-app permissions. */
-import { Fragment, useState } from 'react';
+/** Board 19: notification sources, stored permissions, and native capture. */
+import { useRef, useState } from 'react';
 import { View } from 'react-native';
-
-import { D, Icon } from '../../components/Icon';
-import { Sheet } from '../../components/Overlay';
-import { Screen } from '../../components/Screen';
+import { CollectionScreen } from '../../components/CollectionScreen';
 import { T } from '../../components/T';
-import { BackButton, Chip, SecondaryButton, Switch, Tap } from '../../components/ui';
-import { fx } from '../../theme/effects';
-import palette from '../../theme/palette';
-
-type Status = 'connected' | 'none' | 'reauth' | 'offline';
-
-const STATUS: Record<Status, [string, string, string, string]> = {
-  connected: ['Connected', palette.success.ink, palette.success.bg, D.check],
-  none: ['Not connected', palette.ink.label, 'rgba(255,255,255,0.6)', D.plus],
-  reauth: ['Needs reauthorization', palette.warning.ink, palette.warning.bg, 'M12 8v5M12 16h.01'],
-  offline: ['Offline · sync unavailable', palette.ink.label, 'rgba(255,255,255,0.6)', D.wifiOffShort],
-};
-
-const APPS = [
-  { id: 'local', name: 'This device', mono: 'D', bg: palette.ink.DEFAULT, fg: palette.white, note: 'Notifications, local files and storage', group: 'ON YOUR PHONE', why: 'MIRA uses your phone for reminders, local files you attach and on-device memory.' },
-  { id: 'demo', name: 'Demo mailbox & calendar', mono: 'S', bg: palette.peri.tonal, fg: palette.navy.DEFAULT, note: 'Sample data · not live', group: 'DEMO DATA', why: 'Sample emails and events so you can try MIRA safely. Nothing here is a real account.' },
-  { id: 'gmail', name: 'Gmail', mono: 'G', bg: palette.error.bg, fg: palette.error.ink, note: 'Read, sort and draft replies', group: 'EMAIL & CALENDAR', why: 'Connect to let MIRA read your inbox and prepare drafts. You choose each permission.' },
-  { id: 'gcal', name: 'Google Calendar', mono: 'C', bg: palette.mint.bg, fg: palette.mint.ink, note: 'See events and suggest changes' },
-  { id: 'outlook', name: 'Outlook', mono: 'O', bg: palette.outlook.bg, fg: palette.outlook.ink, note: 'Sign in again to keep syncing' },
-  { id: 'other', name: 'Other compatible services', mono: '+', bg: 'rgba(255,255,255,0.6)', fg: palette.ink.label, note: 'Browse supported apps', group: 'MORE' },
-];
-
-const PERMS = [
-  { label: 'Read information', hint: 'See emails, events or files' },
-  { label: 'Create drafts', hint: 'Prepare things for you to review' },
-  { label: 'Change information', hint: 'Edit events, labels or files' },
-  { label: 'Send or perform actions', hint: 'Always asks you first' },
-];
-
-const DEFAULT_WHY = 'Connect to choose what MIRA can see and do. You can revoke access any time.';
+import {
+  BackButton,
+  Glass,
+  SecondaryButton,
+  Switch,
+  Tap,
+} from '../../components/ui';
+import type { Channel } from '../../core/types';
+import { bridge } from '../../services';
+import { getChannelManager } from '../../services/channels/manager';
+import { useQuery } from '../../services/db/hooks';
+import { useForegroundRetry } from '../../services/db/foreground';
 
 export default function ConnectedAppsScreen() {
-  const [open, setOpen] = useState<string | null>(null);
-  const [status, setStatus] = useState<Record<string, Status>>({
-    local: 'connected', demo: 'offline', gmail: 'none', gcal: 'none', outlook: 'reauth', other: 'none',
-  });
-  const [perms, setPerms] = useState<Record<string, boolean[]>>({
-    local: [true, true, false, false],
-    demo: [true, true, false, false],
-  });
-
-  const cur = APPS.find((a) => a.id === open);
-  const curStatus = cur ? status[cur.id] : 'none';
-  const live = curStatus === 'connected' || curStatus === 'offline';
-  const on = (cur && perms[cur.id]) || [false, false, false, false];
-  const [curLabel, curFg] = STATUS[curStatus];
-  const button = live
-    ? { label: cur?.id === 'demo' ? 'Remove demo data' : 'Disconnect', danger: true }
-    : { label: curStatus === 'reauth' ? 'Sign in again' : 'Connect', danger: false };
-
+  const { data, error, retry } = useQuery(async () => {
+    const manager = await getChannelManager();
+    const [channels, listener] = await Promise.all([
+      manager.discover(),
+      bridge.isListenerEnabled(),
+    ]);
+    return { channels, listener };
+  }, []);
+  useForegroundRetry(retry);
+  const busyRef = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState<Channel | null>(null);
+  const [notice, setNotice] = useState('');
+  async function save(channel: Channel) {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
+    setNotice('');
+    try {
+      await (await getChannelManager()).save(channel);
+      setFailed(null);
+      retry();
+    } catch {
+      setFailed(channel);
+      setNotice('Could not save this app permission. Try again.');
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
+    }
+  }
   return (
-    <Screen>
-      <View className="flex-row items-center">
-        <BackButton to="Profile" label="Back to Profile" />
-      </View>
-      <View className="gap-4">
-        <T accessibilityRole="header" className="text-30 font-medium tracking-[-0.9px]">Connected Apps</T>
-        <T className="text-15 text-ink-2">Choose what MIRA can access.</T>
-      </View>
-
-      <View className="gap-10">
-        {APPS.map((a) => {
-          const [label, fg, bg, icon] = STATUS[status[a.id]];
-          return (
-            <Fragment key={a.id}>
-              {a.group ? <T className="px-2 pt-6 text-12 font-bold tracking-[0.72px] text-ink-label">{a.group}</T> : null}
-              <Tap label={`${a.name}, ${label}`} onPress={() => setOpen(a.id)} glass="glass2" className="w-full flex-row items-center gap-12 rounded-20 p-14">
-                <View className="h-44 w-44 shrink-0 items-center justify-center rounded-14" style={{ backgroundColor: a.bg }}>
-                  <T className="text-16 font-bold" style={{ color: a.fg }}>
-                    {a.mono}
-                  </T>
-                </View>
-                <View className="min-w-0 flex-1 gap-4">
-                  <T className="text-15 font-bold">{a.name}</T>
-                  <Chip label={label} fg={fg} bg={bg} iconD={icon} className="px-8 py-3" />
-                  <T className="text-12 leading-[16.8px] text-ink-muted">{a.note}</T>
-                </View>
-                <Icon name="chevronRight" size={18} color={palette.ink.muted} />
-              </Tap>
-            </Fragment>
-          );
-        })}
-      </View>
-
-      <Sheet visible={!!cur} onClose={() => setOpen(null)} label={`${cur?.name ?? ''} permissions`}>
-        {cur ? (
-          <>
-            <View className="flex-row items-center gap-12">
-              <View className="h-48 w-48 items-center justify-center rounded-16" style={{ backgroundColor: cur.bg }}>
-                <T className="text-17 font-bold" style={{ color: cur.fg }}>
-                  {cur.mono}
-                </T>
-              </View>
-              <View className="gap-2">
-                <T className="text-19 font-bold">{cur.name}</T>
-                <T className="text-12 font-bold" style={{ color: curFg }}>
-                  {curLabel}
-                </T>
-              </View>
-            </View>
-            <T className="text-14 leading-[21px] text-ink-body">{cur.why ?? DEFAULT_WHY}</T>
-            <View className="gap-8">
-              {PERMS.map((p, i) => (
-                <Tap
-                  key={p.label}
-                  label={p.label}
-                  accessibilityRole="switch"
-                  accessibilityState={{ checked: on[i], disabled: !live }}
-                  disabled={!live}
-                  onPress={() => setPerms({ ...perms, [cur.id]: on.map((v, j) => (j === i ? !v : v)) })}
-                  className={`min-h-58 flex-row items-center gap-12 rounded-16 border border-white/80 bg-white/60 py-8 pl-14 pr-12 ${live ? '' : 'opacity-50'}`}
-                >
-                  <View className="flex-1 gap-2">
-                    <T className="text-14 font-bold">{p.label}</T>
-                    <T className="text-12 text-ink-2">{p.hint}</T>
-                  </View>
-                  <Switch on={on[i]} />
-                </Tap>
-              ))}
-            </View>
-            <View className="flex-row gap-8">
-              <SecondaryButton label="Done" onPress={() => setOpen(null)} height={52} radius={16} className="flex-1" />
-              <Tap
-                label={button.label}
-                onPress={() => {
-                  if (live) {
-                    setStatus({ ...status, [cur.id]: 'none' });
+    <CollectionScreen
+      rows={data?.channels ?? []}
+      keyFor={channel => channel.packageName}
+      header={
+        <>
+          <BackButton to="Profile" label="Back to Profile" />
+          <T accessibilityRole="header" className="text-30 font-medium">
+            Connected Apps
+          </T>
+          <T className="text-15 text-ink-2">Choose what MIRA can access.</T>
+          <T className="text-14 text-ink-body">
+            Only notifications from apps you switch on are read. Replies always
+            need your approval. Turning an app off stops new capture; existing
+            messages stay on this phone.
+          </T>
+          {!data && !error ? <T>Loading apps...</T> : null}
+          {error ? (
+            <>
+              <T>Could not load apps. Try again.</T>
+              <SecondaryButton label="Retry apps" onPress={retry} />
+            </>
+          ) : null}
+          {data && !data.listener ? (
+            <Glass className="gap-10 p-14 rounded-20">
+              <T>
+                Allow notification access so MIRA can read your chosen apps.
+              </T>
+              <SecondaryButton
+                label="Open notification settings"
+                onPress={async () => {
+                  try {
+                    await bridge.openListenerSettings();
+                  } catch {
+                    setNotice('Could not open settings. Try again.');
                   }
-                  setOpen(null);
                 }}
-                className={`h-52 flex-1 items-center justify-center rounded-16 ${button.danger ? 'bg-error-bg' : ''}`}
-                style={button.danger ? undefined : fx.primary}
-              >
-                <T className={`text-15 font-bold ${button.danger ? 'text-error-ink' : 'text-white'}`}>{button.label}</T>
-              </Tap>
+              />
+              <SecondaryButton
+                label="Check notification access"
+                onPress={retry}
+              />
+            </Glass>
+          ) : null}
+          {notice ? <T accessibilityRole="alert">{notice}</T> : null}
+          {failed ? (
+            <SecondaryButton
+              label="Retry change"
+              onPress={() => save(failed)}
+            />
+          ) : null}
+          {data?.channels.length === 0 ? (
+            <T>
+              No notification apps found. Tap Refresh apps after installing an
+              app.
+            </T>
+          ) : null}
+        </>
+      }
+      row={channel => (
+        <Glass key={channel.packageName} className="gap-10 rounded-20 p-14">
+          <Tap
+            label={`Read ${channel.label}`}
+            accessibilityRole="switch"
+            accessibilityState={{ checked: channel.enabled, disabled: busy }}
+            disabled={busy}
+            onPress={() => save({ ...channel, enabled: !channel.enabled })}
+            className="min-h-58 flex-row gap-12 items-center"
+          >
+            <View className="flex-1 gap-4">
+              <T className="text-17 font-bold">{channel.label}</T>
+              <T className="text-13 text-ink-2">
+                {channel.enabled ? 'Reading notifications' : 'Off'}
+              </T>
             </View>
-          </>
-        ) : null}
-      </Sheet>
-    </Screen>
+            <Switch on={channel.enabled} />
+          </Tap>
+          <View
+            accessibilityRole="radiogroup"
+            accessibilityLabel={`Permissions for ${channel.label}`}
+            className="gap-8"
+          >
+            {([1, 2] as const).map(level => (
+              <Tap
+                key={level}
+                label={`${
+                  level === 1 ? 'Read and report' : 'Also draft replies'
+                } for ${channel.label}`}
+                accessibilityRole="radio"
+                accessibilityState={{
+                  checked: channel.level === level,
+                  disabled: busy || !channel.enabled,
+                }}
+                disabled={busy || !channel.enabled}
+                onPress={() => save({ ...channel, level })}
+                className={`min-h-48 justify-center rounded-14 px-12 py-10 ${
+                  channel.level === level ? 'bg-peri-tonal' : 'bg-white/60'
+                }`}
+              >
+                <T className="text-14 font-semibold">
+                  {level === 1 ? 'Read and report' : 'Also draft replies'}
+                  {channel.level === level ? ' - selected' : ''}
+                </T>
+              </Tap>
+            ))}
+          </View>
+        </Glass>
+      )}
+      footer={<SecondaryButton label="Refresh apps" onPress={retry} />}
+    />
   );
 }

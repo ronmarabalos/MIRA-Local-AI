@@ -74,12 +74,12 @@ const BOARDS: [string, ComponentType<any>, string, object?][] = [
   ['04 model setup', ModelSetupScreen, 'Your AI runs on this device'],
   ['05 home', HomeScreen, 'Here’s what matters today'],
   ['06 assistant', AssistantScreen, 'how can I help you this morning?'],
-  ['07 teach', TeachScreen, 'Three ways to teach'],
+  ['07 teach', TeachScreen, 'Teach MIRA'],
   ['08 teach by instruction', TeachInstructionScreen, 'What would you like MIRA to learn?'],
   ['09 teach by example', TeachExampleScreen, 'Show MIRA an example.'],
   ['10 automation builder', AutomationBuilderScreen, 'Create an Automation'],
-  ['11 review and approve', AutomationReviewScreen, 'PROPOSED · NOT ACTIVE'],
-  ['12 my automations', AutomationsScreen, 'RECENT RUNS'],
+  ['11 review and approve', AutomationReviewScreen, 'Review rules'],
+  ['12 my automations', AutomationsScreen, 'My automations'],
   ['13 inbox', InboxScreen, 'Can we reschedule our meeting?'],
   ['14 email and reply', EmailDetailScreen, 'Message not found'],
   ['15 approval center', ApprovalsScreen, 'Needs Your Approval'],
@@ -88,10 +88,10 @@ const BOARDS: [string, ComponentType<any>, string, object?][] = [
   ['18 personal memory', MemoryScreen, 'What MIRA Remembers'],
   ['19 connected apps', ConnectedAppsScreen, 'Choose what MIRA can access.'],
   ['20 offline and sync', OfflineSyncScreen, 'Pending When Online'],
-  ['21 activity history', ActivityScreen, 'Drafted reply to Jordan Lee'],
+  ['21 activity history', ActivityScreen, 'Activity'],
   ['22 notifications', NotificationsScreen, 'Mark all read'],
   ['23 profile', ProfileScreen, 'Personal memory'],
-  ['24 settings', SettingsScreen, 'PERSONALIZATION'],
+  ['24 settings', SettingsScreen, 'Privacy proof'],
 ];
 
 // Each row is passed as one object: with spread rows, Jest reads a missing

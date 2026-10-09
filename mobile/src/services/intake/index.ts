@@ -7,7 +7,7 @@ import { splitNotification } from './split';
 
 export type IntakeStore = Pick<
   Store,
-  'addMessage' | 'saveRecord' | 'getMessagesByStatus' | 'getItem'
+  'addMessage' | 'saveRecord' | 'getMessagesByStatus' | 'getItem' | 'getChannels' | 'saveProcessingTime'
 >;
 
 export interface IntakeDeps {
@@ -58,7 +58,10 @@ export function createIntake({
 
   async function takeIn(): Promise<void> {
     for (const notification of await bridge.drainInbox()) {
+      const channels = await store.getChannels();
+      if (!channels.some(c => c.packageName === notification.packageName && c.enabled)) continue;
       for (const { message, chat } of splitNotification(notification)) {
+        const started = Date.now();
         const route = quickFilter(notification, message.text);
         if (route === 'drop') {
           continue;
@@ -66,6 +69,7 @@ export function createIntake({
         const added = await store.addMessage(message, chat);
         if (added && route !== 'model') {
           await store.saveRecord(filteredRecord(message, route), 'filtered');
+          await store.saveProcessingTime(message.id, Math.max(0, Date.now() - started));
         }
       }
     }
@@ -88,7 +92,10 @@ export function createIntake({
   /** Every message still waiting, including ones left by an earlier session. */
   async function process(): Promise<void> {
     for (const message of await store.getMessagesByStatus('new')) {
+      const channels = await store.getChannels();
+      if (!channels.some(c => c.packageName === message.packageName && c.enabled)) continue;
       const item = await store.getItem(message.id);
+      const started = Date.now();
       const extracted = await extractWithRetry(message, {
         chatTitle: item?.chat.title ?? message.sender,
         chatKind: item?.chat.kind ?? 'private',
@@ -96,6 +103,7 @@ export function createIntake({
       if (extracted) {
         const record = verifyRecord(extracted, message);
         await store.saveRecord(record, 'processed');
+        await store.saveProcessingTime(message.id, Math.max(0, Date.now() - started));
         if (onProcessed && item) {
           // A failing rule or action must not stop the next message being read.
           await onProcessed({ ...item, record }).catch(() => {});

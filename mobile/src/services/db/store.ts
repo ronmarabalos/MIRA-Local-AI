@@ -63,6 +63,18 @@ export function createStore(db: SqlDatabase) {
 
     // Messages and records
 
+    async saveProcessingTime(messageId: string, durationMs: number): Promise<void> {
+      if (!Number.isFinite(durationMs) || durationMs < 0) throw new Error('Invalid processing duration');
+      await write(tx => tx.execute('INSERT OR REPLACE INTO processing_times (message_id, duration_ms) VALUES (?, ?)', [messageId, durationMs]).then(() => undefined));
+    },
+
+    async getProcessingStats(from: number, to: number): Promise<{ processed: number; averageMs: number | null; samples: number }> {
+      const { rows } = await db.execute(`SELECT COUNT(*) AS processed, AVG(p.duration_ms) AS average_ms, COUNT(p.duration_ms) AS samples
+        FROM messages m LEFT JOIN processing_times p ON p.message_id = m.id
+        WHERE m.posted_at >= ? AND m.posted_at < ? AND m.status IN ('processed', 'filtered')`, [from, to]);
+      return { processed: Number(rows[0]?.processed ?? 0), averageMs: optNum(rows[0]?.average_ms), samples: Number(rows[0]?.samples ?? 0) };
+    },
+
     /**
      * Stores a message and its chat. Returns false, and stores nothing, when
      * the same message (app, chat, sender, text, and time) is already stored.

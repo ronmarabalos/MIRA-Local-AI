@@ -25,6 +25,10 @@ function memoryStore() {
   const identity = (m: Message) =>
     [m.packageName, m.chatId, m.sender, m.text, m.postedAt].join('|');
   const store: IntakeStore = {
+    async saveProcessingTime() {},
+    async getChannels() {
+      return [...new Set(FIXTURES.map(f => f.notification.packageName))].map(packageName => ({ packageName, label: packageName, enabled: true, level: 1 as const }));
+    },
     async addMessage(message, chat) {
       if ([...messages.values()].some(m => identity(m) === identity(message)))
         return false;
