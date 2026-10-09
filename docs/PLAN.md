@@ -48,7 +48,7 @@ Two lanes with separate folders, so the two developers almost never edit the sam
 | | Lane A: native and model | Lane B: app logic and screens |
 | :--- | :--- | :--- |
 | **Owner** | Steve (has the Infinix) | Ronmar |
-| **Owns** | `mobile/android/**` · `mobile/src/services/native/**` · `mobile/src/services/model/**` · `mobile/package.json` · `mobile/package-lock.json` | `mobile/src/core/**` · `mobile/src/services/db/**` · `mobile/src/services/intake/**` · `mobile/src/services/actions/**` · `mobile/src/services/fakes/**` · `mobile/src/theme/**` · `mobile/src/components/**` · `mobile/src/screens/**` · `mobile/__tests__/**` |
+| **Owns** | `mobile/android/**` · `mobile/src/services/native/**` · `mobile/src/services/model/**` · `mobile/package.json` · `mobile/package-lock.json` · `mobile/index.js` · `mobile/jest.config.js` | `mobile/src/core/**` · `mobile/src/services/db/**` · `mobile/src/services/intake/**` · `mobile/src/services/actions/**` · `mobile/src/services/fakes/**` · `mobile/src/theme/**` · `mobile/src/components/**` · `mobile/src/screens/**` · `mobile/__tests__/**` |
 | **Checks on** | The Infinix | Unit tests and fixture messages; the phone only at integration |
 
 **Shared files, and the rule for each**
@@ -126,23 +126,26 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 **Lane A**
 
 - [ ] **Task A1.1: A model answers on the phone**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `mobile/src/services/model/llama.ts`, a developer-only screen under `mobile/src/services/model/dev/`
   - **Do:** download one instruct model of about 1 to 2B parameters in GGUF, 4-bit (candidates to try: Qwen2.5 1.5B Instruct, Gemma 3 1B). Copy it to the phone with `adb push`. Load it with `llama.rn` and run one prompt.
   - **Done when:** the phone prints an answer and the time taken. Record the model name and seconds per message in this task. Try a 3 to 4B model only if the small one is well under 6 seconds.
   - **If it fails:** stop and rethink together (spec section 12).
+  - **State:** code written, not yet run on the phone. `mobile/src/services/model/llama.ts` loads a model and runs one request; `schema.ts` holds the spec 5.2 JSON form. To check: open the dev menu (shake, or `adb shell input keyevent 82`) → **MIRA probe**, note the folder it shows, `adb push <file>.gguf <that folder>/model.gguf`, then Load and Run sample. Record here: model name, load time, seconds per message, and whether the output parses.
 
 - [ ] **Task A1.2: Log real notifications**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** `mobile/android/app/src/main/java/com/mira/app/notifications/MiraNotificationListener.kt`, `mobile/android/app/src/main/AndroidManifest.xml`
   - **Do:** a `NotificationListenerService` that logs the spec 4.1 fields. Send real Messenger and Gmail messages to the phone.
   - **Done when:** this task records, for each app: how much text is exposed, whether the chat name is present, whether individual messages are listed, and whether a reply box is offered. Remove message text from logs before merging.
+  - **State:** code written, not yet run on the phone. The listener keeps the latest 30 Messenger and Gmail notifications in memory only, and logs lengths and yes/no facts, never text. To check: in the probe, Open settings → allow MIRA, send real messages, Refresh. Record here per app: text length against what was sent, chat name, individual messages, reply box.
 
 - [ ] **Task A1.3: Reply through a notification, and the bytes-sent count**
-  - **Priority:** P0 · **Status:** Backlog
+  - **Priority:** P0 · **Status:** In Progress
   - **Files:** the listener, plus a temporary test call
   - **Do:** send one reply through Messenger's notification reply box from a test build. Try reading the app's own bytes-sent count from Android.
   - **Done when:** this task records "reply works" or "use clipboard fallback", and "bytes count available" or "permission check only".
+  - **State:** code written, not yet run on the phone. To check: in the probe, press **Send test reply** on a Messenger notification and read section 3. Note that Android counts bytes sent since the phone last started, not since install. Record here: reply works or clipboard fallback; bytes count available or permission check only.
 
 **Lane B**
 
