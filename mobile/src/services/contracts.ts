@@ -51,6 +51,12 @@ export interface MessageContext {
   chatKind: ChatKind;
 }
 
+/** One message given to the model as the basis for an answer. */
+export interface AnswerSource {
+  message: Message;
+  context: MessageContext;
+}
+
 /** The local model (spec 4.5). One request runs at a time. */
 export interface ModelService {
   /** Rejects when the output cannot be parsed; the caller retries once. */
