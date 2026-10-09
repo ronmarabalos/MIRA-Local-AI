@@ -42,3 +42,16 @@ export const RECORD_SCHEMA = {
 export function toModelUri(path: string): string {
   return path.startsWith('file://') ? path : `file://${path}`;
 }
+
+/**
+ * The JSON object inside a model reply. Tolerates text before or after it,
+ * such as a chat marker. Throws when there is no object or it does not parse.
+ */
+export function parseJsonObject(text: string): unknown {
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start === -1 || end <= start) {
+    throw new Error('No JSON object in the model output.');
+  }
+  return JSON.parse(text.slice(start, end + 1));
+}

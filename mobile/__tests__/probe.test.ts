@@ -1,5 +1,9 @@
 import type { CapturedNotification } from '../src/core/types';
-import { RECORD_SCHEMA, toModelUri } from '../src/services/model/schema';
+import {
+  RECORD_SCHEMA,
+  parseJsonObject,
+  toModelUri,
+} from '../src/services/model/schema';
 import { describeNotification } from '../src/services/native/dev/describe';
 
 const base: CapturedNotification = {
@@ -64,4 +68,14 @@ test('the record schema requires every field in spec 5.2 and nothing else', () =
   ]);
   expect(Object.keys(RECORD_SCHEMA.properties)).toEqual(RECORD_SCHEMA.required);
   expect(RECORD_SCHEMA.additionalProperties).toBe(false);
+});
+
+test('reads the JSON object out of a reply that has a chat marker around it', () => {
+  expect(
+    parseJsonObject('<|im_start|>assistant\n{\n  "type": "announcement"\n}\n'),
+  ).toEqual({
+    type: 'announcement',
+  });
+  expect(() => parseJsonObject('no object here')).toThrow();
+  expect(() => parseJsonObject('{"type": ')).toThrow();
 });

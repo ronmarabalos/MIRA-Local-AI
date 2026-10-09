@@ -9,7 +9,13 @@ let context: LlamaContext | null = null;
 export interface Completion {
   text: string;
   ms: number;
+  promptTokens: number;
+  outputTokens: number;
+  tokensPerSecond: number;
 }
+
+/** The phone's four fast cores. More threads than that slows generation down. */
+const THREADS = 4;
 
 /** Loads one model file. The spec runs the model on the CPU, so no GPU layers. */
 export async function loadModel(path: string): Promise<{ ms: number }> {
@@ -18,6 +24,7 @@ export async function loadModel(path: string): Promise<{ ms: number }> {
   context = await initLlama({
     model: toModelUri(path),
     n_ctx: 2048,
+    n_threads: THREADS,
     n_gpu_layers: 0,
   });
   return { ms: Date.now() - started };
@@ -58,5 +65,13 @@ export async function complete(
         }
       : { type: 'text' },
   });
-  return { text: result.text, ms: Date.now() - started };
+  return {
+    // `text` is the raw output and can carry the chat template's opening
+    // marker; `content` is the message alone.
+    text: result.content || result.text,
+    ms: Date.now() - started,
+    promptTokens: result.timings.prompt_n,
+    outputTokens: result.timings.predicted_n,
+    tokensPerSecond: result.timings.predicted_per_second,
+  };
 }
