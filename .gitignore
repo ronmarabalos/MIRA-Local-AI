@@ -27,3 +27,6 @@ build/
 # Skills Staging
 .agents/skills/_staging/*
 !.agents/skills/_staging/.gitkeep
+
+# Dual-agent sync bus: rewritten on every commit, kept per machine
+.agents/sync/handoff.*
