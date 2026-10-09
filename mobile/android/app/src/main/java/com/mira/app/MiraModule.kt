@@ -9,6 +9,8 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.TrafficStats
+import android.os.Handler
+import android.os.Looper
 import android.os.Process
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
@@ -56,6 +58,7 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
 
   override fun invalidate() {
     MiraNotificationListener.onCaptured = null
+    mainHandler.removeCallbacksAndMessages(null)
     try {
       connectivity.unregisterNetworkCallback(networkCallback)
     } catch (e: IllegalArgumentException) {
@@ -71,10 +74,25 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
         capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
   }
 
+  private val mainHandler = Handler(Looper.getMainLooper())
+  private var lastOnline: Boolean? = null
+
+  /**
+   * Android reports a lost network before it stops being the active one, so the state is read a
+   * moment later. JavaScript is told only when the answer changes.
+   */
   private fun emitOnline() {
-    if (reactApplicationContext.hasActiveReactInstance()) {
-      reactApplicationContext.emitDeviceEvent(EVENT_ONLINE, currentlyOnline())
-    }
+    mainHandler.removeCallbacksAndMessages(null)
+    mainHandler.postDelayed(
+        {
+          val online = currentlyOnline()
+          if (online != lastOnline && reactApplicationContext.hasActiveReactInstance()) {
+            lastOnline = online
+            reactApplicationContext.emitDeviceEvent(EVENT_ONLINE, online)
+          }
+        },
+        ONLINE_SETTLE_MS,
+    )
   }
 
   @ReactMethod
@@ -193,5 +211,6 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
     const val EVENT_NOTIFICATION = "MiraNotification"
     const val EVENT_ONLINE = "MiraOnline"
     const val MODEL_FILE = "model.gguf"
+    private const val ONLINE_SETTLE_MS = 500L
   }
 }

@@ -393,8 +393,8 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingTop: 48, gap: 8, backgroundColor: '#FFFFFF' },
   row: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: 8,
   },
   title: { fontSize: 22, fontWeight: '700', color: '#1C2140' },

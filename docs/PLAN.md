@@ -261,12 +261,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Done when:** a reply typed in the app reaches Messenger from the phone.
   - **State (2026-10-10):** sending is confirmed on the Infinix (A1.3). `draftReply` is in `services/model/index.ts` (at most 60 words, message inside a data block). **Phone check handed to Ronmar:** with a Messenger notification showing, open the dev menu → **MIRA probe** → **Switch on Messenger + Gmail** → receive a new message → **Refresh** → **Draft a reply** on its card. Record the draft's quality and seconds here. Without a model file on the phone the draft is the fake one-liner.
 
-- [ ] **Task A3.2: Reminders**
-  - **Priority:** P0 · **Status:** In Progress
+- [x] **Task A3.2: Reminders**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `MiraModule.kt`, a small Kotlin alarm receiver, `bridge.ts`
   - **Do:** `scheduleReminder(title, at)` posts a local notification at the given time with `NotificationCompat`.
   - **Done when:** a reminder set one minute ahead appears on the phone.
-  - **State (2026-10-10):** `reminders/ReminderReceiver.kt` sets an alarm and shows a "Reminder" notification that opens MIRA; `bridge.scheduleReminder` asks for the notification permission on Android 13 and later. Reminders do not survive a phone restart. **Phone check handed to Ronmar:** in the probe tap **Remind in 1 min**, allow notifications if asked, and confirm the reminder appears about a minute later.
+  - **State (2026-10-10):** `reminders/ReminderReceiver.kt` sets an alarm and shows a "Reminder" notification that opens MIRA; `bridge.scheduleReminder` asks for the notification permission on Android 13 and later. Reminders do not survive a phone restart. **Checked on the Infinix (2026-10-10):** a reminder set from the probe for one minute ahead appeared on time, on the `reminders` channel at high importance. Ronmar no longer needs to run this check.
 
 - [ ] **Task A3.3: Release build with no internet permission, and proof facts**
   - **Priority:** P0 · **Status:** In Progress
@@ -321,12 +321,12 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 **Lane A**
 
-- [ ] **Task A4.1: Online state and airplane-mode run**
-  - **Priority:** P0 · **Status:** In Progress
+- [x] **Task A4.1: Online state and airplane-mode run**
+  - **Priority:** P0 · **Status:** Done
   - **Files:** `MiraModule.kt`, `bridge.ts`
   - **Do:** `isOnline()` and an online/offline event. Run the app in airplane mode: Today, drafting, and the model must work.
   - **Done when:** the app reports offline within a few seconds of airplane mode, and nothing breaks.
-  - **State (2026-10-10):** the code has been in place since A2.1: `isOnline()` and the `MiraOnline` event in `MiraModule.kt`, passed through by `bridge.ts` and covered by a unit test. Online means a network that Android has validated as reaching the internet. The probe's section 3 shows the live state and counts changes. **Phone check still to do** (either developer): open the probe, turn airplane mode on, and confirm it reads `online: no` within a few seconds; then with airplane mode still on, run **Run sample** and **Show stored** to confirm the model and storage work offline; turn it off and confirm `online: yes`.
+  - **State (2026-10-10):** the code has been in place since A2.1: `isOnline()` and the `MiraOnline` event in `MiraModule.kt`, passed through by `bridge.ts` and covered by a unit test. Online means a network that Android has validated as reaching the internet. The probe's section 3 shows the live state and counts changes. **Checked on the Infinix (2026-10-10):** with airplane mode on and Wi-Fi off the probe read `online: no`, and `online: yes` again after reconnecting, with exactly one change each way. The model loaded and answered while offline. Two findings: (1) the first version reported `yes` while offline, because Android announces a lost network before it stops being the active one; the module now reads the state half a second later and tells JavaScript only when it changes. (2) **On this phone, airplane mode leaves Wi-Fi connected**, so airplane mode alone does not take it offline. For demo step 8, turn Wi-Fi off as well, or the reply will send instead of queueing.
 
 - [ ] **Task A4.2: Fix what the phone shows**
   - **Priority:** P0 · **Status:** Backlog
