@@ -74,7 +74,7 @@ export default function SetupScreen() {
           </View>
           <View className="flex-row items-center gap-12 py-12">
             <IconTile name="phone" fg={palette.navy.DEFAULT} bg={palette.peri.tonal} />
-            <T className="flex-1 text-14 font-bold">On-device AI model</T>
+            <T className="flex-1 text-14 font-bold">Runs on this phone</T>
             <Badge text="Next" />
           </View>
           <View className="flex-row items-center gap-12 py-12">

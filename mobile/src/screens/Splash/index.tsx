@@ -10,6 +10,9 @@ import { useStatusBar } from '../../components/Screen';
 import { SilkBackground } from '../../components/SilkBackground';
 import { T } from '../../components/T';
 import { Tap } from '../../components/ui';
+import { bridge } from '../../services';
+import { getStore } from '../../services/db';
+import { isSetUp } from '../../services/firstRun';
 import { fx } from '../../theme/effects';
 
 export default function SplashScreen() {
@@ -18,8 +21,21 @@ export default function SplashScreen() {
   useStatusBar(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => go('Onboarding', { replace: true }), 2600);
-    return () => clearTimeout(timer);
+    let live = true;
+    // Someone who has already set MIRA up goes straight to their day.
+    const next = getStore()
+      .then(store => isSetUp(bridge, store))
+      .catch(() => false);
+    const timer = setTimeout(async () => {
+      const ready = await next;
+      if (live) {
+        go(ready ? 'Home' : 'Onboarding', ready ? { reset: true } : { replace: true });
+      }
+    }, 2600);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
   }, [go]);
 
   return (
@@ -36,7 +52,7 @@ export default function SplashScreen() {
         <View className="items-center gap-10">
           <T className="pl-[9.7px] text-44 font-bold tracking-[9.7px]">MIRA</T>
           <T className="max-w-260 text-center text-15 font-medium leading-[22.5px] text-ink-2">
-            Your AI. Your Rules.{'\n'}Your Personal Assistant.
+            Your Messages. Your Rules.{'\n'}Your Personal Assistant.
           </T>
         </View>
       </Tap>

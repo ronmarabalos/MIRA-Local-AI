@@ -2,6 +2,18 @@ import type { Channel } from '../../core/types';
 import type { NativeBridge } from '../contracts';
 import type { Store } from '../db';
 
+const MESSAGE_APPS = new Set([
+  'com.facebook.orca',
+  'com.google.android.gm',
+  'com.google.android.apps.messaging',
+  'com.google.android.apps.classroom',
+  'org.telegram.messenger',
+  'com.whatsapp',
+  'com.viber.voip',
+  'com.microsoft.office.outlook',
+  'com.discord',
+]);
+
 /** One serialized permission boundary shared by startup and channel controls. */
 export function createChannelManager(
   store: Pick<Store, 'getChannels' | 'saveChannel'>,
@@ -26,7 +38,12 @@ export function createChannelManager(
         if (!all.has(app.packageName))
           all.set(app.packageName, { ...app, enabled: false, level: 1 });
       }
-      return [...all.values()].sort((a, b) => a.label.localeCompare(b.label));
+      // Switched-on apps first, then apps people get messages in, then the rest by name.
+      const rank = (c: Channel) =>
+        c.enabled ? 0 : MESSAGE_APPS.has(c.packageName) ? 1 : 2;
+      return [...all.values()].sort(
+        (a, b) => rank(a) - rank(b) || a.label.localeCompare(b.label),
+      );
     },
     sync: () =>
       serial(async () =>

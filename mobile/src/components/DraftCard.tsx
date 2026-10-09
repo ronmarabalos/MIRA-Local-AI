@@ -61,13 +61,13 @@ export function DraftCard({
       <View className="gap-8">
         {waiting && item ? (
           <SecondaryButton
-            label={`Send reply ${draft.id}`}
+            label="Send reply"
             disabled={busy || !text.trim()}
             onPress={() => onSend(row, text)}
           />
         ) : null}
         <SecondaryButton
-          label={`Discard draft ${draft.id}`}
+          label="Discard draft"
           disabled={busy}
           onPress={() => onDiscard(draft.id)}
         />

@@ -200,11 +200,11 @@ test('Send opens confirmation; cancel never sends; edited text is saved before c
     n => n.props.accessibilityLabel === 'Reply text d1' && n.props.onChangeText,
   )[0];
   await act(() => input.props.onChangeText('Edited reply'));
-  await press('Send reply d1');
+  await press('Send reply');
   expect(send).not.toHaveBeenCalled();
   await press('Cancel send');
   expect(send).not.toHaveBeenCalled();
-  await press('Send reply d1');
+  await press('Send reply');
   await press('Confirm send');
   expect(send).toHaveBeenCalledWith('n1', 'Edited reply');
   expect((await db.store.getDrafts('sent'))[0].firstText).toBe(
@@ -215,7 +215,7 @@ test('discard removes pending draft without sending', async () => {
   await draft();
   const send = jest.spyOn(bridge, 'sendReply');
   await render(Approvals);
-  await press('Discard draft d1');
+  await press('Discard draft');
   expect(await db.store.getDrafts('waiting')).toEqual([]);
   expect(send).not.toHaveBeenCalled();
 });
@@ -224,7 +224,7 @@ test('offline confirmation shows Queued and does not send', async () => {
   jest.spyOn(bridge, 'isOnline').mockResolvedValue(false);
   const send = jest.spyOn(bridge, 'sendReply');
   await render(Approvals);
-  await press('Send reply d1');
+  await press('Send reply');
   await press('Confirm send');
   expect(output()).toContain('Queued');
   expect(send).not.toHaveBeenCalled();

@@ -45,15 +45,11 @@ export function PrivacyProof() {
           <T className="text-14 text-ink-body">{`${data.processed} message${
             data.processed === 1 ? '' : 's'
           } processed today`}</T>
-          <T className="text-14 text-ink-body">
-            {data.averageMs === null
-              ? 'Average processing time: no timed messages yet.'
-              : `Average processing time: ${(data.averageMs / 1000).toFixed(
-                  2,
-                )} seconds across ${
-                  data.samples
-                } timed messages (reading and filtering).`}
-          </T>
+          {data.averageMs === null ? null : (
+            <T className="text-14 text-ink-body">
+              {`Average processing time: ${(data.averageMs / 1000).toFixed(2)} seconds across ${data.samples} timed messages (reading and filtering).`}
+            </T>
+          )}
         </>
       ) : null}
       <SecondaryButton label="Refresh privacy facts" onPress={retry} />

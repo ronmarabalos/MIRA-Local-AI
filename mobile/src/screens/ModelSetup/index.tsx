@@ -1,5 +1,5 @@
-/** Board 04-ai-model-setup. The download is simulated, as on the board. */
-import { useEffect, useRef, useState } from 'react';
+/** Board 04-ai-model-setup. Shows whether the model file is on this phone; nothing is downloaded. */
+import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { Companion } from '../../components/Companion';
@@ -10,15 +10,15 @@ import { Screen } from '../../components/Screen';
 import { Steps } from '../../components/Steps';
 import { T } from '../../components/T';
 import { BackButton, Glass, PrimaryButton, Rows, SecondaryButton } from '../../components/ui';
+import { isModelOnPhone } from '../../services/firstRun';
 import { fx } from '../../theme/effects';
 import palette from '../../theme/palette';
 
-type Phase = 'idle' | 'downloading' | 'ready';
+type Phase = 'idle' | 'ready';
 
 const STATUS: Record<Phase, { label: string; fg: string; bg: string }> = {
-  idle: { label: 'Not downloaded', fg: palette.ink.label, bg: 'rgba(255,255,255,0.6)' },
-  downloading: { label: 'Downloading · demo', fg: palette.navy.DEFAULT, bg: palette.peri.tonal },
-  ready: { label: 'Installed · ready offline', fg: palette.success.ink, bg: palette.success.bg },
+  idle: { label: 'Not on this phone yet', fg: palette.ink.label, bg: 'rgba(255,255,255,0.6)' },
+  ready: { label: 'On this phone · ready offline', fg: palette.success.ink, bg: palette.success.bg },
 };
 
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
@@ -33,29 +33,15 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
 export default function ModelSetupScreen() {
   const go = useGo();
   const [phase, setPhase] = useState<Phase>('idle');
-  const [pct, setPct] = useState(0);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const stop = () => {
-    if (timer.current) {
-      clearInterval(timer.current);
-      timer.current = null;
-    }
-  };
-  useEffect(() => stop, []);
-
-  useEffect(() => {
-    if (phase === 'downloading' && pct >= 100) {
-      stop();
-      setPhase('ready');
-    }
-  }, [phase, pct]);
-
-  const start = () => {
-    setPhase('downloading');
-    setPct(0);
-    timer.current = setInterval(() => setPct((p) => Math.min(100, p + 7)), 180);
-  };
+  // MIRA cannot download anything: the file is copied to the phone over USB.
+  const check = useCallback(() => {
+    isModelOnPhone().then(
+      present => setPhase(present ? 'ready' : 'idle'),
+      () => setPhase('idle'),
+    );
+  }, []);
+  useEffect(check, [check]);
 
   const status = STATUS[phase];
   const finish = () => go('Home', { reset: true });
@@ -78,16 +64,16 @@ export default function ModelSetupScreen() {
               style={{ borderColor: phase === 'ready' ? palette.success.DEFAULT : palette.peri[300] }}
             />
           </Spin>
-          <Companion size={84} mode={phase === 'downloading' ? 'thinking' : phase === 'ready' ? 'offline' : 'idle'} />
+          <Companion size={84} mode={phase === 'ready' ? 'offline' : 'idle'} />
           <View className="absolute bottom-6 right-2 h-30 w-30 items-center justify-center rounded-10 border-[3px] border-white bg-ink">
             <Icon name="phoneBare" size={14} strokeWidth={2.4} color={palette.white} />
           </View>
         </View>
         <View className="items-center gap-6">
           <T accessibilityRole="header" className="text-center text-24 font-bold leading-[30px] tracking-[-0.48px]">
-            Your AI runs on this device
+            MIRA runs on this phone
           </T>
-          <T className="max-w-290 text-center text-14 leading-[21px] text-ink-2">Private, and works offline.</T>
+          <T className="max-w-290 text-center text-14 leading-[21px] text-ink-2">Your messages are read here, never on a server. It works with no connection.</T>
         </View>
         <View className="flex-row items-center gap-6 rounded-full px-12 py-6" style={{ backgroundColor: status.bg }}>
           <View className="h-8 w-8 rounded-full" style={{ backgroundColor: status.fg }} />
@@ -99,19 +85,16 @@ export default function ModelSetupScreen() {
 
       <Glass className="rounded-22 px-16 py-4">
         <Rows>
-          <Fact label="Model">
-            <T className="text-14 font-bold">MIRA Core · compact</T>
+          <Fact label="Where it runs">
+            <T className="text-14 font-bold">On this phone</T>
           </Fact>
-          <Fact label="Download size">
-            <T className="text-14 font-bold">1.8 GB</T>
+          <Fact label="Size on this phone">
+            <T className="text-14 font-bold">About 1.1 GB</T>
           </Fact>
-          <Fact label="Free space">
-            <T className="text-14 font-bold">23.4 GB available</T>
-          </Fact>
-          <Fact label="This device">
+          <Fact label="Internet needed">
             <View className="flex-row items-center gap-6">
               <Icon name="check" size={16} strokeWidth={2.4} color={palette.success.ink} />
-              <T className="text-14 font-bold text-success-ink">Compatible</T>
+              <T className="text-14 font-bold text-success-ink">Never</T>
             </View>
           </Fact>
         </Rows>
@@ -121,30 +104,16 @@ export default function ModelSetupScreen() {
         <View className="mt-1">
           <Icon name="info" size={18} color={palette.warning.text} />
         </View>
-        <T className="text-13 leading-[18.85px] text-warning-text">Wi-Fi recommended</T>
+        <T className="flex-1 text-13 leading-[18.85px] text-warning-text">
+          {phase === 'ready'
+            ? 'Nothing was downloaded. The file was copied to this phone over USB.'
+            : 'MIRA never downloads anything. Copy the file to this phone over USB, then check again.'}
+        </T>
       </View>
 
       <View className="mt-auto gap-10">
         {phase === 'idle' ? (
-          <PrimaryButton
-            label="Download model · 1.8 GB"
-            onPress={start}
-            left={<Icon name="download" size={18} strokeWidth={2.2} color={palette.white} />}
-          />
-        ) : phase === 'downloading' ? (
-          <Glass
-            accessibilityRole="progressbar"
-            accessibilityValue={{ min: 0, max: 100, now: pct }}
-            className="h-56 justify-center gap-8 rounded-18 px-16"
-          >
-            <View className="flex-row justify-between">
-              <T className="text-13 font-bold">Downloading…</T>
-              <T className="text-13 font-bold text-navy">{pct}%</T>
-            </View>
-            <View className="h-6 overflow-hidden rounded-full bg-peri-tonal">
-              <View className="h-6 rounded-full" style={[fx.progress, { width: `${pct}%` }]} />
-            </View>
-          </Glass>
+          <PrimaryButton label="Check again" onPress={check} />
         ) : (
           <PrimaryButton label="Finish setup" onPress={finish} />
         )}
