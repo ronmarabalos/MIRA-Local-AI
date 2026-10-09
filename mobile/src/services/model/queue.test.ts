@@ -47,3 +47,13 @@ test('a failing task rejects its own promise and the queue carries on', async ()
   await expect(failed).rejects.toThrow('boom');
   expect(await after).toBe('still running');
 });
+
+test('a task that throws before returning a promise still rejects, and the queue carries on', async () => {
+  const inTurn = createTurnQueue();
+  const failed = inTurn((() => {
+    throw new Error('thrown at once');
+  }) as () => Promise<string>);
+  const after = inTurn(async () => 'still running');
+  await expect(failed).rejects.toThrow('thrown at once');
+  expect(await after).toBe('still running');
+});

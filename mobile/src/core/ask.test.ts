@@ -208,3 +208,37 @@ describe('which messages can be found', () => {
     expect(found).not.toContain(older.message.id);
   });
 });
+
+describe('words that should not be searched for', () => {
+  test('the leftover letter of a contraction does not match', () => {
+    const other = item("It's Carla's turn to present today.");
+    expect(ids("what's that?", [other])).toEqual([]);
+    expect(ids("when's the fee due?", [other])).toEqual([]);
+  });
+
+  test('"next" does not make an unrelated message a match', () => {
+    const gym = item('See you next week at the gym.', {
+      dateText: 'next week',
+    });
+    const deadline = item('Submit your project on oct 12 at 11:59pm.', {
+      type: 'deadline',
+      dateText: 'oct 12',
+    });
+    expect(ids('When is the next deadline?', [gym, deadline])).toEqual([
+      deadline.message.id,
+    ]);
+  });
+
+  test('Filipino question forms are understood: anong, kelan', () => {
+    const meeting = item('Meeting tayo bukas ng 3pm sa library.', {
+      dateText: 'bukas ng 3pm',
+    });
+    const food = item('Anong ulam natin mamaya sa bahay?');
+    expect(ids('anong oras ang meeting?', [food, meeting])).toEqual([
+      meeting.message.id,
+    ]);
+    expect(
+      searchMessages('kelan ang meeting?', [meeting], NOW)[0].fact?.kind,
+    ).toBe('date');
+  });
+});

@@ -25,14 +25,18 @@ const FILLER = new Set(
     'i me my mine you your we our us it its this that these those there here of in on at to for from with by about as ' +
     'and or but if so not no yes what which who whom whose where why how any some all ' +
     'please tell show give find know need want get got thing ' +
+    // What is left of a contraction once its apostrophe is gone ("what's", "didn't").
+    'don didn doesn isn wasn aren ll ve re ' +
+    'next last say said ' +
     'ang ng mga sa si ni kay na pa ba po ho yung yun ito iyan iyon ko mo ka ako ikaw siya kami tayo sila ' +
-    'ano sino saan bakit paano may meron wala at o pero kung din rin lang naman nga daw raw'
+    'ano anong anu sino saan bakit paano ilan sabi may meron wala at o pero kung din rin lang naman nga daw raw'
   ).split(' '),
 );
 
 const DATE_WORDS = new Set([
   'when',
   'kailan',
+  'kelan',
   'time',
   'oras',
   'due',
@@ -50,6 +54,7 @@ const AMOUNT_WORDS = new Set([
 const INTENT_ONLY = new Set([
   'when',
   'kailan',
+  'kelan',
   'time',
   'oras',
   'much',
@@ -128,7 +133,12 @@ export function searchMessages(
   const wantsAmount = raw.some(word => AMOUNT_WORDS.has(word));
   const asked = [
     ...new Set(
-      raw.filter(word => !FILLER.has(word) && !INTENT_ONLY.has(word)).map(stem),
+      raw
+        .filter(
+          word =>
+            word.length > 1 && !FILLER.has(word) && !INTENT_ONLY.has(word),
+        )
+        .map(stem),
     ),
   ];
   if (asked.length === 0) return [];
