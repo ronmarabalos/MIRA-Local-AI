@@ -18,7 +18,7 @@ MIRA's interface is React Native 0.87 in TypeScript, using **react-native-paper*
 
 - Code lives under `mobile/src/`: `screens/` (one folder per screen), `components/` (shared pieces), `theme/` (tokens), `services/` (model, database, native bridge), and `core/` (pure logic).
 - **Screens contain no product logic.** They call `services/` and `core/` and render the result. Filtering, rule decisions, and report building belong in `core/`, where they can be tested without a phone.
-- Navigation is a bottom bar with four destinations (Today, Ask, Approvals, Rules) and a stack for detail and settings screens.
+- Navigation is the design's floating bar with four destinations (Home, Inbox, Teach, Planner) and a stack for Assistant, detail, and settings screens. Spec section 7 maps each screen to its function.
 - Function components and hooks only. Strict TypeScript; no `any`.
 
 ### 2. State

@@ -341,25 +341,30 @@ Shows facts read from the system at that moment, not fixed text: whether the ins
 
 Visual design follows the [design prompt](../mira-design-prompt.md): Material 3, brand colour `#7665E8`, every MIRA statement followed by its quoted source.
 
-| Screen | Tier | Fed by |
-|---|---|---|
-| Onboarding (4 steps) | P0 | Bridge, channels |
-| Today, with empty and offline states | P0 | Report builder |
-| Item detail | P0 | Records, messages, action runner |
-| Ask (typed) | P0 | Ask |
-| Approvals | P0 | Drafts, action runner |
-| Rules: list, new, preview | P0 | Rules, rule engine |
-| Channels | P0 | Channels |
-| Activity log | P0 | Actions |
-| Privacy proof | P0 | Bridge |
-| Today catch-up state | P1 | Report builder |
-| Rule suggestion sheet | P1 | Drafts |
-| What MIRA knows | P1 | Memory |
-| Companion on Ask | P1 | Model service state |
+Screens follow the MIRA design file's screen set (decided 2026-10-10). The functions below are unchanged; each lives on the design screen named beside it. Folders are under `mobile/src/screens/`.
+
+| Function | Screen (folder) | Tier | Fed by |
+|---|---|---|---|
+| Onboarding | Splash, Onboarding, Setup, ModelSetup | P0 | Bridge, channels |
+| Today report, with empty and offline states | Home | P0 | Report builder |
+| Report for one app or chat | Inbox | P0 | Report builder with a filter |
+| Item detail | EmailDetail | P0 | Records, messages, action runner |
+| Ask (typed), with the companion | Assistant | P0 (companion states P1) | Ask |
+| Approvals | Approvals | P0 | Drafts, action runner |
+| Rules: list, new, preview | Teach, TeachInstruction, Automations, AutomationBuilder, AutomationReview | P0 | Rules, rule engine |
+| Channels | ConnectedApps | P0 | Channels |
+| Activity log | Activity | P0 | Actions |
+| Privacy proof | Settings (privacy section) | P0 | Bridge |
+| Dates found and reminders | Planner | P1 | Report builder, actions |
+| Queued replies while offline | OfflineSync | P1 | Actions |
+| Rule suggestion sheet, teach by example | TeachExample | P1 | Drafts |
+| What MIRA knows | Memory | P1 | Memory |
+| Today catch-up state | Home | P1 | Report builder |
+| Notifications, Profile | Notifications, Profile | Visual only | No new features |
 
 The design prompt shows three permission levels per app. This build offers two, *Read and report* and *Also draft replies*; the third, automatic replies, is shown as unavailable.
 
-Navigation: bottom bar with Today, Ask, Approvals, Rules. Settings screens open from the top bar. The privacy indicator in the top bar opens Privacy proof.
+Navigation: the design's floating bar with Home, Inbox, Teach, Planner. The companion opens Assistant. Approvals, Activity, ConnectedApps, and Settings open from Home and the top bar. The privacy indicator opens the privacy section of Settings. Screens show stored data only; a design screen with no function above adds no feature.
 
 ---
 

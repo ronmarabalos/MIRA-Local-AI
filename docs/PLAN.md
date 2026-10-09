@@ -208,15 +208,17 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
   - **Do:** spec 4.10 sections: Needs you, Dates found, Announcements, Handled for you, Ignored (a count), Couldn't read. No duplicate merging, no clash check.
   - **Done when:** tests cover section membership and ordering.
 
+> **Screens follow the design's screen set** (decided 2026-10-10, spec section 7). Task names keep the spec's functions; the folders are the design's: Today is `Home`, Item detail is `EmailDetail`, Channels is `ConnectedApps`, Activity log is `Activity`, Rules are `Teach` and `Automations`, Ask is `Assistant`, Privacy proof is a section of `Settings`.
+
 - [ ] **Task B2.3: Today and Item detail**
   - **Priority:** P0 · **Status:** Backlog
-  - **Files:** `mobile/src/screens/Today/`, `mobile/src/screens/ItemDetail/`, `mobile/src/components/ReportItem.tsx`
+  - **Files:** `mobile/src/screens/Home/`, `mobile/src/screens/Inbox/`, `mobile/src/screens/EmailDetail/`, `mobile/src/components/ReportItem.tsx`
   - **Do:** build to boards `05-home` and `14-email-and-ai-reply`. Every line carries its `SourceQuote`. Empty state and placeholder rows while the model works.
   - **Done when:** fixture data renders on Today, and tapping a line opens the original message.
 
 - [ ] **Task B2.4: Channels**
   - **Priority:** P0 · **Status:** Backlog
-  - **Files:** `mobile/src/screens/Channels/`
+  - **Files:** `mobile/src/screens/ConnectedApps/`
   - **Do:** build to board `19-connected-apps`. A switch per app and two levels (Read and report; Also draft replies). Each change calls `setEnabledPackages`.
   - **Done when:** switching an app off is stored and sent to the bridge.
 
@@ -259,13 +261,13 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 - [ ] **Task B3.2: Action runner and activity log**
   - **Priority:** P0 · **Status:** Backlog
-  - **Files:** `mobile/src/services/actions/index.ts`, `mobile/src/screens/ActivityLog/`
+  - **Files:** `mobile/src/services/actions/index.ts`, `mobile/src/screens/Activity/`
   - **Do:** write every action to the `actions` table before it runs and update it with the result (safety requirement 8). Log screen to board `21-activity-history`, showing the rule and, for blocked actions, the reason.
   - **Done when:** a hostile fixture message shows in the log as blocked, with the reason.
 
 - [ ] **Task B3.3: Rules screen**
   - **Priority:** P0 · **Status:** Backlog
-  - **Files:** `mobile/src/screens/Rules/`
+  - **Files:** `mobile/src/screens/Teach/`, `mobile/src/screens/Automations/`, `mobile/src/screens/AutomationReview/`
   - **Do:** build to board `12-my-automations`. The three built-in rules as switches, each with a plain-words description and a preview count of past messages it would have matched.
   - **Done when:** switching a rule on changes what the engine decides for the next message.
 
@@ -277,7 +279,7 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 - [ ] **Task B3.5: Privacy proof**
   - **Priority:** P0 · **Status:** Backlog
-  - **Files:** `mobile/src/screens/PrivacyProof/`, `mobile/src/components/PrivacyIndicator.tsx`
+  - **Files:** `mobile/src/screens/Settings/` (privacy section), `mobile/src/components/PrivacyIndicator.tsx`
   - **Do:** build to board `24-settings-and-privacy`. Show the facts from `getProofFacts()`, messages processed today, and average processing time. A debug build says "Development build: internet permission present."
   - **Done when:** the indicator in the top bar opens the screen and the facts are read live.
 
@@ -319,8 +321,8 @@ Do these on one machine, in one sitting, as one or two commits. Both developers 
 
 - [ ] **Task B4.4: Ask, lookup only (cut first if late)**
   - **Priority:** P0 · **Status:** Backlog
-  - **Files:** `mobile/src/core/ask.ts`, test beside it, `mobile/src/screens/Ask/`
-  - **Do:** keyword and date search over records; answer from a record field with its `SourceQuote`; "I couldn't find that in your messages" when nothing matches. No model call. If cut, hide the Ask tab.
+  - **Files:** `mobile/src/core/ask.ts`, test beside it, `mobile/src/screens/Assistant/`
+  - **Do:** keyword and date search over records; answer from a record field with its `SourceQuote`; "I couldn't find that in your messages" when nothing matches. No model call. If cut, Assistant shows the companion without answers.
   - **Done when:** "when is the deadline?" returns the deadline record and its source.
 
 **Phase 4 exit check:** in airplane mode, Today and drafting work and an approved reply shows as queued; back online, it sends.

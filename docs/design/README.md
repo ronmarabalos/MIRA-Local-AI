@@ -11,23 +11,29 @@ The visual source of truth for MIRA's screens. Read this file, then the one boar
 
 ## Which board for which screen
 
-| Spec screen | Board in `screens/` |
-| :--- | :--- |
-| Onboarding | `02-onboarding`, `03-initial-setup`, `04-ai-model-setup` |
-| Today | `05-home`, `05b-home-dark` |
-| Item detail | `14-email-and-ai-reply` |
-| Ask, and the companion | `06-mira-assistant`, `00-orb-styles` |
-| Approvals | `15-approval-center` |
-| Rules: list, new, preview | `12-my-automations`, `10-automation-builder`, `11-review-and-approve` |
-| Rule suggestion sheet | `07-teach-mira` |
-| Channels | `19-connected-apps` |
-| Activity log | `21-activity-history` |
-| Privacy proof | `24-settings-and-privacy`, `20-offline-and-sync` |
-| What MIRA knows | `18-personal-memory` |
+The app uses the design's screen set (spec section 7). Each board is one screen folder in `mobile/src/screens/`.
 
-Tokens and components: `00-foundations`. The bottom bar is the design's floating tab bar, carrying the spec's four destinations (Today, Ask, Approvals, Rules).
+| Screen (folder) | Spec function | Board in `screens/` |
+| :--- | :--- | :--- |
+| Splash, Onboarding, Setup, ModelSetup | Onboarding | `01-splash`, `02-onboarding`, `03-initial-setup`, `04-ai-model-setup` |
+| Home | Today report | `05-home`, `05b-home-dark` |
+| Assistant | Ask, and the companion | `06-mira-assistant`, `00-orb-styles` |
+| Teach, TeachInstruction, TeachExample | Rules stated in words; rule suggestions | `07-teach-mira`, `08-teach-by-instruction`, `09-teach-by-example` |
+| AutomationBuilder, AutomationReview, Automations | Rules: new, preview, list | `10-automation-builder`, `11-review-and-approve`, `12-my-automations` |
+| Inbox | Report for one app or chat | `13-inbox` |
+| EmailDetail | Item detail | `14-email-and-ai-reply` |
+| Approvals | Approvals | `15-approval-center` |
+| Planner | Dates found and reminders | `16-tasks-and-reminders`, `17-calendar` |
+| Memory | What MIRA knows | `18-personal-memory` |
+| ConnectedApps | Channels | `19-connected-apps` |
+| OfflineSync | Queued replies while offline | `20-offline-and-sync` |
+| Activity | Activity log | `21-activity-history` |
+| Notifications, Profile | Visual only | `22-notifications`, `23-profile` |
+| Settings | Privacy proof and settings | `24-settings-and-privacy` |
 
-Boards with no spec screen (`01-splash`, `13-inbox`, `16-tasks-and-reminders`, `17-calendar`, `22-notifications`, `23-profile`, `08-teach-by-instruction`, `09-teach-by-example`) are style reference only. They do not add features.
+Tokens and components: `00-foundations`. The bottom bar is the design's floating tab bar with Home, Inbox, Teach, Planner.
+
+Screens show stored data only. Where a board shows a feature the spec does not have (calendar sync, cloud accounts), leave it out rather than fake it.
 
 Board text such as "AI model setup" or "AI reply" is placeholder copy. The wording rules in [`frontend.md`](../rules/frontend.md) still apply.
 
