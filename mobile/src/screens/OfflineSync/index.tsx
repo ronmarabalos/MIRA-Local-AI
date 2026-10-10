@@ -7,9 +7,8 @@ export default function OfflineSyncScreen() {
       back="Home"
       backLabel="Back to Home"
       title="Offline"
-      lead="MIRA works without a connection."
       emptyTitle="Nothing is waiting"
-      emptyBody="Reading, reminders, and drafts all happen on this phone. A reply you approve while offline waits in Approvals and sends when the phone is back online."
+      emptyBody="Replies approved offline send when you’re back online."
       action={{ label: 'Review drafts', to: 'Approvals' }}
     />
   );

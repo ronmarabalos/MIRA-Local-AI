@@ -50,6 +50,14 @@ export interface NativeBridge {
 export interface MessageContext {
   chatTitle: string;
   chatKind: ChatKind;
+  /** How the user wants replies to sound, from the reply helper. Drafts only. */
+  voice?: { about: string; tone: string };
+}
+
+/** A document the user attached in Ask MIRA, as the passages chosen for one request. */
+export interface DocumentSource {
+  name: string;
+  passages: string[];
 }
 
 /** One message given to the model as the basis for an answer. */
@@ -71,4 +79,14 @@ export interface ModelService {
    * Rejects when there is no usable answer; the caller shows the sources alone.
    */
   answer(question: string, sources: AnswerSource[]): Promise<string>;
+  /**
+   * Does what the user asked with a document (summarise, list deadlines,
+   * explain, make a reviewer), from these passages only. Rejects when the
+   * passages do not hold what was asked.
+   */
+  answerDocument(request: string, document: DocumentSource): Promise<string>;
+  /** Loads the model now and runs one tiny request, to show it answers on this phone. */
+  warmUp?(): Promise<{ ms: number }>;
+  /** Lets go of the loaded model after its file was replaced; the next call loads the new one. */
+  reload?(): Promise<void>;
 }

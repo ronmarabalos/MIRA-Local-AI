@@ -19,6 +19,9 @@ import EmailDetailScreen from './screens/EmailDetail';
 import HomeScreen from './screens/Home';
 import InboxScreen from './screens/Inbox';
 import MemoryScreen from './screens/Memory';
+import KeepWordsScreen from './screens/KeepWords';
+import ReplyHelperScreen from './screens/ReplyHelper';
+import MiraFileScreen from './screens/MiraFile';
 import ModelSetupScreen from './screens/ModelSetup';
 import NotificationsScreen from './screens/Notifications';
 import OfflineSyncScreen from './screens/OfflineSync';
@@ -43,7 +46,8 @@ export type TabParamList = {
 export type RootStackParamList = {
   Splash: undefined;
   Onboarding: undefined;
-  Setup: undefined;
+  /** `firstRun` shows the step bar; otherwise this is Personal information. */
+  Setup: { firstRun?: boolean } | undefined;
   ModelSetup: undefined;
   Tabs: NavigatorScreenParams<TabParamList> | undefined;
   Assistant: undefined;
@@ -55,7 +59,11 @@ export type RootStackParamList = {
   EmailDetail: { messageId: string } | undefined;
   Approvals: undefined;
   Memory: undefined;
-  ConnectedApps: undefined;
+  /** `firstRun` is step 3 of the first visit. */
+  ConnectedApps: { firstRun?: boolean } | undefined;
+  MiraFile: undefined;
+  KeepWords: undefined;
+  ReplyHelper: undefined;
   OfflineSync: undefined;
   Activity: undefined;
   Notifications: undefined;
@@ -98,6 +106,9 @@ export function RootNavigator() {
       <Stack.Screen name="Approvals" component={ApprovalsScreen} />
       <Stack.Screen name="Memory" component={MemoryScreen} />
       <Stack.Screen name="ConnectedApps" component={ConnectedAppsScreen} />
+      <Stack.Screen name="MiraFile" component={MiraFileScreen} />
+      <Stack.Screen name="KeepWords" component={KeepWordsScreen} />
+      <Stack.Screen name="ReplyHelper" component={ReplyHelperScreen} />
       <Stack.Screen name="OfflineSync" component={OfflineSyncScreen} />
       <Stack.Screen name="Activity" component={ActivityScreen} />
       <Stack.Screen name="Notifications" component={NotificationsScreen} />

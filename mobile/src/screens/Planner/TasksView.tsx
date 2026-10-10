@@ -37,7 +37,7 @@ export function TasksView({ header }: { header: ReactNode }) {
         {empty ? (
           <EmptyState
             title="Nothing coming up"
-            body="Dates MIRA finds in your messages will appear here."
+            body="Dates from your messages show up here."
           />
         ) : (
           GROUPS.filter(([key]) => groups[key].length > 0).map(

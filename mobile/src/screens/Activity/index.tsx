@@ -34,9 +34,6 @@ export default function ActivityScreen() {
           <T accessibilityRole="header" className="text-30 font-medium">
             Activity
           </T>
-          <T className="text-15 text-ink-2">
-            Every action and its result, stored on this phone.
-          </T>
           {!data && !error ? <T>Loading activity...</T> : null}
           {error ? (
             <>
@@ -46,11 +43,13 @@ export default function ActivityScreen() {
           ) : null}
           {data?.rows.length === 0 ? (
             <T>
-              No activity yet. Actions and blocked messages will appear here.
+              No activity yet.
             </T>
           ) : null}
         </>
       }
+      // CollectionScreen invokes this item renderer; it is not mounted as a component type.
+      // eslint-disable-next-line react/no-unstable-nested-components
       row={({ action, item, rule, appLabel }) => (
         <Glass className="gap-10 rounded-20 p-14">
           <View className="gap-4">

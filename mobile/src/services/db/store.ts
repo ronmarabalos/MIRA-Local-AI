@@ -401,6 +401,31 @@ export function createStore(db: SqlDatabase) {
       );
     },
 
+    /** The words a message must contain to be kept (core/keep.ts); empty keeps everything. */
+    async getKeepWords(): Promise<string[]> {
+      const { rows } = await db.execute("SELECT value FROM prefs WHERE key = 'keepWords'");
+      if (rows.length === 0) return [];
+      try {
+        const words = JSON.parse(str(rows[0].value));
+        return Array.isArray(words) ? words.filter((w): w is string => typeof w === 'string') : [];
+      } catch {
+        return [];
+      }
+    },
+
+    /** Saved like a report change, so Today's "Which messages" line updates. */
+    async setKeepWords(words: string[]): Promise<void> {
+      await write(tx =>
+        tx
+          .execute(
+            `INSERT INTO prefs (key, value) VALUES ('keepWords', ?)
+             ON CONFLICT (key) DO UPDATE SET value = excluded.value`,
+            [JSON.stringify(words)],
+          )
+          .then(() => undefined),
+      );
+    },
+
     /** Removes everything stored from one app, together. */
     async deleteAppData(packageName: string): Promise<void> {
       await write(async tx => {

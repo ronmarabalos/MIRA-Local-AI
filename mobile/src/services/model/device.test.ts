@@ -1,22 +1,30 @@
 import type { Message } from '../../core/types';
-import type { ModelService } from '../contracts';
 import { MiraModule } from '../native/miraModule';
+import { codeOf } from '../../core/modelErrors';
 import { createDeviceModel } from './index';
-import { complete } from './llama';
+import { complete, loadModel, unloadModel } from './llama';
 
 jest.mock('../native/miraModule', () => ({
   MiraModule: { getModelPath: jest.fn() },
 }));
 jest.mock('./llama', () => {
-  let loaded = false;
+  const state = { loaded: false };
   return {
+    state,
     complete: jest.fn(),
-    isModelLoaded: () => loaded,
+    isModelLoaded: () => state.loaded,
     loadModel: jest.fn(async () => {
-      loaded = true;
+      state.loaded = true;
       return { ms: 1 };
     }),
+    unloadModel: jest.fn(async () => {
+      state.loaded = false;
+    }),
   };
+});
+const llamaState = (jest.requireMock('./llama') as { state: { loaded: boolean } }).state;
+beforeEach(() => {
+  llamaState.loaded = false;
 });
 
 const message: Message = {
@@ -33,41 +41,50 @@ const message: Message = {
 };
 const context = { chatTitle: 'ACM Org', chatKind: 'group' as const };
 
-/** A stand-in model whose answer is watched, to prove it is never used for answering. */
-function fallback() {
-  const answer = jest.fn(async () => 'a made-up sentence');
-  const model: ModelService = {
-    extract: async () => ({
-      type: 'other',
-      summary: 'from the fallback',
-      needs_user: false,
-      urgency: 'normal',
-      request: null,
-      date_text: null,
-      amount: null,
-      sensitive: false,
-      instruction_like: false,
-    }),
-    draftReply: async () => 'fallback draft',
-    answer,
-  };
-  return { model, answer };
-}
-
 afterEach(() => jest.clearAllMocks());
 
-test('with no model file on the phone, answering fails and the stand-in is never used', async () => {
+test('with no model file, every call fails with MODEL_NOT_INSTALLED and nothing is made up', async () => {
   jest.mocked(MiraModule.getModelPath).mockResolvedValue(null);
-  const standIn = fallback();
-  const model = createDeviceModel(standIn.model);
-  await expect(
+  const model = createDeviceModel();
+  const calls = [
+    model.extract(message, context),
+    model.draftReply(message, context),
     model.answer('When is it due?', [{ message, context }]),
-  ).rejects.toThrow(/not on this phone/);
-  expect(standIn.answer).not.toHaveBeenCalled();
-  // Reading a message still falls back, so the app works on an emulator.
-  expect((await model.extract(message, context)).summary).toBe(
-    'from the fallback',
-  );
+    model.answerDocument('summarise', { name: 'a.pdf', passages: ['x'] }),
+  ];
+  for (const call of calls) {
+    await expect(call.catch(codeOf)).resolves.toBe('MODEL_NOT_INSTALLED');
+  }
+  expect(complete).not.toHaveBeenCalled();
+});
+
+test('warm-up loads the model once, even when asked twice at the same time', async () => {
+  jest.mocked(MiraModule.getModelPath).mockResolvedValue('/phone/model.gguf');
+  jest.mocked(complete).mockResolvedValue({ text: 'OK', ms: 1, promptTokens: 1, outputTokens: 1, tokensPerSecond: 1 });
+  const model = createDeviceModel();
+  await Promise.all([model.warmUp!(), model.warmUp!()]);
+  expect(loadModel).toHaveBeenCalledTimes(1);
+});
+
+test('a load that fails gives MODEL_LOAD_FAILED and is tried again next time', async () => {
+  jest.mocked(MiraModule.getModelPath).mockResolvedValue('/phone/model.gguf');
+  jest.mocked(loadModel).mockRejectedValueOnce(new Error('out of memory'));
+  jest.mocked(complete).mockResolvedValue({ text: 'OK', ms: 1, promptTokens: 1, outputTokens: 1, tokensPerSecond: 1 });
+  const model = createDeviceModel();
+  await expect(model.warmUp!().catch(codeOf)).resolves.toBe('MODEL_LOAD_FAILED');
+  await expect(model.warmUp!()).resolves.toEqual(expect.objectContaining({ ms: expect.any(Number) }));
+  expect(loadModel).toHaveBeenCalledTimes(2);
+});
+
+test('after the file is replaced, reload lets the old model go and the next call loads the new one', async () => {
+  jest.mocked(MiraModule.getModelPath).mockResolvedValue('/phone/model.gguf');
+  jest.mocked(complete).mockResolvedValue({ text: 'OK', ms: 1, promptTokens: 1, outputTokens: 1, tokensPerSecond: 1 });
+  const model = createDeviceModel();
+  await model.warmUp!();
+  await model.reload!();
+  expect(unloadModel).toHaveBeenCalledTimes(1);
+  await model.warmUp!();
+  expect(loadModel).toHaveBeenCalledTimes(2);
 });
 
 test("the user's question is answered before messages still waiting to be read", async () => {
@@ -92,7 +109,7 @@ test("the user's question is answered before messages still waiting to be read",
     };
   });
 
-  const model = createDeviceModel(fallback().model);
+  const model = createDeviceModel();
   const first = model.extract(message, context);
   const second = model.extract(message, context);
   const question = model.answer('When is it due?', [{ message, context }]);

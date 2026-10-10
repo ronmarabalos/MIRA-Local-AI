@@ -39,11 +39,10 @@ export function TabBar({ active, dark = false }: { active: Tab; dark?: boolean }
         label={tab}
         accessibilityState={{ selected: true }}
         onPress={() => go(to)}
-        className={`h-52 flex-row items-center gap-8 rounded-full pl-12 pr-18 ${dark ? 'bg-dk-chip' : 'bg-ink'}`}
+        className={`h-52 w-52 items-center justify-center rounded-full ${dark ? 'bg-dk-chip' : 'bg-ink'}`}
         style={fx.tabActive}
       >
         <Icon name={icon} size={21} strokeWidth={2} color={dark ? palette.dk.bg : palette.white} />
-        <T className={`text-14 font-semibold ${dark ? 'text-dk-bg' : 'text-white'}`}>{tab}</T>
       </Tap>
     ) : (
       <Tap key={tab} label={tab} onPress={() => go(to)} className="h-52 w-52 items-center justify-center rounded-full">

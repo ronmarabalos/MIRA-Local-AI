@@ -7,7 +7,7 @@ export default function AutomationBuilderScreen() {
       back="Teach"
       title="Create an Automation"
       emptyTitle="Not in this version"
-      emptyBody="Building your own rule is coming later. For now, switch on the rules MIRA already knows."
+      emptyBody="Coming later."
       action={{ label: 'My automations', to: 'Automations' }}
     />
   );

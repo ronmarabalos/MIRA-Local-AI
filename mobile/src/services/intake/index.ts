@@ -1,6 +1,8 @@
 import { resolveInMessage } from '../../core/dates';
 import { DUPLICATE_WINDOW_MS, findDuplicate } from '../../core/dedupe';
 import { quickFilter } from '../../core/filter';
+import { keepsMessage } from '../../core/keep';
+import { codeOf } from '../../core/modelErrors';
 import type { ExtractedRecord, Message, MiraRecord } from '../../core/types';
 import { failedRecord, verifyRecord } from '../../core/verify';
 import type { MessageContext, ModelService, NativeBridge } from '../contracts';
@@ -16,7 +18,9 @@ export type IntakeStore = Pick<
   | 'getItems'
   | 'getChannels'
   | 'saveProcessingTime'
->;
+> &
+  // Optional so stores without it keep every message, as before.
+  Partial<Pick<Store, 'getKeepWords'>>;
 
 export interface IntakeDeps {
   bridge: Pick<NativeBridge, 'drainInbox'>;
@@ -69,7 +73,10 @@ export function createIntake({
   let relinked = false;
 
   async function takeIn(): Promise<void> {
-    for (const notification of await bridge.drainInbox()) {
+    const notifications = await bridge.drainInbox();
+    // Read once per run: the user's words narrow what is kept from switched-on apps.
+    const keepWords = notifications.length > 0 ? (await store.getKeepWords?.()) ?? [] : [];
+    for (const notification of notifications) {
       const channels = await store.getChannels();
       if (
         !channels.some(
@@ -80,7 +87,10 @@ export function createIntake({
       for (const { message, chat } of splitNotification(notification)) {
         const started = Date.now();
         const route = quickFilter(notification, message.text);
-        if (route === 'drop') {
+        if (
+          route === 'drop' ||
+          !keepsMessage(keepWords, { text: message.text, sender: message.sender, chatTitle: chat.title })
+        ) {
           continue;
         }
         const added = await store.addMessage(message, chat);
@@ -102,8 +112,10 @@ export function createIntake({
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
         return await model.extract(message, context);
-      } catch {
-        // Tried once more, then stored as "couldn't read".
+      } catch (error) {
+        // No model on the phone yet: nothing to retry, and nothing is unreadable.
+        if (codeOf(error) === 'MODEL_NOT_INSTALLED') throw error;
+        // Otherwise tried once more, then stored as "couldn't read".
       }
     }
     return null;
@@ -134,10 +146,17 @@ export function createIntake({
       }
       const item = await store.getItem(message.id);
       const started = Date.now();
-      const extracted = await extractWithRetry(message, {
-        chatTitle: item?.chat.title ?? message.sender,
-        chatKind: item?.chat.kind ?? 'private',
-      });
+      let extracted: ExtractedRecord | null;
+      try {
+        extracted = await extractWithRetry(message, {
+          chatTitle: item?.chat.title ?? message.sender,
+          chatKind: item?.chat.kind ?? 'private',
+        });
+      } catch (error) {
+        // The message stays waiting and is read once the model is installed.
+        if (codeOf(error) === 'MODEL_NOT_INSTALLED') return;
+        throw error;
+      }
       if (extracted) {
         const record = verifyRecord(extracted, message);
         await store.saveRecord(record, 'processed');

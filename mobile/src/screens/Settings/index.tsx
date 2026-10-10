@@ -6,11 +6,14 @@ import { T } from '../../components/T';
 import {
   BackButton,
   Glass,
+  IconTile,
   SecondaryButton,
   Switch,
   Tap,
 } from '../../components/ui';
 import { useGo } from '../../components/nav';
+import { Icon } from '../../components/Icon';
+import palette from '../../theme/palette';
 import { usePrefs } from '../../theme/prefs';
 
 export default function SettingsScreen() {
@@ -22,13 +25,22 @@ export default function SettingsScreen() {
       <T accessibilityRole="header" className="text-30 font-medium">
         Settings
       </T>
+      <Tap
+        label="MIRA on this phone"
+        onPress={() => go('MiraFile')}
+        glass="glass2"
+        className="min-h-64 flex-row items-center gap-12 rounded-20 p-14"
+      >
+        <IconTile name="download" fg={palette.navy.DEFAULT} bg={palette.peri.tonal} />
+        <View className="flex-1 gap-2">
+          <T className="text-16 font-semibold">MIRA on this phone</T>
+          <T className="text-13 text-ink-2">Download, resume, or replace MIRA’s file</T>
+        </View>
+        <Icon name="chevronRight" size={16} color={palette.ink.muted} />
+      </Tap>
       <PrivacyProof />
       <Glass className="gap-10 rounded-20 p-14">
         <T className="text-17 font-semibold">Privacy and permissions</T>
-        <T className="text-14 text-ink-body">
-          Messages stay on this phone. Replies always need your tap and
-          confirmation. Notification access applies only to apps you switch on.
-        </T>
         <SecondaryButton
           label="Review app permissions"
           onPress={() => go('ConnectedApps')}

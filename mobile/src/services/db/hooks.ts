@@ -123,3 +123,8 @@ export function useActions(): QueryState<Action[]> {
 export function useRules(): QueryState<Rule[]> {
   return useQuery(store => store.getRules(), []);
 }
+
+/** The words a message must contain to be kept. */
+export function useKeepWords(): QueryState<string[]> {
+  return useQuery(store => store.getKeepWords(), []);
+}

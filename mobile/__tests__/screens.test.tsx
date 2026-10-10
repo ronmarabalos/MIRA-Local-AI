@@ -19,6 +19,8 @@ import EmailDetailScreen from '../src/screens/EmailDetail';
 import HomeScreen from '../src/screens/Home';
 import InboxScreen from '../src/screens/Inbox';
 import MemoryScreen from '../src/screens/Memory';
+import KeepWordsScreen from '../src/screens/KeepWords';
+import MiraFileScreen from '../src/screens/MiraFile';
 import ModelSetupScreen from '../src/screens/ModelSetup';
 import NotificationsScreen from '../src/screens/Notifications';
 import OfflineSyncScreen from '../src/screens/OfflineSync';
@@ -70,8 +72,11 @@ async function render(component: ComponentType<any>, params?: object) {
 const BOARDS: [string, ComponentType<any>, string, object?][] = [
   ['01 splash', SplashScreen, 'Waking up your on-device assistant'],
   ['02 onboarding', OnboardingScreen, 'Allow notification access'],
-  ['03 initial setup', SetupScreen, 'What should MIRA call you?'],
-  ['04 model setup', ModelSetupScreen, 'MIRA runs on this phone'],
+  ['03 initial setup', SetupScreen, 'Step 1 of 3', { firstRun: true }],
+  ['03 personal information', SetupScreen, 'Personal information'],
+  ['04 model setup', ModelSetupScreen, 'Step 2 of 3'],
+  ['04 MIRA on this phone', MiraFileScreen, 'MIRA on this phone'],
+  ['keep words', KeepWordsScreen, 'Which messages should I keep?'],
   ['05 home', HomeScreen, 'What can I help you with today?'],
   ['06 assistant', AssistantScreen, 'Ask MIRA'],
   ['07 teach', TeachScreen, 'Teach MIRA'],
@@ -80,13 +85,13 @@ const BOARDS: [string, ComponentType<any>, string, object?][] = [
   ['10 automation builder', AutomationBuilderScreen, 'Create an Automation'],
   ['11 review and approve', AutomationReviewScreen, 'Review rules'],
   ['12 my automations', AutomationsScreen, 'My automations'],
-  ['13 inbox', InboxScreen, 'Every message MIRA has read, newest first.'],
+  ['13 inbox', InboxScreen, 'Inbox'],
   ['14 email and reply', EmailDetailScreen, 'Message not found'],
   ['15 approval center', ApprovalsScreen, 'Needs Your Approval'],
   ['16 tasks', PlannerScreen, 'Planner'],
   ['17 calendar', PlannerScreen, 'Planner', { view: 'calendar' }],
   ['18 personal memory', MemoryScreen, 'What MIRA Remembers'],
-  ['19 connected apps', ConnectedAppsScreen, 'Choose what MIRA can access.'],
+  ['19 connected apps', ConnectedAppsScreen, 'Connected Apps'],
   ['20 offline and sync', OfflineSyncScreen, 'Nothing is waiting'],
   ['21 activity history', ActivityScreen, 'Activity'],
   ['22 notifications', NotificationsScreen, 'Nothing new'],

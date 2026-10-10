@@ -49,7 +49,7 @@ function MissingMessage() {
         Message not found
       </T>
       <T className="text-14 leading-[22px] text-ink-2">
-        Choose a saved message from Today. This message may have been deleted.
+        It may have been deleted.
       </T>
       <Tap
         label="Open Today"
@@ -164,9 +164,6 @@ function StoredDetail({ messageId }: { messageId: string }) {
         <T className="text-13 text-ink-2">
           {new Date(message.postedAt).toLocaleString()}
         </T>
-        <T className="text-12 text-ink-2">
-          Saved messages are available offline.
-        </T>
       </View>
       {readable ? (
         <View
@@ -200,9 +197,6 @@ function StoredDetail({ messageId }: { messageId: string }) {
             {message.status === 'failed'
               ? "Couldn't read this message"
               : 'Reading this message…'}
-          </T>
-          <T className="text-14 text-ink-2">
-            You can still read the original below.
           </T>
         </Glass>
       )}

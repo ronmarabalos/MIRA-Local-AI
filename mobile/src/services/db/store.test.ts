@@ -184,6 +184,16 @@ describe('store', () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 
+  it('keeps the words to keep messages by, and tells screens', async () => {
+    const { store } = await setup();
+    expect(await store.getKeepWords()).toEqual([]);
+    const listener = jest.fn();
+    store.subscribe(listener);
+    await store.setKeepWords(['announcement', 'exam']);
+    expect(await store.getKeepWords()).toEqual(['announcement', 'exam']);
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+
   it('keeps preferences, replacing a value in place, without telling report subscribers', async () => {
     const { store } = await setup();
     const listener = jest.fn();

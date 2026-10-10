@@ -66,8 +66,9 @@ test('permission onboarding opens settings, rechecks on return, and continues to
   await act(async () => mockForegroundRetry?.());
   expect(text(tree!)).toContain('Notification access is on');
 
-  await act(async () => button(tree!, 'Continue to Connected Apps').props.onPress());
-  expect(mockGo).toHaveBeenCalledWith('ConnectedApps');
+  // The first visit goes on to step 1 of 3.
+  await act(async () => button(tree!, 'Continue').props.onPress());
+  expect(mockGo).toHaveBeenCalledWith('Setup', { firstRun: true });
 
   await act(async () => tree!.unmount());
 });

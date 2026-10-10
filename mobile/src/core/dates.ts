@@ -104,3 +104,64 @@ export function resolveInMessage(
 ): number | null {
   return resolveWhen(phrase, messageText, postedAt)?.at ?? null;
 }
+
+const startOfDay = (at: number) => {
+  const d = new Date(at);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+};
+
+/** `days` whole days after a local midnight, safe across daylight-saving changes. */
+const addDays = (midnight: number, days: number) => {
+  const d = new Date(midnight);
+  d.setDate(d.getDate() + days);
+  return d.getTime();
+};
+
+/** Monday 00:00 of the week holding `at`. */
+const mondayOf = (at: number) => {
+  const today = startOfDay(at);
+  const back = (new Date(today).getDay() + 6) % 7;
+  return addDays(today, -back);
+};
+
+const monthStart = (at: number, plus: number) => {
+  const d = new Date(at);
+  return new Date(d.getFullYear(), d.getMonth() + plus, 1).getTime();
+};
+
+/** Time words a question can use, English and Tagalog; longer phrases first. */
+const WINDOWS: [RegExp, (now: number) => [number, number]][] = [
+  [/\b(?:sa )?susunod na linggo\b|\bnext week\b/i, now => [addDays(mondayOf(now), 7), addDays(mondayOf(now), 14)]],
+  [/\bngayong linggo\b|\bthis week\b/i, now => [mondayOf(now), addDays(startOfDay(now), 7)]],
+  [/\b(?:this )?weekend\b/i, now => [addDays(mondayOf(now), 5), addDays(mondayOf(now), 7)]],
+  [/\b(?:susunod na buwan|next month)\b/i, now => [monthStart(now, 1), monthStart(now, 2)]],
+  [/\b(?:ngayong buwan|this month)\b/i, now => [monthStart(now, 0), monthStart(now, 1)]],
+  [/\b(?:tomorrow|bukas)\b/i, now => [addDays(startOfDay(now), 1), addDays(startOfDay(now), 2)]],
+  [/\b(?:yesterday|kahapon)\b/i, now => [addDays(startOfDay(now), -1), startOfDay(now)]],
+  [/\b(?:today|tonight|ngayon|mamaya)\b/i, now => [startOfDay(now), addDays(startOfDay(now), 1)]],
+];
+
+/**
+ * The span of time a question asks about ("what's due this week?", "may klase
+ * ba bukas?"), as local midnights [from, to), with the words that named it so
+ * they are not searched for as well. Null when the question names no time.
+ */
+export function questionWindow(
+  question: string,
+  now: number,
+): { from: number; to: number; phrase: string } | null {
+  for (const [pattern, span] of WINDOWS) {
+    const match = question.match(pattern);
+    if (match) {
+      const [from, to] = span(now);
+      return { from, to, phrase: match[0] };
+    }
+  }
+  // A named day: "friday", "oct 20", "Biyernes".
+  const english = toEnglish(question);
+  const named = parse(english, now).find(namesDay);
+  if (!named) return null;
+  const from = startOfDay(named.start.date().getTime());
+  return { from, to: addDays(from, 1), phrase: named.text };
+}

@@ -28,6 +28,15 @@ export function createFakeModel(
     async draftReply(message) {
       return `Thanks ${message.sender}, I'll get back to you on this.`;
     },
+    async warmUp() {
+      return { ms: 0 };
+    },
+    async reload() {},
+    async answerDocument(_request, document) {
+      const first = document.passages[0];
+      if (!first) return 'There is nothing to answer from.';
+      return `From ${document.name}: ${first.slice(0, 160)}`;
+    },
     async answer(_question, sources) {
       const first = sources[0];
       if (!first) return 'There is nothing to answer from.';

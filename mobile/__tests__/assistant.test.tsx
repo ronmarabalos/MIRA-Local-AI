@@ -7,10 +7,15 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AssistantScreen from '../src/screens/Assistant';
 import { model } from '../src/services';
 import { getStore } from '../src/services/db';
+import { pickDocument } from '../src/services/documents';
 import { PrefsProvider } from '../src/theme/prefs';
 import { testStore } from '../test-support/sqlite';
 
 jest.mock('../src/services/db', () => ({ getStore: jest.fn() }));
+jest.mock('../src/services/documents', () => ({
+  ...jest.requireActual('../src/services/documents'),
+  pickDocument: jest.fn(),
+}));
 
 const Stack = createNativeStackNavigator();
 let db: Awaited<ReturnType<typeof testStore>>;
@@ -224,4 +229,35 @@ test('two questions sent quickly each get their own answer', async () => {
   expect(feeAt).toBeGreaterThan(-1);
   // Newest question first: "proposal" block, then "org fee" block, each holding its own answer.
   expect(proposalAt).toBeLessThan(feeAt);
+});
+
+test('an attached document is read, and questions about it are answered from its passages', async () => {
+  jest.mocked(pickDocument).mockResolvedValue({
+    name: 'syllabus.pdf',
+    pages: 3,
+    usedOcr: false,
+    passages: ['Biology 101 course outline.', 'The midterm exam is on October 20 in room 301.'],
+  });
+  await render();
+  await act(async () => tree!.root.findAllByProps({ accessibilityLabel: 'Attach a document' })[0].props.onPress());
+  expect(shown()).toContain('syllabus.pdf · 3 pages');
+  expect(shown()).toContain('Summarise this');
+
+  await ask('when is the midterm exam?');
+  await settle();
+  expect(shown()).toContain('MIRA’s answer · from syllabus.pdf');
+  await act(() => tree!.root.findAllByProps({ accessibilityLabel: 'Show passages' })[0].props.onPress());
+  expect(shown()).toContain('The midterm exam is on October 20 in room 301.');
+
+  // Removing it goes back to asking about messages.
+  await act(async () => tree!.root.findAllByProps({ accessibilityLabel: 'Remove document' })[0].props.onPress());
+  expect(field().props.placeholder).toBe('Ask about your messages');
+});
+
+test('a file that cannot be read says so and keeps asking about messages', async () => {
+  jest.mocked(pickDocument).mockRejectedValue(Object.assign(new Error('x'), { code: 'unsupported' }));
+  await render();
+  await act(async () => tree!.root.findAllByProps({ accessibilityLabel: 'Attach a document' })[0].props.onPress());
+  expect(shown()).toContain('I can read PDFs, Word files, text, and photos.');
+  expect(field().props.placeholder).toBe('Ask about your messages');
 });

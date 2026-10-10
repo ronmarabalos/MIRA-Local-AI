@@ -24,6 +24,8 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableArray
+import com.mira.app.documents.DocumentReader
+import com.mira.app.documents.UnsupportedDocument
 import com.mira.app.notifications.EnabledPackages
 import com.mira.app.notifications.MiraNotificationListener
 import com.mira.app.notifications.NativeInbox
@@ -59,6 +61,9 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
   /** The JavaScript call waiting for the user to pick a model file. */
   private var pendingImport: Promise? = null
 
+  /** The JavaScript call waiting for the user to pick a document for Ask MIRA. */
+  private var pendingDocument: Promise? = null
+
   private val activityListener =
       object : BaseActivityEventListener() {
         override fun onActivityResult(
@@ -67,6 +72,10 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
             resultCode: Int,
             data: Intent?,
         ) {
+          if (requestCode == REQUEST_DOCUMENT) {
+            onDocumentPicked(resultCode, data)
+            return
+          }
           if (requestCode != REQUEST_MODEL_FILE) return
           val promise = pendingImport ?: return
           pendingImport = null
@@ -189,7 +198,20 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
   @ReactMethod
   fun getModelPath(promise: Promise) {
     val file = File(reactApplicationContext.getExternalFilesDir(null), MODEL_FILE)
-    promise.resolve(if (file.isFile) file.absolutePath else null)
+    // Only a real model file is offered for loading.
+    promise.resolve(if (file.isFile && startsWithGguf(file)) file.absolutePath else null)
+  }
+
+  /** "missing", "invalid" (there, but not a GGUF model file), or "installed". */
+  @ReactMethod
+  fun getModelStatus(promise: Promise) {
+    val file = File(reactApplicationContext.getExternalFilesDir(null), MODEL_FILE)
+    promise.resolve(
+        when {
+          !file.isFile -> "missing"
+          !startsWithGguf(file) -> "invalid"
+          else -> "installed"
+        })
   }
 
   @ReactMethod
@@ -332,6 +354,8 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
           emitImportProgress(copied, if (total > 0) total else copied)
         }
       }
+      // The header was checked before copying; the copy is complete.
+      emitImportProgress(part.length(), part.length(), verifying = true)
       installModel(part, dir)
       promise.resolve("imported")
     } catch (e: Exception) {
@@ -340,12 +364,80 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
     }
   }
 
-  private fun emitImportProgress(copied: Long, total: Long) {
+  private fun emitImportProgress(copied: Long, total: Long, verifying: Boolean = false) {
     if (!reactApplicationContext.hasActiveReactInstance()) return
     val progress = Arguments.createMap()
     progress.putDouble("copied", copied.toDouble())
     progress.putDouble("total", total.toDouble())
+    if (verifying) progress.putString("phase", "verifying")
     reactApplicationContext.emitDeviceEvent(EVENT_MODEL_IMPORT, progress)
+  }
+
+  /**
+   * Opens the file picker for a document (PDF, Word, text, or a photo) and
+   * reads its text on the phone, using text recognition for scans and photos.
+   * Resolves { name, text, pages, usedOcr }, or null when the user cancels.
+   */
+  @ReactMethod
+  fun pickDocument(promise: Promise) {
+    val activity = reactApplicationContext.currentActivity
+    if (activity == null) {
+      promise.reject("no_activity", "MIRA is not on screen.")
+      return
+    }
+    if (pendingDocument != null) {
+      promise.reject("busy", "A document is already being chosen.")
+      return
+    }
+    pendingDocument = promise
+    val intent =
+        Intent(Intent.ACTION_OPEN_DOCUMENT)
+            .addCategory(Intent.CATEGORY_OPENABLE)
+            .setType("*/*")
+            .putExtra(
+                Intent.EXTRA_MIME_TYPES,
+                arrayOf(
+                    "application/pdf",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "text/plain",
+                    "text/markdown",
+                    "image/*",
+                ),
+            )
+    try {
+      activity.startActivityForResult(intent, REQUEST_DOCUMENT)
+    } catch (e: Exception) {
+      pendingDocument = null
+      promise.reject("no_picker", "This phone has no file picker.")
+    }
+  }
+
+  private fun onDocumentPicked(resultCode: Int, data: Intent?) {
+    val promise = pendingDocument ?: return
+    pendingDocument = null
+    val uri = data?.data
+    if (resultCode != Activity.RESULT_OK || uri == null) {
+      promise.resolve(null)
+      return
+    }
+    // Reading a scan can take several seconds a page; never on the UI thread.
+    Thread {
+      try {
+        val doc = DocumentReader.read(reactApplicationContext, uri)
+        val result = Arguments.createMap()
+        result.putString("name", doc.name)
+        result.putString("text", doc.text)
+        result.putInt("pages", doc.pages)
+        result.putBoolean("usedOcr", doc.usedOcr)
+        promise.resolve(result)
+      } catch (e: UnsupportedDocument) {
+        promise.reject("unsupported", "That kind of file can't be read.")
+      } catch (e: OutOfMemoryError) {
+        promise.reject("too_big", "That file is too big to read on this phone.")
+      } catch (e: Exception) {
+        promise.reject("unreadable", "That file couldn't be read.")
+      }
+    }.start()
   }
 
   @Volatile private var downloadCancelled = false
@@ -455,6 +547,7 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
         }
       }
 
+      emitImportProgress(part.length(), part.length(), verifying = true)
       if (sha256 != null) {
         val got = digest.digest().joinToString("") { "%02x".format(it) }
         if (got != sha256) {
@@ -489,8 +582,12 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
   /** Puts a finished file in place of the model, replacing any old one. */
   private fun installModel(part: File, dir: File) {
     val target = File(dir, MODEL_FILE)
-    if (target.exists() && !target.delete()) throw IllegalStateException("old model in use")
-    if (!part.renameTo(target)) throw IllegalStateException("rename failed")
+    // One rename over the old file (rename(2) replaces it in one step), so a
+    // working model is never deleted before the new one is in place.
+    if (!part.renameTo(target)) {
+      part.delete()
+      throw IllegalStateException("rename failed")
+    }
   }
 
   /** Where the model file is copied to over USB. Readable by the app with no permission. */
@@ -507,6 +604,7 @@ class MiraModule(context: ReactApplicationContext) : ReactContextBaseJavaModule(
     /** Kept apart from the import's part file, so one cannot delete the other's. */
     private const val DOWNLOAD_PART = "model.gguf.download"
     private const val REQUEST_MODEL_FILE = 4711
+    private const val REQUEST_DOCUMENT = 4712
     private val GGUF_MAGIC = byteArrayOf(0x47, 0x47, 0x55, 0x46) // "GGUF"
     /** Room left over after the copy, so the phone is not filled to the last byte. */
     private const val SPACE_MARGIN = 200L * 1024 * 1024

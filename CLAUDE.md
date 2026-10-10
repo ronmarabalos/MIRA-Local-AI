@@ -1,4 +1,4 @@
-# CLAUDE.md — Claude Code Guidelines (The Builder)
+<!-- # CLAUDE.md — Claude Code Guidelines (The Builder)
 
 Welcome, Claude. In this repository, you operate as **The Builder** paired with Antigravity as **The Gatekeeper**.
 
@@ -46,4 +46,4 @@ In a 24-hour hackathon, protecting your token quota is critical:
 
 ## 3. Universal Repository Rules
 
-All universal tenets (zero secret exposure, clickable `file://` links) are defined in [`AGENTS.md`](AGENTS.md).
+All universal tenets (zero secret exposure, clickable `file://` links) are defined in [`AGENTS.md`](AGENTS.md). -->

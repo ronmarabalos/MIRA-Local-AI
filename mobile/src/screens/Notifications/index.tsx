@@ -8,7 +8,7 @@ export default function NotificationsScreen() {
       backLabel="Back to Home"
       title="Notifications"
       emptyTitle="Nothing new"
-      emptyBody="Reminders and alerts from MIRA appear as notifications on your phone. What MIRA did, and why, is in Activity."
+      emptyBody="Reminders show up as phone notifications."
       action={{ label: 'View activity', to: 'Activity' }}
     />
   );

@@ -21,7 +21,7 @@ function deviceBridge(): NativeBridge {
 }
 
 function deviceModel(): ModelService {
-  return require('./model').createDeviceModel(createFakeModel());
+  return require('./model').createDeviceModel();
 }
 
 export const bridge: NativeBridge = onDevice

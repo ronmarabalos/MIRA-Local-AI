@@ -129,9 +129,6 @@ export default function HomeScreen() {
                 accessibilityRole="alert"
               >
                 <T className={`text-16 font-semibold ${ink}`}>Could not load saved messages</T>
-                <T className={`text-14 ${sub}`}>
-                  Try reading them again. Your saved messages have not been changed.
-                </T>
                 <Tap label="Retry" onPress={retry} className="min-h-48 justify-center">
                   <T className={`text-15 font-semibold ${link}`}>Retry</T>
                 </Tap>
@@ -153,9 +150,6 @@ export default function HomeScreen() {
             ) : empty ? (
               <Glass kind={dark ? 'dark' : 'glass'} className="gap-8 rounded-22 p-18">
                 <T className={`text-18 font-semibold ${ink}`}>No messages today</T>
-                <T className={`text-14 leading-[22px] ${sub}`}>
-                  New messages from the apps you choose will appear here with their original source.
-                </T>
                 <Tap
                   label="Choose apps"
                   onPress={() => go('ConnectedApps')}
@@ -172,7 +166,7 @@ export default function HomeScreen() {
                 {data.hasMore ? (
                   <T
                     className={`text-13 ${sub}`}
-                  >{`Showing the latest ${limit} messages today. Load more for earlier messages and counts.`}</T>
+                  >{`Showing the latest ${limit}.`}</T>
                 ) : null}
                 {sections.length === 0 ? (
                   <T className={`text-16 ${ink}`}>Nothing needs your attention today.</T>

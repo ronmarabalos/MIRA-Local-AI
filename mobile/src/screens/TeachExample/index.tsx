@@ -8,7 +8,7 @@ export default function TeachExampleScreen() {
       backLabel="Back to Teach MIRA"
       title="Show MIRA an example."
       emptyTitle="Not in this version"
-      emptyBody="Teaching by example is coming later. For now, switch on the rules MIRA already knows."
+      emptyBody="Coming later."
       action={{ label: 'My automations', to: 'Automations' }}
     />
   );

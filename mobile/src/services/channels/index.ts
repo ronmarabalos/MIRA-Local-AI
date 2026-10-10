@@ -14,6 +14,9 @@ const MESSAGE_APPS = new Set([
   'com.discord',
 ]);
 
+/** Apps people get messages in: suggested on Connected Apps without searching. */
+export const isMessageApp = (packageName: string) => MESSAGE_APPS.has(packageName);
+
 /** One serialized permission boundary shared by startup and channel controls. */
 export function createChannelManager(
   store: Pick<Store, 'getChannels' | 'saveChannel'>,

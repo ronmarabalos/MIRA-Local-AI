@@ -1,3 +1,4 @@
+import { codeOf } from '../../core/modelErrors';
 import { AppState } from 'react-native';
 
 import { getActionRunner } from '../actions/runner';
@@ -12,6 +13,9 @@ import { createIntake } from './index';
  * model reads is passed to the action runner, which applies the user's rules. Returns a
  * function that stops it.
  */
+/** A code or an error's kind for the log, never its text, which could quote a message (backend rules 7). */
+const logCode = (error: unknown) => codeOf(error) ?? (error instanceof Error ? error.name : 'unknown');
+
 export function startIntake(): () => void {
   let stopped = false;
   let drain = () => {};
@@ -32,18 +36,18 @@ export function startIntake(): () => void {
       flush = () => {
         runner
           .flushQueue()
-          .catch(error => console.warn('MIRA queue failed', String(error)));
+          .catch(error => console.warn('MIRA queue failed', logCode(error)));
       };
       drain = () => {
         if (!stopped) {
           intake
             .drain()
-            .catch(error => console.warn('MIRA intake failed', String(error)));
+            .catch(error => console.warn('MIRA intake failed', logCode(error)));
         }
       };
       drain();
     })
-    .catch(error => console.warn('MIRA storage failed to open', String(error)));
+    .catch(error => console.warn('MIRA storage failed to open', logCode(error)));
 
   const unsubscribe = bridge.onNotification(() => drain());
   // Replies approved while offline go out when the connection returns.

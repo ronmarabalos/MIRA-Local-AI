@@ -1,5 +1,6 @@
 import { initLlama, releaseAllLlama } from 'llama.rn';
 
+import { ModelError } from '../../core/modelErrors';
 import { toModelUri } from './schema';
 
 type LlamaContext = Awaited<ReturnType<typeof initLlama>>;
@@ -48,13 +49,14 @@ export function isModelLoaded(): boolean {
 export async function complete(
   system: string,
   user: string,
-  options: { schema?: object; grammar?: string; maxTokens?: number } = {},
+  options: { schema?: object; grammar?: string; maxTokens?: number; timeoutMs?: number } = {},
 ): Promise<Completion> {
   if (!context) {
     throw new Error('No model is loaded.');
   }
   const started = Date.now();
-  const result = await context.completion({
+  const running = context;
+  const request = running.completion({
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },
@@ -75,6 +77,22 @@ export async function complete(
         }
       : {}),
   });
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const limit = options.timeoutMs
+    ? new Promise<never>((_, reject) => {
+        timer = setTimeout(() => {
+          // Stop the work on the phone too, so the next request can start.
+          running.stopCompletion().catch(() => {});
+          reject(new ModelError('MODEL_TIMEOUT'));
+        }, options.timeoutMs);
+      })
+    : null;
+  let result: Awaited<typeof request>;
+  try {
+    result = await (limit ? Promise.race([request, limit]) : request);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
   return {
     // `text` is the raw output and can carry the chat template's opening
     // marker; `content` is the message alone.

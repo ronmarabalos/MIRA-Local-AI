@@ -7,7 +7,7 @@ import { useGo, type Board } from '../../components/nav';
 import { T } from '../../components/T';
 import { Glass, IconTile, Tap } from '../../components/ui';
 import type { Channel } from '../../core/types';
-import { useRules } from '../../services/db/hooks';
+import { useKeepWords, useRules } from '../../services/db/hooks';
 import palette from '../../theme/palette';
 import { usePrefs } from '../../theme/prefs';
 
@@ -39,7 +39,6 @@ export function Greeting({ dark, thinking }: { dark: boolean; thinking: boolean 
         <T className={`flex-1 text-15 ${sub}`}>Ask about your messages</T>
         <Icon name="arrowRight" size={18} color={dark ? palette.dk.accent : palette.navy.DEFAULT} />
       </Tap>
-      <T className={`text-12 ${sub}`}>Everything stays on this phone and works offline.</T>
     </Glass>
   );
 }
@@ -50,6 +49,8 @@ type Question = { ask: string; answer: string; on: boolean; icon: IconName; fg: 
 export function GetToKnow({ channels, dark }: { channels: Channel[]; dark: boolean }) {
   const go = useGo();
   const { data: rules } = useRules();
+  const { data: keepWords } = useKeepWords();
+  const words = keepWords ?? [];
   const on = (id: string) => rules?.some(rule => rule.id === id && rule.enabled) ?? false;
   const apps = channels.filter(channel => channel.enabled).map(channel => channel.label);
   const remind = on('builtin-remind');
@@ -62,12 +63,17 @@ export function GetToKnow({ channels, dark }: { channels: Channel[]; dark: boole
       answer:
         apps.length === 0
           ? 'No apps yet. Tap to choose.'
-          : `From ${apps.slice(0, 2).join(', ')}${apps.length > 2 ? ` and ${apps.length - 2} more` : ''}`,
+          : words.length === 0
+          ? `Everything from ${apps.slice(0, 2).join(', ')}${apps.length > 2 ? ` and ${apps.length - 2} more` : ''}`
+          : `Messages that say ${words
+              .slice(0, 2)
+              .map(w => `“${w}”`)
+              .join(', ')}${words.length > 2 ? ` and ${words.length - 2} more` : ''}`,
       on: apps.length > 0,
       icon: 'chat',
       fg: palette.mint.ink,
       bg: palette.mint.bg,
-      to: 'ConnectedApps',
+      to: 'KeepWords',
     },
     {
       ask: 'What should I remind you about?',
@@ -92,7 +98,7 @@ export function GetToKnow({ channels, dark }: { channels: Channel[]; dark: boole
       icon: 'pencil',
       fg: palette.navy.DEFAULT,
       bg: palette.peri.tonal,
-      to: drafts ? 'Approvals' : 'Teach',
+      to: 'ReplyHelper',
     },
   ];
 
@@ -104,7 +110,6 @@ export function GetToKnow({ channels, dark }: { channels: Channel[]; dark: boole
         <T accessibilityRole="header" className={`text-18 font-semibold ${ink}`}>
           Help me get to know you
         </T>
-        <T className={`text-13 ${sub}`}>So I can help the way you like.</T>
       </View>
       <Glass kind={dark ? 'dark' : 'glass'} className="rounded-22 px-16 py-4">
         {questions.map((q, i) => (

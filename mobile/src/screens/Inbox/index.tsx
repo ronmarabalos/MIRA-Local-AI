@@ -59,9 +59,6 @@ export default function InboxScreen() {
         >
           Inbox
         </T>
-        <T className="text-15 text-ink-2">
-          Every message MIRA has read, newest first.
-        </T>
       </View>
 
       <FilterPills<InboxFilter>
@@ -112,12 +109,12 @@ export default function InboxScreen() {
       ) : stored.data.length === 0 ? (
         <EmptyState
           title="Nothing here yet"
-          body="Messages from the apps you switch on will be listed here."
+          body="Messages from your apps show up here."
         />
       ) : inbox.rows.length === 0 ? (
         <EmptyState
           title="No messages match this filter"
-          body="Choose another filter to see more."
+          body="Try another filter."
         />
       ) : (
         <View>

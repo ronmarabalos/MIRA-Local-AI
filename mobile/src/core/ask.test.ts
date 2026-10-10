@@ -264,3 +264,36 @@ describe('recentHighlights, for a question no keyword matches', () => {
     expect(top.map(m => m.item)).not.toContain(old);
   });
 });
+
+describe('time words in the question', () => {
+  const at = (d: number, h = 9) => new Date(2026, 9, d, h).getTime();
+  // Saturday 10 October 2026, 3 PM local; items are posted an hour before NOW.
+  const LOCAL_NOW = new Date(2026, 9, 10, 15).getTime();
+  const posted = (hoursBefore: number) => ({ hoursAgo: (NOW - LOCAL_NOW) / HOUR + hoursBefore });
+
+  test('"this week" finds what is dated this week, even without the word "due"', () => {
+    const exam = item('Midterm exam in room 301', { type: 'deadline', dateAt: at(14), dateText: 'Wednesday' }, posted(1));
+    const later = item('Thesis defense', { type: 'deadline', dateAt: at(28), dateText: 'Oct 28' }, posted(1));
+    const found = searchMessages("what's due this week?", [exam, later], LOCAL_NOW);
+    expect(found.map(m => m.item)).toEqual([exam]);
+    expect(found[0].fact).toEqual({ kind: 'date', text: 'Wednesday' });
+  });
+
+  test('"bukas" (tomorrow) with a topic word keeps only tomorrow', () => {
+    const tomorrow = item('Walang klase, may seminar', { type: 'schedule_change', dateAt: at(11) }, posted(1));
+    const nextWeek = item('Klase moved to room 4', { type: 'schedule_change', dateAt: at(15) }, posted(1));
+    expect(searchMessages('may klase ba bukas?', [tomorrow, nextWeek], LOCAL_NOW).map(m => m.item)).toEqual([tomorrow]);
+  });
+
+  test('"today" also finds messages sent today that match the topic', () => {
+    const prof = item('Prof: bring your lab manual', { dateAt: null }, { sender: 'Prof. Reyes', ...posted(2) });
+    const old = item('Prof: quiz moved', { dateAt: null }, { sender: 'Prof. Reyes', ...posted(30) });
+    expect(searchMessages('what did my prof say today?', [prof, old], LOCAL_NOW).map(m => m.item)).toEqual([prof]);
+  });
+
+  test('a question that is only a time ("anything tomorrow?") lists what is dated then', () => {
+    const due = item('Pay the lab fee', { type: 'payment', dateAt: at(11) }, posted(1));
+    const other = item('Nice game', { type: 'other', dateAt: null }, posted(1));
+    expect(searchMessages('anything tomorrow?', [due, other], LOCAL_NOW).map(m => m.item)).toEqual([due]);
+  });
+});

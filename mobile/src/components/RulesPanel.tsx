@@ -70,7 +70,6 @@ export function RulesPanel({ summary = false }: { summary?: boolean }) {
             <T className="text-18 font-bold text-dk-text">
               {on === 0 ? 'No helpers on yet' : `${on} of ${rules.length} helpers on`}
             </T>
-            <T className="text-13 text-dk-text2">Switch on what you want. Turn off anytime.</T>
           </View>
         </View>
       ) : null}

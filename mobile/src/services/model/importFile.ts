@@ -1,5 +1,6 @@
 import { DeviceEventEmitter } from 'react-native';
 
+import { fromNative, ModelError } from '../../core/modelErrors';
 import { EVENT_MODEL_IMPORT, MiraModule } from '../native/miraModule';
 
 /**
@@ -17,6 +18,26 @@ export interface ImportProgress {
   copied: number;
   /** -1 when the file's size is not known. */
   total: number;
+  /** Set while the finished file is being checked, before it is put in place. */
+  phase?: 'verifying';
+}
+
+export type ModelFileStatus = 'missing' | 'invalid' | 'installed';
+
+/** Whether MIRA's file is on the phone, and whether it is a real model file (GGUF). */
+export async function modelStatus(): Promise<ModelFileStatus> {
+  if (MiraModule?.getModelStatus) return MiraModule.getModelStatus();
+  // Off a device, or an app built before the check: only whether a file is there.
+  return (await MiraModule?.getModelPath?.()) ? 'installed' : 'missing';
+}
+
+/** Runs a native step, turning its failure codes into fixed MODEL_ codes. */
+async function native<T>(step: 'download' | 'import', work: () => Promise<T>): Promise<T> {
+  try {
+    return await work();
+  } catch (error) {
+    throw new ModelError(fromNative((error as { code?: string }).code, step));
+  }
 }
 
 /**
@@ -26,9 +47,12 @@ export interface ImportProgress {
 export async function downloadModelFile(
   onProgress: (progress: ImportProgress) => void,
 ): Promise<'downloaded' | 'cancelled'> {
+  // Offline before installation: say so at once instead of a failed download.
+  if (!(await MiraModule.isOnline().catch(() => true))) throw new ModelError('MODEL_OFFLINE');
   const sub = DeviceEventEmitter.addListener(EVENT_MODEL_IMPORT, onProgress);
   try {
-    return await MiraModule.downloadModel(MODEL_DOWNLOAD_URL, MODEL_SHA256);
+    // Only the fixed link and checksum go to the native side; nothing from the user.
+    return await native('download', () => MiraModule.downloadModel(MODEL_DOWNLOAD_URL, MODEL_SHA256));
   } finally {
     sub.remove();
   }
@@ -43,16 +67,15 @@ export async function partialDownloadBytes(): Promise<number> {
 
 /**
  * Lets the user pick a model file already on the phone (copied over USB, or
- * downloaded elsewhere) and copies it into MIRA's folder. With no model loaded yet, the next message is read with
- * it; a model already in use is replaced the next time MIRA opens, so a
- * message being read is never cut off.
+ * downloaded elsewhere) and copies it into MIRA's folder. The screen then
+ * calls the model's reload, so the next request uses the new file.
  */
 export async function importModelFile(
   onProgress: (progress: ImportProgress) => void,
 ): Promise<'imported' | 'cancelled'> {
   const sub = DeviceEventEmitter.addListener(EVENT_MODEL_IMPORT, onProgress);
   try {
-    return await MiraModule.importModel();
+    return await native('import', () => MiraModule.importModel());
   } finally {
     sub.remove();
   }

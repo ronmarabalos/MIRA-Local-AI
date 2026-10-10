@@ -8,7 +8,7 @@ export default function TeachInstructionScreen() {
       backLabel="Back to Teach MIRA"
       title="What would you like MIRA to learn?"
       emptyTitle="Not in this version"
-      emptyBody="Writing a rule in your own words is coming later. For now, switch on the rules MIRA already knows."
+      emptyBody="Coming later."
       action={{ label: 'My automations', to: 'Automations' }}
     />
   );

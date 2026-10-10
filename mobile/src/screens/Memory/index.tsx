@@ -8,7 +8,7 @@ export default function MemoryScreen() {
       backLabel="Back to Profile"
       title="What MIRA Remembers"
       emptyTitle="Nothing saved"
-      emptyBody="MIRA does not keep preferences or facts about you in this version. It stores only the messages from apps you switch on, on this phone."
+      emptyBody="MIRA keeps only your messages, on this phone."
     />
   );
 }

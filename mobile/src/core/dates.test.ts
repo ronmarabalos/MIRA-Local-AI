@@ -1,4 +1,4 @@
-import { resolveDate, resolveInMessage, resolveWhen } from './dates';
+import { questionWindow, resolveDate, resolveInMessage, resolveWhen } from './dates';
 
 // Local time, so the tests hold in any time zone. Saturday 10 October 2026.
 const posted = new Date(2026, 9, 10, 9, 0).getTime();
@@ -111,5 +111,52 @@ describe('resolveWhen', () => {
       resolveWhen('this Friday, 5 PM', 'this Friday, 5 PM', posted)?.hasTime,
     ).toBe(true);
     expect(resolveWhen('asap', 'do it asap', posted)).toBeNull();
+  });
+});
+
+describe('questionWindow', () => {
+  // Saturday 10 October 2026, 3 PM, in the phone's own time zone.
+  const now = new Date(2026, 9, 10, 15, 0).getTime();
+  const day = (d: number, m = 9) => new Date(2026, m, d).getTime();
+  const range = (q: string) => {
+    const w = questionWindow(q, now);
+    return w && [w.from, w.to];
+  };
+
+  test('today, tomorrow, and yesterday are whole days', () => {
+    expect(range('anything today?')).toEqual([day(10), day(11)]);
+    expect(range('what is due tomorrow')).toEqual([day(11), day(12)]);
+    expect(range('what did they say yesterday?')).toEqual([day(9), day(10)]);
+  });
+
+  test('this week runs from Monday through the next seven days; next week is Monday to Monday', () => {
+    expect(range("what's due this week?")).toEqual([day(5), day(17)]);
+    expect(range('any exams next week')).toEqual([day(12), day(19)]);
+  });
+
+  test('the weekend, this month, and next month', () => {
+    expect(range('plans this weekend?')).toEqual([day(10), day(12)]);
+    expect(range('payments this month')).toEqual([day(1), day(1, 10)]);
+    expect(range('anything next month')).toEqual([day(1, 10), day(1, 11)]);
+  });
+
+  test('a named day is that one day', () => {
+    expect(range('what is on friday?')).toEqual([day(16), day(17)]);
+    expect(range('due oct 20?')).toEqual([day(20), day(21)]);
+  });
+
+  test('Tagalog words work too', () => {
+    expect(range('may klase ba bukas?')).toEqual([day(11), day(12)]);
+    expect(range('ano ang sinabi kahapon')).toEqual([day(9), day(10)]);
+    expect(range('ano ang deadline ngayong linggo?')).toEqual([day(5), day(17)]);
+    expect(range('meron ba sa susunod na linggo')).toEqual([day(12), day(19)]);
+  });
+
+  test('the matched words are reported, so they are not searched for', () => {
+    expect(questionWindow("what's due this week?", now)?.phrase.toLowerCase()).toBe('this week');
+  });
+
+  test('a question with no time in it has no window', () => {
+    expect(questionWindow('how much is the org fee?', now)).toBeNull();
   });
 });

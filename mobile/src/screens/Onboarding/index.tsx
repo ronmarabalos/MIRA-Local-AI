@@ -44,8 +44,8 @@ export default function OnboardingScreen() {
     ? 'Checking notification access...'
     : error ||
       (enabled
-        ? 'Notification access is on. You choose which apps MIRA can read.'
-        : 'Notification access is off. MIRA cannot read messages yet.');
+        ? 'Notification access is on.'
+        : 'Notification access is off.');
 
   return (
     <Screen top={56} px={24} gap={20} bottom={36} fill>
@@ -88,7 +88,7 @@ export default function OnboardingScreen() {
 
       <View className="mt-auto gap-10">
         {enabled ? (
-          <PrimaryButton label="Continue to Connected Apps" onPress={() => go('ConnectedApps')} />
+          <PrimaryButton label="Continue" onPress={() => go('Setup', { firstRun: true })} />
         ) : (
           <PrimaryButton label="Open notification settings" onPress={openSettings} disabled={checking} />
         )}

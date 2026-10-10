@@ -12,6 +12,8 @@ export interface MiraNativeModule {
   getProofFacts(): Promise<ProofFacts>;
   getModelDir(): Promise<string | null>;
   getModelPath(): Promise<string | null>;
+  /** Whether MIRA's file is there and starts like a GGUF model file. */
+  getModelStatus(): Promise<'missing' | 'invalid' | 'installed'>;
   /** Opens the file picker and copies the chosen model file into MIRA's folder. */
   importModel(): Promise<'imported' | 'cancelled'>;
   /** Downloads MIRA's file into its folder, resuming an earlier part; checks the SHA-256 when given. */
@@ -19,6 +21,8 @@ export interface MiraNativeModule {
   cancelModelDownload(): Promise<void>;
   /** Bytes left by an unfinished download, 0 when there is none. */
   getPartialDownloadBytes(): Promise<number>;
+  /** Opens the file picker and reads the document's text on the phone; null when cancelled. */
+  pickDocument(): Promise<{ name: string; text: string; pages: number; usedOcr: boolean } | null>;
   setEnabledPackages(packageNames: string[]): Promise<void>;
   listNotifyingApps(): Promise<NotifyingApp[]>;
   /** A JSON array of CapturedNotification. */

@@ -47,7 +47,8 @@ describe('parseExtraction', () => {
     expect(
       parseExtraction(JSON.stringify({ ...good, type: 'invoice' })),
     ).toEqual({ ok: false, reason: 'bad_shape' });
-    const { needs_user: _dropped, ...missing } = good;
+    const missing: Partial<typeof good> = { ...good };
+    delete missing.needs_user;
     expect(parseExtraction(JSON.stringify(missing))).toEqual({
       ok: false,
       reason: 'bad_shape',

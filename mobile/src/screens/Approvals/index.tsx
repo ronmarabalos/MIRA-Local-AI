@@ -80,9 +80,6 @@ export default function ApprovalsScreen() {
             <T accessibilityRole="header" className="text-30 font-medium">
               Needs Your Approval
             </T>
-            <T className="text-15 text-ink-2">
-              Read the original, edit the reply, and confirm each send.
-            </T>
             {!data && !error ? <T>Loading drafts...</T> : null}
             {error ? (
               <>
@@ -93,11 +90,13 @@ export default function ApprovalsScreen() {
             {notice ? <T accessibilityRole="alert">{notice}</T> : null}
             {data?.length === 0 ? (
               <T>
-                No drafts waiting. Replies prepared by your rules appear here.
+                No drafts waiting.
               </T>
             ) : null}
           </>
         }
+        // CollectionScreen invokes this item renderer; it is not mounted as a component type.
+        // eslint-disable-next-line react/no-unstable-nested-components
         row={row => (
           <DraftCard
             row={row}

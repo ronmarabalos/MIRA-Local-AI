@@ -8,6 +8,8 @@ import type {
 import { createFakeBridge } from '../fakes/bridge';
 import { createFakeModel } from '../fakes/model';
 import type { StoredItem } from '../db';
+import { ModelError } from '../../core/modelErrors';
+import type { MessageContext } from '../contracts';
 import { createIntake, type IntakeStore } from './index';
 import { splitNotification } from './split';
 
@@ -222,6 +224,39 @@ describe('intake', () => {
     const [message] = [...messages.values()];
     expect(message.status).toBe('failed');
     expect(records.get(message.id)?.type).toBe('other');
+  });
+
+  test("only messages with the user's words are kept, and the rest are never stored", async () => {
+    const bridge = createFakeBridge([fixture('proposal-due'), fixture('lab-report')]);
+    const { store, messages } = memoryStore();
+    const intake = createIntake({
+      bridge,
+      model: createFakeModel(),
+      store: { ...store, getKeepWords: async () => ['proposal'] },
+    });
+    await intake.drain();
+    const texts = [...messages.values()].map(m => m.text);
+    expect(texts).toEqual(['Project proposal is due this Friday, 5 PM. Submit on the portal.']);
+  });
+
+  test('before the model is installed, messages wait instead of being marked unreadable', async () => {
+    const bridge = createFakeBridge([fixture('proposal-due')]);
+    const { store, messages } = memoryStore();
+    let installed = false;
+    const fake = createFakeModel();
+    const extract = jest.fn(async (message: Message, context: MessageContext) => {
+      if (!installed) throw new ModelError('MODEL_NOT_INSTALLED');
+      return fake.extract(message, context);
+    });
+    const intake = createIntake({ bridge, model: { extract }, store });
+    await intake.drain();
+    expect([...messages.values()].map(m => m.status)).toEqual(['new']);
+    // Asked once, not retried: there is nothing to retry until the file is there.
+    expect(extract).toHaveBeenCalledTimes(1);
+
+    installed = true;
+    await intake.drain();
+    expect([...messages.values()].map(m => m.status)).toEqual(['processed']);
   });
 
   test('a message left unprocessed by an earlier session is picked up', async () => {

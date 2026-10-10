@@ -41,8 +41,11 @@ function tabFor(to: Board): TabTarget | null {
 export function useGo() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   return useCallback(
-    /** `reset` starts a fresh history (end of setup); `replace` swaps the current screen. */
-    (to: Board, options?: { reset?: boolean; replace?: boolean }) => {
+    /**
+     * `reset` starts a fresh history (end of setup); `replace` swaps the
+     * current screen; `firstRun` opens a setup screen as a first-visit step.
+     */
+    (to: Board, options?: { reset?: boolean; replace?: boolean; firstRun?: boolean }) => {
       const tab = tabFor(to);
       if (tab && options?.reset) {
         navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Tabs', params: tab }] }));
@@ -52,7 +55,10 @@ export function useGo() {
       } else {
         // The boards' "Main" page is not in the design; About MIRA lives in onboarding.
         const name = to === 'Main' ? 'Onboarding' : (to as Exclude<Board, 'Main' | TabTarget['screen'] | 'Tasks' | 'Calendar'>);
-        navigation.dispatch(options?.replace ? StackActions.replace(name) : CommonActions.navigate(name));
+        const params = options?.firstRun ? { firstRun: true } : undefined;
+        navigation.dispatch(
+          options?.replace ? StackActions.replace(name, params) : CommonActions.navigate({ name, params }),
+        );
       }
     },
     [navigation],

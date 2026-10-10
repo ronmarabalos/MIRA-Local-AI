@@ -1,6 +1,6 @@
 /**
- * Board 06-mira-assistant: ask about your messages. MIRA sums up what it
- * found in a reply; every reply shows the messages it came from.
+ * Board 06-mira-assistant: ask about your messages, or about a document you
+ * attach. MIRA sums up what it found; every reply shows where it came from.
  */
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
@@ -18,6 +18,11 @@ import palette from '../../theme/palette';
 import { model } from '../../services';
 import { type Ask, createAsk } from '../../services/ask';
 import { getStore } from '../../services/db';
+import {
+  askDocument,
+  type OpenDocument,
+  pickDocument,
+} from '../../services/documents';
 
 type State =
   | 'searching'
@@ -35,6 +40,8 @@ interface Block {
   matches: AskMatch[];
   /** Sources unfolded under the reply. */
   open: boolean;
+  /** Set when the question was about an attached document: its name and the passages used. */
+  doc?: { name: string; passages: string[] };
 }
 
 const EXAMPLES = [
@@ -42,6 +49,20 @@ const EXAMPLES = [
   'When is the next deadline?',
   'How much do I need to pay?',
 ];
+
+const DOC_EXAMPLES = [
+  'Summarise this',
+  'What are the deadlines?',
+  'Make a short reviewer',
+];
+
+/** What went wrong reading a document, by the native error code. */
+const DOC_ERRORS: Record<string, string> = {
+  unsupported: 'I can read PDFs, Word files, text, and photos.',
+  too_big: 'That file is too big to read on this phone.',
+  empty: 'I couldn’t find any text in that file.',
+  no_picker: 'Documents can only be added on the phone.',
+};
 
 const MAX_QUESTION = 300;
 
@@ -63,6 +84,9 @@ export default function AssistantScreen() {
   const nextId = useRef(1);
   const live = useRef(true);
   const askRef = useRef<Promise<Ask> | null>(null);
+  const [doc, setDoc] = useState<OpenDocument | null>(null);
+  const [reading, setReading] = useState(false);
+  const [docProblem, setDocProblem] = useState('');
   /** App names by package, so a source reads "Messenger" and never a package id. */
   const [appLabels, setAppLabels] = useState<Record<string, string>>({});
 
@@ -106,12 +130,65 @@ export default function AssistantScreen() {
   const question = text.trim();
   const canSend = question !== '';
 
+  const attach = async () => {
+    setDocProblem('');
+    setReading(true);
+    try {
+      const picked = await pickDocument();
+      if (live.current && picked) setDoc(picked);
+    } catch (error) {
+      const code = (error as { code?: string }).code ?? '';
+      if (live.current)
+        setDocProblem(
+          DOC_ERRORS[code] ?? 'That file couldn’t be read. Try another.',
+        );
+    } finally {
+      if (live.current) setReading(false);
+    }
+  };
+
+  const sendToDocument = async (open: OpenDocument) => {
+    const id = nextId.current++;
+    setBlocks(current => [
+      {
+        id,
+        question,
+        state: 'explaining',
+        answer: null,
+        matches: [],
+        open: false,
+        doc: { name: open.name, passages: [] },
+      },
+      ...current,
+    ]);
+    setText('');
+    const { answer, passages } = await askDocument(question, open, model);
+    const docInfo = { name: open.name, passages };
+    update(
+      id,
+      answer !== null
+        ? { state: 'answered', answer, doc: docInfo }
+        : { state: 'found', open: true, doc: docInfo },
+    );
+  };
+
   const send = async () => {
     if (!canSend) return;
+    if (doc) {
+      await sendToDocument(doc);
+      return;
+    }
     const id = nextId.current++;
     // Newest first, so an answer never arrives below the fold.
     setBlocks(current => [
-      { id, question, state: 'searching', answer: null, matches: [], open: false },
+      {
+        id,
+        question,
+        state: 'searching',
+        answer: null,
+        matches: [],
+        open: false,
+      },
       ...current,
     ]);
     setText('');
@@ -144,28 +221,83 @@ export default function AssistantScreen() {
 
   const bar = (
     <View
-      className="absolute bottom-0 left-0 right-0 flex-row items-end gap-8 border-t border-white/80 bg-silk-base px-20 pt-10"
+      className="absolute bottom-0 left-0 right-0 gap-8 border-t border-white/80 bg-silk-base px-20 pt-10"
       style={{ paddingBottom: insets.bottom + 12 }}
     >
-      <Field
-        accessibilityLabel="Your question"
-        placeholder="Ask about your messages"
-        value={text}
-        onChangeText={setText}
-        maxLength={MAX_QUESTION}
-        multiline
-        className="min-h-48 flex-1 rounded-16 border border-white/80 bg-white/60 px-14 py-12 text-15"
-      />
-      <Tap
-        label="Ask"
-        disabled={!canSend}
-        onPress={send}
-        className={`h-48 items-center justify-center rounded-16 bg-navy px-16 ${
-          canSend ? '' : 'opacity-50'
-        }`}
-      >
-        <T className="text-15 font-bold text-white">Ask</T>
-      </Tap>
+      {reading ? (
+        <View className="flex-row items-center gap-8 self-start rounded-full bg-white/70 px-12 py-8">
+          <View className="flex-row gap-4">
+            {[0, 200, 400].map(delay => (
+              <PulseDot
+                key={delay}
+                delay={delay}
+                duration={1400}
+                scale
+                className="h-6 w-6 rounded-full bg-peri-600"
+              />
+            ))}
+          </View>
+          <T className="text-13 font-semibold text-ink-body">
+            Reading the document…
+          </T>
+        </View>
+      ) : doc ? (
+        <View className="flex-row items-center gap-8 self-start rounded-full bg-peri-tonal py-6 pl-12 pr-6">
+          <Icon name="file" size={16} color={palette.navy.DEFAULT} />
+          <T
+            className="max-w-220 text-13 font-semibold text-navy"
+            numberOfLines={1}
+          >
+            {`${doc.name}${doc.pages > 1 ? ` · ${doc.pages} pages` : ''}`}
+          </T>
+          <Tap
+            label="Remove document"
+            onPress={() => setDoc(null)}
+            className="h-28 w-28 items-center justify-center rounded-full"
+          >
+            <Icon name="x" size={14} color={palette.navy.DEFAULT} />
+          </Tap>
+        </View>
+      ) : null}
+      {docProblem ? (
+        <T
+          accessibilityRole="alert"
+          className="text-13 font-semibold text-error-ink"
+        >
+          {docProblem}
+        </T>
+      ) : null}
+      <View className="flex-row items-end gap-8">
+        <Tap
+          label="Attach a document"
+          disabled={reading}
+          onPress={attach}
+          className="h-48 w-48 items-center justify-center rounded-16 border border-white/80 bg-white/60"
+        >
+          <Icon name="file" size={20} color={palette.navy.DEFAULT} />
+        </Tap>
+        <Field
+          accessibilityLabel="Your question"
+          placeholder={
+            doc ? 'Ask about this document' : 'Ask about your messages'
+          }
+          value={text}
+          onChangeText={setText}
+          maxLength={MAX_QUESTION}
+          multiline
+          className="min-h-48 flex-1 rounded-16 border border-white/80 bg-white/60 px-14 py-12 text-15"
+        />
+        <Tap
+          label="Ask"
+          disabled={!canSend}
+          onPress={send}
+          className={`h-48 items-center justify-center rounded-16 bg-navy px-16 ${
+            canSend ? '' : 'opacity-50'
+          }`}
+        >
+          <T className="text-15 font-bold text-white">Ask</T>
+        </Tap>
+      </View>
     </View>
   );
 
@@ -182,9 +314,6 @@ export default function AssistantScreen() {
         >
           Ask MIRA
         </T>
-        <T className="text-15 text-ink-2">
-          Ask about your messages. I’ll sum up what matters.
-        </T>
       </View>
 
       {blocks.length === 0 ? (
@@ -192,7 +321,7 @@ export default function AssistantScreen() {
           <T className="text-12 font-bold tracking-[0.72px] text-ink-label">
             TRY ASKING
           </T>
-          {EXAMPLES.map(example => (
+          {(doc ? DOC_EXAMPLES : EXAMPLES).map(example => (
             <Tap
               key={example}
               label={example}
@@ -206,23 +335,38 @@ export default function AssistantScreen() {
       ) : null}
 
       {blocks.map(block => {
+        if (block.doc)
+          return (
+            <DocumentBlock
+              key={block.id}
+              block={block}
+              onToggle={() => update(block.id, { open: !block.open })}
+            />
+          );
         const sources = block.matches;
         const apps = [
           ...new Set(
             sources.map(
               ({ item }) =>
-                `${appLabels[item.message.packageName] ?? 'Another app'} · ${item.chat.title}`,
+                `${appLabels[item.message.packageName] ?? 'Another app'} · ${
+                  item.chat.title
+                }`,
             ),
           ),
         ];
         return (
           <View key={block.id} className="gap-10">
             <View className="max-w-[85%] self-end rounded-18 rounded-br-6 bg-navy px-14 py-10">
-              <T className="text-14 font-semibold text-white">{block.question}</T>
+              <T className="text-14 font-semibold text-white">
+                {block.question}
+              </T>
             </View>
 
             <View className="flex-row items-start gap-8">
-              <Companion size={36} mode={busy(block.state) ? 'thinking' : 'idle'} />
+              <Companion
+                size={36}
+                mode={busy(block.state) ? 'thinking' : 'idle'}
+              />
               <View
                 accessibilityLiveRegion="polite"
                 className="flex-1 gap-8 rounded-18 rounded-tl-6 border border-white/80 bg-white/60 p-14"
@@ -238,15 +382,29 @@ export default function AssistantScreen() {
                   </FadeIn>
                 ) : busy(block.state) ? (
                   <View className="flex-row items-center gap-10">
-                    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" className="flex-row gap-5">
+                    <View
+                      accessibilityElementsHidden
+                      importantForAccessibility="no-hide-descendants"
+                      className="flex-row gap-5"
+                    >
                       {[0, 200, 400].map(delay => (
-                        <PulseDot key={delay} delay={delay} duration={1400} scale className="h-8 w-8 rounded-full bg-peri-600" />
+                        <PulseDot
+                          key={delay}
+                          delay={delay}
+                          duration={1400}
+                          scale
+                          className="h-8 w-8 rounded-full bg-peri-600"
+                        />
                       ))}
                     </View>
-                    <T className="text-14 font-semibold text-ink-body">{LINE[block.state]}</T>
+                    <T className="text-14 font-semibold text-ink-body">
+                      {LINE[block.state]}
+                    </T>
                   </View>
                 ) : (
-                  <T className="text-14 font-semibold text-ink-body">{LINE[block.state]}</T>
+                  <T className="text-14 font-semibold text-ink-body">
+                    {LINE[block.state]}
+                  </T>
                 )}
                 {sources.length > 0 && block.state !== 'searching' ? (
                   <Tap
@@ -258,10 +416,22 @@ export default function AssistantScreen() {
                     <T className="text-13 font-bold text-navy">
                       {block.open
                         ? 'Hide sources'
-                        : `Show ${sources.length} source${sources.length === 1 ? '' : 's'}`}
+                        : `Show ${sources.length} source${
+                            sources.length === 1 ? '' : 's'
+                          }`}
                     </T>
-                    <View style={{ transform: [{ rotate: block.open ? '-90deg' : '90deg' }] }}>
-                      <Icon name="chevronRight" size={14} color={palette.navy.DEFAULT} />
+                    <View
+                      style={{
+                        transform: [
+                          { rotate: block.open ? '-90deg' : '90deg' },
+                        ],
+                      }}
+                    >
+                      <Icon
+                        name="chevronRight"
+                        size={14}
+                        color={palette.navy.DEFAULT}
+                      />
                     </View>
                   </Tap>
                 ) : null}
@@ -273,10 +443,14 @@ export default function AssistantScreen() {
                   <ReportItem
                     key={match.item.message.id}
                     item={match.item}
-                    appLabel={appLabels[match.item.message.packageName] ?? 'Another app'}
+                    appLabel={
+                      appLabels[match.item.message.packageName] ?? 'Another app'
+                    }
                     label={
                       match.fact
-                        ? `${match.fact.kind === 'date' ? 'Date' : 'Amount'}: ${match.fact.text}`
+                        ? `${match.fact.kind === 'date' ? 'Date' : 'Amount'}: ${
+                            match.fact.text
+                          }`
                         : undefined
                     }
                   />
@@ -286,5 +460,89 @@ export default function AssistantScreen() {
         );
       })}
     </Screen>
+  );
+}
+
+/** A reply about an attached document, with the passages it came from. */
+function DocumentBlock({
+  block,
+  onToggle,
+}: {
+  block: Block;
+  onToggle(): void;
+}) {
+  const doc = block.doc!;
+  return (
+    <View className="gap-10">
+      <View className="max-w-[85%] self-end rounded-18 rounded-br-6 bg-navy px-14 py-10">
+        <T className="text-14 font-semibold text-white">{block.question}</T>
+      </View>
+      <View className="flex-row items-start gap-8">
+        <Companion size={36} mode={busy(block.state) ? 'thinking' : 'idle'} />
+        <View
+          accessibilityLiveRegion="polite"
+          className="flex-1 gap-8 rounded-18 rounded-tl-6 border border-white/80 bg-white/60 p-14"
+        >
+          {block.state === 'answered' ? (
+            <FadeIn className="gap-8">
+              <T className="text-15 leading-[22px]">{block.answer}</T>
+              <T className="text-12 text-ink-muted">{`MIRA’s answer · from ${doc.name}`}</T>
+            </FadeIn>
+          ) : busy(block.state) ? (
+            <View className="flex-row items-center gap-10">
+              <View
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+                className="flex-row gap-5"
+              >
+                {[0, 200, 400].map(delay => (
+                  <PulseDot
+                    key={delay}
+                    delay={delay}
+                    duration={1400}
+                    scale
+                    className="h-8 w-8 rounded-full bg-peri-600"
+                  />
+                ))}
+              </View>
+              <T className="text-14 font-semibold text-ink-body">
+                Reading the document…
+              </T>
+            </View>
+          ) : (
+            <T className="text-14 font-semibold text-ink-body">
+              I couldn’t answer that from the document. Here’s what I read.
+            </T>
+          )}
+          {doc.passages.length > 0 && !busy(block.state) ? (
+            <Tap
+              label={block.open ? 'Hide passages' : 'Show passages'}
+              accessibilityState={{ expanded: block.open }}
+              onPress={onToggle}
+              className="min-h-36 flex-row items-center gap-6 self-start"
+            >
+              <T className="text-13 font-bold text-navy">
+                {block.open
+                  ? 'Hide passages'
+                  : `Show ${doc.passages.length} passage${
+                      doc.passages.length === 1 ? '' : 's'
+                    }`}
+              </T>
+            </Tap>
+          ) : null}
+        </View>
+      </View>
+      {block.open
+        ? doc.passages.map((passage, i) => (
+            <View
+              key={i}
+              className="gap-4 rounded-18 border border-white/80 bg-white/46 p-14"
+            >
+              <T className="text-12 font-bold text-ink-label">{`From ${doc.name}`}</T>
+              <T className="text-14 leading-[21px] text-ink-deep">{`“${passage}”`}</T>
+            </View>
+          ))
+        : null}
+    </View>
   );
 }

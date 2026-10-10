@@ -92,14 +92,14 @@ afterEach(async () => {
   db.close();
   jest.restoreAllMocks();
 });
-async function render(Screen: React.ComponentType) {
+async function render(Screen: React.ComponentType, params?: object) {
   await act(async () => {
     tree = Renderer.create(
       <SafeAreaProvider>
         <PrefsProvider>
           <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="Test" component={Screen} />
+              <Stack.Screen name="Test" component={Screen} initialParams={params} />
             </Stack.Navigator>
           </NavigationContainer>
         </PrefsProvider>
@@ -145,7 +145,9 @@ async function draft() {
 
 test('Connected Apps reads saved values and persists off and level choices', async () => {
   const sync = jest.spyOn(bridge, 'setEnabledPackages');
-  await render(ConnectedApps);
+  // Step 3 of the first visit leads on to Today.
+  await render(ConnectedApps, { firstRun: true });
+  expect(output()).toContain('Step 3 of 3');
   expect(output()).toContain('Continue to Today');
   await press('Read Messenger');
   expect((await db.store.getChannels())[0].enabled).toBe(false);
@@ -153,6 +155,30 @@ test('Connected Apps reads saved values and persists off and level choices', asy
   await press('Read Messenger');
   await press('Read and report for Messenger');
   expect((await db.store.getChannels())[0].level).toBe(1);
+});
+test('opened later, Connected Apps has no steps and no Continue to Today', async () => {
+  await render(ConnectedApps);
+  expect(output()).not.toContain('Step 3 of 3');
+  expect(output()).not.toContain('Continue to Today');
+});
+test('Connected Apps lists only connected and message apps; others are found with Add an app', async () => {
+  jest.spyOn(bridge, 'listNotifyingApps').mockResolvedValue([
+    { packageName: 'com.facebook.orca', label: 'Messenger' },
+    { packageName: 'com.google.android.gm', label: 'Gmail' },
+    { packageName: 'com.spotify.music', label: 'Spotify' },
+  ]);
+  await render(ConnectedApps);
+  expect(output()).toContain('Messenger');
+  expect(output()).toContain('Suggested');
+  expect(output()).not.toContain('Spotify');
+  await press('Add an app');
+  const search = tree!.root.findAll(n => n.props.accessibilityLabel === 'Search apps' && n.props.onChangeText)[0];
+  await act(async () => search.props.onChangeText('spot'));
+  await press('Connect Spotify');
+  const spotify = (await db.store.getChannels()).find(c => c.packageName === 'com.spotify.music');
+  expect(spotify?.enabled).toBe(true);
+  await press('Done adding');
+  expect(output()).toContain('Spotify');
 });
 test('Connected Apps exposes a failed save and retry without a false success', async () => {
   jest

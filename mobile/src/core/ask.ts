@@ -1,3 +1,4 @@
+import { questionWindow } from './dates';
 import type { ReportItem } from './report';
 
 /** Questions look at messages from the last 14 days. */
@@ -24,7 +25,7 @@ const FILLER = new Set(
     'a an the is are was were be been am do does did has have had will would can could should may ' +
     'i me my mine you your we our us it its this that these those there here of in on at to for from with by about as ' +
     'and or but if so not no yes what which who whom whose where why how any some all ' +
-    'please tell show give find know need want get got thing ' +
+    'please tell show give find know need want get got thing anything something everything happening happen ' +
     // What is left of a contraction once its apostrophe is gone ("what's", "didn't").
     'don didn doesn isn wasn aren ll ve re ' +
     'next last say said ' +
@@ -118,6 +119,22 @@ const same = (a: string, b: string) =>
 const hasWord = (words: string[], asked: string) =>
   words.some(word => same(word, asked));
 
+/** The words of a question worth searching for: no filler, plurals folded. Also used for documents. */
+export function searchWords(question: string): string[] {
+  return [
+    ...new Set(
+      rawWords(question.slice(0, MAX_QUESTION_CHARS))
+        .filter(word => word.length > 1 && !FILLER.has(word) && !INTENT_ONLY.has(word))
+        .map(stem),
+    ),
+  ];
+}
+
+/** Whether a text holds a searched word, or one of its related words. */
+export function textHas(text: string, word: string): boolean {
+  return hasWord(rawWords(text).map(stem), word);
+}
+
 /**
  * Whether a message may be used to answer at all: read by MIRA, not chatter,
  * a promotion, a copy, or a message trying to give instructions, and recent.
@@ -176,8 +193,11 @@ export function searchMessages(
   items: ReportItem[],
   now: number,
 ): AskMatch[] {
-  const raw = rawWords(question.slice(0, MAX_QUESTION_CHARS));
-  const wantsDate = raw.some(word => DATE_WORDS.has(word));
+  const cut = question.slice(0, MAX_QUESTION_CHARS);
+  // "this week", "bukas", "friday": a span of time, not words to look for.
+  const window = questionWindow(cut, now);
+  const raw = rawWords(window ? cut.replace(window.phrase, ' ') : cut);
+  const wantsDate = window !== null || raw.some(word => DATE_WORDS.has(word));
   const wantsAmount = raw.some(word => AMOUNT_WORDS.has(word));
   const asked = [
     ...new Set(
@@ -189,7 +209,7 @@ export function searchMessages(
         .map(stem),
     ),
   ];
-  if (asked.length === 0) return [];
+  if (asked.length === 0 && !window) return [];
 
   const matches: AskMatch[] = [];
   for (const item of items) {
@@ -206,7 +226,20 @@ export function searchMessages(
       if (hasWord(text, word)) score += 3;
       else if (hasWord(summary, word) || hasWord(names, word)) score += 2;
     }
-    if (score === 0) continue;
+    if (window) {
+      const inWindow = (at: number | null) => at !== null && at >= window.from && at < window.to;
+      if (inWindow(record.dateAt)) {
+        // Dated inside the window: what the question is about, whatever its words.
+        score += 5;
+      } else if (inWindow(message.postedAt) && (asked.length === 0 || score > 0)) {
+        // Sent inside the window ("what did my prof say today?").
+        score += 1;
+      } else {
+        continue;
+      }
+    } else if (score === 0) {
+      continue;
+    }
 
     let fact: AskFact | null = null;
     if (wantsDate && record.dateText)

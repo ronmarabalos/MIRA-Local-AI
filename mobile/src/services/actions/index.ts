@@ -22,7 +22,9 @@ export type ActionStore = Pick<
   | 'updateDraft'
   | 'getDrafts'
   | 'getItem'
->;
+> &
+  // Optional: without it drafts are written in the default voice.
+  Partial<Pick<Store, 'getPrefs'>>;
 
 export interface ActionDeps {
   bridge: Pick<
@@ -78,6 +80,14 @@ export function createActionRunner({
   let flushing: Promise<void> | null = null;
   const newId = (prefix: string) =>
     `${prefix}-${now().toString(36)}-${(counter++).toString(36)}`;
+
+  /** How the user asked replies to sound (the reply helper), if they said. */
+  async function voice(): Promise<{ about: string; tone: string } | undefined> {
+    const prefs = await store.getPrefs?.().catch(() => undefined);
+    const about = prefs?.replyAbout ?? '';
+    const tone = prefs?.replyTone ?? '';
+    return about || tone ? { about, tone } : undefined;
+  }
 
   async function log(
     kind: ActionKind,
@@ -148,6 +158,7 @@ export function createActionRunner({
         const text = await model.draftReply(message, {
           chatTitle: item.chat.title,
           chatKind: item.chat.kind,
+          voice: await voice(),
         });
         await store.addDraft({
           id: newId('d'),
@@ -360,6 +371,7 @@ export function createActionRunner({
           const text = await model.draftReply(message, {
             chatTitle: item.chat.title,
             chatKind: item.chat.kind,
+            voice: await voice(),
           });
           await store.addDraft({
             id: draftId,
